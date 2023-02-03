@@ -4,7 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/background"
     tools:context=".login_page">
 
     <ImageView
@@ -22,7 +21,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
-        android:text="Sign In"
+        android:text="SIGN IN"
         android:textColor="@color/white"
         android:textSize="28sp"
         android:textStyle="bold"
@@ -94,19 +93,32 @@
         android:id="@+id/tv_loginBtn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="108dp"
-        android:background="@drawable/gradient_button_background"
         android:layout_marginLeft="16dp"
         android:layout_marginRight="16dp"
+        android:layout_marginBottom="8dp"
+        android:background="@drawable/gradient_button_background"
+        android:gravity="center"
         android:paddingTop="16dp"
         android:paddingBottom="16dp"
-        android:gravity="center"
         android:text="LOGIN"
         android:textColor="@color/white"
         android:textStyle="bold"
-        app:layout_constraintBottom_toTopOf="@+id/linearLayout"
+        app:layout_constraintBottom_toTopOf="@+id/tv_forgotPassword"
         app:layout_constraintEnd_toEndOf="@+id/linearLayout"
         app:layout_constraintStart_toStartOf="@+id/linearLayout" />
+
+    <TextView
+        android:id="@+id/tv_forgotPassword"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="108dp"
+        android:text="Forgot Password"
+        android:textColor="@color/teal_200"
+        android:textSize="15sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/linearLayout"
+        app:layout_constraintEnd_toEndOf="@+id/et_passwordLayout" />
+
 
     <LinearLayout
         android:id="@+id/linearLayout"
