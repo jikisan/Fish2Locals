@@ -4,10 +4,8 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentTransaction;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
-import android.view.View;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -16,31 +14,31 @@ import com.google.android.material.navigation.NavigationBarView;
 import Fragments.Home_Fragment;
 import Fragments.Messages_Fragment;
 import Fragments.Notification_Fragment;
-import Fragments.Profile_Fragment;
 import Fragments.Add_Product_Fragment;
+import Fragments.Seller_Home_Fragment;
+import Fragments.Seller_Profile_Fragment;
 
-public class homepage extends AppCompatActivity {
+public class seller_homepage extends AppCompatActivity {
 
     private BottomNavigationView bottomNavigationView;
     private FloatingActionButton fab;
 
     private String pageNumber;
 
-    Home_Fragment home_fragment = new Home_Fragment();
+    Seller_Home_Fragment seller_home_fragment = new Seller_Home_Fragment();
     Messages_Fragment messages_fragment = new Messages_Fragment();
     Add_Product_Fragment search_fragment = new Add_Product_Fragment();
     Notification_Fragment notification_fragment = new Notification_Fragment();
-    Profile_Fragment profile_fragment = new Profile_Fragment();
+    Seller_Profile_Fragment seller_profile_fragment = new Seller_Profile_Fragment();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.homepage);
+        setContentView(R.layout.seller_homepage);
 
         pageNumber = getIntent().getStringExtra("pageNumber");
 
-        bottomNavigationView = findViewById(R.id.bottom_nav);
-        fab = findViewById(R.id.fab);
+        bottomNavigationView = findViewById(R.id.seller_bottom_nav);
 
         if(pageNumber != null) {
 
@@ -49,7 +47,7 @@ public class homepage extends AppCompatActivity {
             {
 
                 FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-                fragmentTransaction.replace(R.id.container, profile_fragment);
+                fragmentTransaction.replace(R.id.container, seller_profile_fragment);
                 fragmentTransaction.commitNow();
 
                 bottomNavigationView.setSelectedItemId(R.id.profile);
@@ -58,7 +56,7 @@ public class homepage extends AppCompatActivity {
         }
         else {
 
-            getSupportFragmentManager().beginTransaction().replace(R.id.container,home_fragment).commit();
+            getSupportFragmentManager().beginTransaction().replace(R.id.container,seller_home_fragment).commit();
         }
 
 
@@ -74,15 +72,19 @@ public class homepage extends AppCompatActivity {
                 switch (item.getItemId()){
 
                     case R.id.home:
-                        getSupportFragmentManager().beginTransaction().replace(R.id.container,home_fragment).commit();
+                        getSupportFragmentManager().beginTransaction().replace(R.id.container,seller_home_fragment).commit();
                         return true;
 
                     case R.id.notification:
                         getSupportFragmentManager().beginTransaction().replace(R.id.container,notification_fragment).commit();
                         return true;
 
+                    case R.id.add_product:
+                        getSupportFragmentManager().beginTransaction().replace(R.id.container,search_fragment).commit();
+                        return true;
+
                     case R.id.profile:
-                        getSupportFragmentManager().beginTransaction().replace(R.id.container,profile_fragment).commit();
+                        getSupportFragmentManager().beginTransaction().replace(R.id.container,seller_profile_fragment).commit();
                         return true;
 
                     case R.id.messages:
@@ -91,20 +93,13 @@ public class homepage extends AppCompatActivity {
                     default:
 
 
+
+
                 }
                 return false;
 
             }
         });
 
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                Intent intent = new Intent(homepage.this, marketplace_page.class);
-                startActivity(intent);
-
-            }
-        });
     }
 }
