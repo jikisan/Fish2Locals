@@ -40,6 +40,7 @@ import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
@@ -196,7 +197,7 @@ public class seller_application extends AppCompatActivity {
             new AlertDialog.Builder(seller_application.this)
                     .setTitle("SUBMIT FORM")
                     .setMessage("Please make sure all information entered are correct")
-                    .setCancelable(true)
+                    .setCancelable(false)
                     .setPositiveButton("Submit", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
@@ -308,6 +309,8 @@ public class seller_application extends AppCompatActivity {
                 pdialog.setConfirmButton("Complete", new SweetAlertDialog.OnSweetClickListener() {
                     @Override
                     public void onClick(SweetAlertDialog sweetAlertDialog) {
+
+
 
                         pdialog.dismiss();
                         Intent intent = new Intent(seller_application.this, homepage.class);

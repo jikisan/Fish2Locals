@@ -1,5 +1,9 @@
 package Fragments;
 
+import android.app.AlertDialog;
+import android.app.ProgressDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -18,6 +22,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.fish2locals.R;
+import com.example.fish2locals.homepage;
+import com.example.fish2locals.seller_application;
+import com.example.fish2locals.seller_homepage;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -36,7 +45,9 @@ import java.util.Collections;
 import java.util.Comparator;
 
 import Adapters.Adapter_Spinner_Fish;
+import Models.Products;
 import Models.Store;
+import cn.pedant.SweetAlert.SweetAlertDialog;
 
 public class Add_Product_Fragment extends Fragment {
 
@@ -63,12 +74,14 @@ public class Add_Product_Fragment extends Fragment {
     private EditText et_price;
 
     private FirebaseUser user;
-    private DatabaseReference storeDatabase;
+    private DatabaseReference storeDatabase, productsDatabase;
     private StorageReference storeStorage;
 
+    private ProgressDialog progressDialog;
     private String myUserID, storeId;
     private int itemNumber;
     private boolean hasPickup, hasOwnDelivery, has3rdPartyDelivery;
+
 
 
     @Override
@@ -80,6 +93,7 @@ public class Add_Product_Fragment extends Fragment {
         myUserID = user.getUid();
         storeStorage = FirebaseStorage.getInstance().getReference("Store").child(myUserID);
         storeDatabase = FirebaseDatabase.getInstance().getReference("Store");
+        productsDatabase = FirebaseDatabase.getInstance().getReference("Products");
 
         setRef(view);
         getStoreId();
@@ -102,7 +116,11 @@ public class Add_Product_Fragment extends Fragment {
 
                 if(snapshot.exists())
                 {
-                    storeId = snapshot.getKey();
+                    for(DataSnapshot dataSnapshot : snapshot.getChildren())
+                    {
+                        storeId = dataSnapshot.getKey();
+                    }
+
                 }
             }
 
@@ -121,8 +139,10 @@ public class Add_Product_Fragment extends Fragment {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
 
+                itemNumber = i;
+
                 Picasso.get()
-                        .load(images[i])
+                        .load(images[itemNumber])
                         .fit()
                         .centerCrop()
                         .into(iv_fishPhoto);
@@ -140,12 +160,23 @@ public class Add_Product_Fragment extends Fragment {
             @Override
             public void onClick(View view) {
 
+
                 String stringValue = tv_quantity.getText().toString();
                 int intValue = Integer.parseInt(stringValue);
 
-                intValue--;
+                if(intValue <= 1)
+                {
+                    Toast.makeText(getContext(), "Cannot be less than 1 kilo", Toast.LENGTH_SHORT).show();
+                }
+                else
+                {
+                    intValue--;
 
-                tv_quantity.setText(intValue);
+                    stringValue = String.valueOf(intValue);
+
+                    tv_quantity.setText(stringValue.toString());
+                }
+
 
             }
         });
@@ -159,7 +190,10 @@ public class Add_Product_Fragment extends Fragment {
 
                 intValue++;
 
-                tv_quantity.setText(intValue);
+
+                stringValue = String.valueOf(intValue);
+
+                tv_quantity.setText(stringValue.toString());
             }
         });
 
@@ -188,15 +222,90 @@ public class Add_Product_Fragment extends Fragment {
         }
         else
         {
-            addDataToDatabase();
+            new AlertDialog.Builder(getContext())
+                    .setTitle("ADD PRODUCT")
+                    .setMessage("Please make sure all information entered are correct")
+                    .setCancelable(false)
+                    .setPositiveButton("Add", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+
+                            addDataToDatabase();
+
+                        }
+                    })
+                    .setNegativeButton("Back", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int i) {
+                        }
+                    })
+                    .show();
+
         }
 
     }
 
     private void addDataToDatabase() {
 
-        Toast.makeText(getContext(), "Product Added", Toast.LENGTH_SHORT).show();
+        progressDialog = new ProgressDialog(getContext());
+        progressDialog.setTitle("Submitting form");
+        progressDialog.setCancelable(false);
+        progressDialog.show();
 
+        int fishImageNumber = images[itemNumber];
+        String fishName = fish[itemNumber];
+        double pricePerKilo = Double.parseDouble(et_price.getText().toString());
+        int quantityByKilo = Integer.parseInt(tv_quantity.getText().toString());
+
+
+        if(cb_pickUp.isChecked())
+        {
+            hasPickup = true;
+        }
+
+        if(cb_ownDelivery.isChecked())
+        {
+            hasOwnDelivery = true;
+        }
+
+        if(cb_3rdPartyDelivery.isChecked())
+        {
+            has3rdPartyDelivery = true;
+        }
+
+
+
+        Products products = new Products(fishImageNumber, fishName, hasPickup, hasOwnDelivery,
+                has3rdPartyDelivery, pricePerKilo, quantityByKilo, storeId, myUserID);
+
+        productsDatabase.push().setValue(products).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+
+                progressDialog.dismiss();
+
+                SweetAlertDialog pdialog;
+                pdialog = new SweetAlertDialog(getContext(), SweetAlertDialog.SUCCESS_TYPE);
+                pdialog.setTitleText("ADDED!");
+                pdialog.setContentText("Product is submitted successfully \n for admin review.");
+                pdialog.setConfirmButton("Complete", new SweetAlertDialog.OnSweetClickListener() {
+                    @Override
+                    public void onClick(SweetAlertDialog sweetAlertDialog) {
+
+                        pdialog.dismiss();
+
+                        cb_pickUp.setChecked(false);
+                        cb_ownDelivery.setChecked(false);
+                        cb_3rdPartyDelivery.setChecked(false);
+
+                        et_price.setText("");
+                        tv_quantity.setText("");
+
+                    }
+                });
+                pdialog.show();
+            }
+        });
 
     }
 
