@@ -294,12 +294,16 @@ public class Add_Product_Fragment extends Fragment {
 
                         pdialog.dismiss();
 
-                        cb_pickUp.setChecked(false);
+                        cb_pickUp.setChecked(true);
                         cb_ownDelivery.setChecked(false);
                         cb_3rdPartyDelivery.setChecked(false);
 
+                        hasPickup = false;
+                        hasOwnDelivery = false;
+                        has3rdPartyDelivery = false;
+
                         et_price.setText("");
-                        tv_quantity.setText("");
+                        tv_quantity.setText("1");
 
                     }
                 });

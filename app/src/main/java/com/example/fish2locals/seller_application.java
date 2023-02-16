@@ -58,7 +58,7 @@ public class seller_application extends AppCompatActivity {
     private ProgressDialog progressDialog;
 
     private FirebaseUser user;
-    private DatabaseReference storeDatabase;
+    private DatabaseReference storeDatabase, userDatabase;
     private StorageReference storeStorage;
     private StorageTask addTask;
 
@@ -76,6 +76,7 @@ public class seller_application extends AppCompatActivity {
         myUserID = user.getUid();
         storeStorage = FirebaseStorage.getInstance().getReference("Store").child(myUserID);
         storeDatabase = FirebaseDatabase.getInstance().getReference("Store");
+        userDatabase = FirebaseDatabase.getInstance().getReference("Users");
 
         setRef();
         clicks();
@@ -224,7 +225,7 @@ public class seller_application extends AppCompatActivity {
                         String storeContactNum, String storeContactPerson, String validDocsName) {
 
         progressDialog = new ProgressDialog(this);
-        progressDialog.setTitle("Submitting form");
+        progressDialog.setTitle("Processing Application");
         progressDialog.setCancelable(false);
         progressDialog.show();
 
@@ -311,6 +312,12 @@ public class seller_application extends AppCompatActivity {
                     public void onClick(SweetAlertDialog sweetAlertDialog) {
 
 
+                        boolean hasSellerAccount = true;
+
+                        HashMap<String, Object> hashMap = new HashMap<String, Object>();
+                        hashMap.put("hasSellerAccount", hasSellerAccount);
+
+                        userDatabase.child(myUserID).updateChildren(hashMap);
 
                         pdialog.dismiss();
                         Intent intent = new Intent(seller_application.this, homepage.class);
@@ -342,7 +349,8 @@ public class seller_application extends AppCompatActivity {
             validDocsUri = data.getData();
 
             Picasso.get().load(validDocsUri)
-                    .resize(300, 200)
+                    .centerCrop()
+                    .fit()
                     .into(iv_validDocs);
         }
         else if(requestCode == 100 && resultCode == RESULT_OK){
