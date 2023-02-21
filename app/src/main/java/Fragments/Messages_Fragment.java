@@ -157,4 +157,5 @@ public class Messages_Fragment extends Fragment {
 
         tv_noMessagesText = view.findViewById(R.id.tv_noMessagesText);
     }
+
 }

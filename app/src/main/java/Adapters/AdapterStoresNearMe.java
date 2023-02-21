@@ -86,7 +86,14 @@ public class AdapterStoresNearMe extends RecyclerView.Adapter<AdapterStoresNearM
 
     @Override
     public int getItemCount() {
-        return arrTempStoreData.size();
+
+        if(arrTempStoreData.size() < 10)
+        {
+            return arrTempStoreData.size();
+        }
+        else
+            return 10;
+
     }
 
     public interface  OnItemClickListener{

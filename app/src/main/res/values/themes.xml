@@ -4,6 +4,8 @@
         <!-- Primary brand color. -->
 
         <item name="android:windowBackground">@drawable/background</item>
+        <item name="android:forceDarkAllowed" tools:targetApi="q">false</item>
+
 
         <item name="colorPrimary">@color/purple_500</item>
         <item name="colorPrimaryVariant">@color/purple_700</item>

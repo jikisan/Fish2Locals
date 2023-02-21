@@ -57,8 +57,8 @@ public class Home_Fragment extends Fragment {
     private double myLatDouble, myLongDouble, distance;
 
     private ImageView iv_userPhoto;
-    private TextView tv_fName;
-    private RecyclerView rv_nearMe;
+    private TextView tv_fName, tv_loadingNearMe, tv_loadingMostTrusted;
+    private RecyclerView rv_nearMe, rv_mostTrusted;
 
     private AdapterStoresNearMe adapterStoresNearMe;
     private List<Store> arrStore = new ArrayList<>();
@@ -193,13 +193,35 @@ public class Home_Fragment extends Fragment {
 
     private void generateRecyclerview() {
 
+        Collections.sort(arrTempStoreData, new Comparator<TempStoreData>() {
+            @Override
+            public int compare(TempStoreData tempStoreData, TempStoreData t1) {
+                return Double.compare(tempStoreData.getDistance(), t1.getDistance());
+            }
+        });
+
         rv_nearMe.setHasFixedSize(true);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext(),
                 LinearLayoutManager.HORIZONTAL, false);
         rv_nearMe.setLayoutManager(linearLayoutManager);
 
+
+        Collections.sort(arrTempStoreData, new Comparator<TempStoreData>() {
+            @Override
+            public int compare(TempStoreData tempStoreData, TempStoreData t1) {
+                return Double.compare(tempStoreData.getRatings(), t1.getRatings());
+            }
+        });
+
+
+        rv_mostTrusted.setHasFixedSize(true);
+        LinearLayoutManager linearLayoutManager1 = new LinearLayoutManager(getContext(),
+                LinearLayoutManager.HORIZONTAL, false);
+        rv_mostTrusted.setLayoutManager(linearLayoutManager1);
+
         adapterStoresNearMe = new AdapterStoresNearMe(arrStore, arrTempStoreData);
         rv_nearMe.setAdapter(adapterStoresNearMe);
+        rv_mostTrusted.setAdapter(adapterStoresNearMe);
 
         getViewHolderValues();
     }
@@ -214,6 +236,9 @@ public class Home_Fragment extends Fragment {
 
                 if(snapshot.exists())
                 {
+                    arrTempStoreData.clear();
+                    arrStore.clear();
+
                     for(DataSnapshot dataSnapshot : snapshot.getChildren())
                     {
                         Store store = dataSnapshot.getValue(Store.class);
@@ -233,18 +258,27 @@ public class Home_Fragment extends Fragment {
                         TempStoreData tempStoreData = new TempStoreData(storeUrl, storeName,
                                 distance, ratings, storeId, storeOwnersUserId);
 
+
                         arrStore.add(store);
                         arrTempStoreData.add(tempStoreData);
+
 
                     }
                 }
 
-                Collections.sort(arrTempStoreData, new Comparator<TempStoreData>() {
-                    @Override
-                    public int compare(TempStoreData tempStoreData, TempStoreData t1) {
-                        return Double.compare(tempStoreData.getDistance(), t1.getDistance());
-                    }
-                });
+                if (arrTempStoreData.isEmpty()) {
+                    rv_mostTrusted.setVisibility(View.GONE);
+                    rv_nearMe.setVisibility(View.GONE);
+                    tv_loadingMostTrusted.setVisibility(View.VISIBLE);
+                    tv_loadingNearMe.setVisibility(View.VISIBLE);
+                }
+                else {
+                    rv_mostTrusted.setVisibility(View.VISIBLE);
+                    rv_nearMe.setVisibility(View.VISIBLE);
+                    tv_loadingMostTrusted.setVisibility(View.INVISIBLE);
+                    tv_loadingNearMe.setVisibility(View.INVISIBLE);
+
+                }
 
 
                 adapterStoresNearMe.notifyDataSetChanged();
@@ -283,5 +317,10 @@ public class Home_Fragment extends Fragment {
         tv_fName = view.findViewById(R.id.tv_fName);
 
         rv_nearMe = view.findViewById(R.id.rv_nearMe);
+        rv_mostTrusted = view.findViewById(R.id.rv_mostTrusted);
+
+        tv_loadingNearMe = view.findViewById(R.id.tv_loadingNearMe);
+        tv_loadingMostTrusted = view.findViewById(R.id.tv_loadingMostTrusted);
+
     }
 }

@@ -56,10 +56,12 @@ public class intro_page extends AppCompatActivity {
         setContentView(R.layout.intro_page);
 
         user = FirebaseAuth.getInstance().getCurrentUser();
-        myUserId = user.getUid();
+
         userDatabase = FirebaseDatabase.getInstance().getReference("Users");
 
         progressbar = findViewById(R.id.progressbar);
+
+
 
         validatePermissionToUseLocation();
 
@@ -72,19 +74,40 @@ public class intro_page extends AppCompatActivity {
                 && ContextCompat.checkSelfPermission(intro_page.this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             // When permission is granted
             // Call method
-            checkSellerModeStatus();
+            checkUserStatus();
+
 
         } else {
             // When permission is not granted
             // Call method
+            Toast.makeText(this, "Location is required, please turn it on.", Toast.LENGTH_SHORT).show();
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 requestPermissions(
-                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, 100);
+
+                new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, 100);
+
+//                validatePermissionToUseLocation();
+                checkUserStatus();
             }
 
-            Toast.makeText(this, "Location is required, please turn it on.", Toast.LENGTH_SHORT).show();
-            validatePermissionToUseLocation();
+        }
+    }
+
+    private void checkUserStatus() {
+
+        if(!(user == null))
+        {
+            myUserId = user.getUid();
+            checkSellerModeStatus();
+
+
+        }else{
+
+            Intent intent;
+            intent = new Intent(intro_page.this, login_page.class);
+            startActivity(intent);
+            finish();
         }
     }
 
@@ -99,9 +122,8 @@ public class intro_page extends AppCompatActivity {
                     Users users = snapshot.getValue(Users.class);
 
                     sellerMode = users.isSellerMode();
-                    startSplashScreen();
+
                 }
-                else
                     startSplashScreen();
             }
 
@@ -120,26 +142,15 @@ public class intro_page extends AppCompatActivity {
             @Override
             public void run() {
 
-                if(!(user == null))
+                if(!sellerMode)
                 {
-                    if(!sellerMode)
-                    {
-                        Intent intent = new Intent(intro_page.this, homepage.class);
-                        startActivity(intent);
-                        finish();
-                    }
-                    else if (sellerMode)
-                    {
-                        Intent intent = new Intent(intro_page.this, seller_homepage.class);
-                        startActivity(intent);
-                        finish();
-                    }
-
-
-                }else{
-
-                    Intent intent;
-                    intent = new Intent(intro_page.this, login_page.class);
+                    Intent intent = new Intent(intro_page.this, homepage.class);
+                    startActivity(intent);
+                    finish();
+                }
+                else if (sellerMode)
+                {
+                    Intent intent = new Intent(intro_page.this, seller_homepage.class);
                     startActivity(intent);
                     finish();
                 }
