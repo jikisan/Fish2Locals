@@ -24,4 +24,14 @@
         <item name="colorControlActivated">@color/duskYellow</item>
     </style>
 
+    <style name="expandedColor" parent="@android:style/TextAppearance.Medium">
+        <item name="android:textSize">32sp</item>
+        <item name="android:textColor">@color/black</item>
+    </style>
+
+    <style name="collapsedColor" parent="@android:style/TextAppearance.Medium">
+        <item name="android:textSize">32sp</item>
+        <item name="android:textColor">@color/white</item>
+    </style>
+
 </resources>

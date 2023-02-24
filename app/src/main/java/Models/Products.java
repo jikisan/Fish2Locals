@@ -2,7 +2,7 @@ package Models;
 
 public class Products {
 
-    private int fishImageNumber;
+    private String imageName;
     private String fishName;
     private boolean hasPickup;
     private boolean hasOwnDelivery;
@@ -15,10 +15,10 @@ public class Products {
     public Products() {
     }
 
-    public Products(int fishImageNumber, String fishName, boolean hasPickup, boolean hasOwnDelivery,
+    public Products(String imageName, String fishName, boolean hasPickup, boolean hasOwnDelivery,
                     boolean has3rdPartyDelivery, double pricePerKilo, int quantityByKilo,
                     String storeId, String userId) {
-        this.fishImageNumber = fishImageNumber;
+        this.imageName = imageName;
         this.fishName = fishName;
         this.hasPickup = hasPickup;
         this.hasOwnDelivery = hasOwnDelivery;
@@ -29,12 +29,12 @@ public class Products {
         this.userId = userId;
     }
 
-    public int getFishImageNumber() {
-        return fishImageNumber;
+    public String getImageName() {
+        return imageName;
     }
 
-    public void setFishImageNumber(int fishImageNumber) {
-        this.fishImageNumber = fishImageNumber;
+    public void setImageName(String imageName) {
+        this.imageName = imageName;
     }
 
     public String getFishName() {

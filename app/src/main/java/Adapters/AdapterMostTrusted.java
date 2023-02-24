@@ -15,7 +15,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.fish2locals.R;
 import com.example.fish2locals.view_store_page;
-import com.google.android.gms.maps.model.LatLng;
 import com.squareup.picasso.Picasso;
 
 import java.text.DecimalFormat;
@@ -24,17 +23,17 @@ import java.util.List;
 import Models.Store;
 import Models.TempStoreData;
 
-public class AdapterStoresNearMe extends RecyclerView.Adapter<AdapterStoresNearMe.ItemViewHolder> {
+public class AdapterMostTrusted extends RecyclerView.Adapter<AdapterMostTrusted.ItemViewHolder> {
 
     private List<Store> arrStore;
     private List<TempStoreData> arrTempStoreData;
     private OnItemClickListener onItemClickListener;
     private Context context;
 
-    public AdapterStoresNearMe() {
+    public AdapterMostTrusted() {
     }
 
-    public AdapterStoresNearMe(List<Store> arrStore, List<TempStoreData> arrTempStoreData, Context context) {
+    public AdapterMostTrusted(List<Store> arrStore, List<TempStoreData> arrTempStoreData, Context context) {
         this.arrStore = arrStore;
         this.arrTempStoreData = arrTempStoreData;
         this.context = context;
@@ -42,13 +41,14 @@ public class AdapterStoresNearMe extends RecyclerView.Adapter<AdapterStoresNearM
 
     @NonNull
     @Override
-    public AdapterStoresNearMe.ItemViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public AdapterMostTrusted.ItemViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         return new ItemViewHolder
                 (LayoutInflater.from(parent.getContext()).inflate(R.layout.item_stores,parent, false));
+
     }
 
     @Override
-    public void onBindViewHolder(@NonNull AdapterStoresNearMe.ItemViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull AdapterMostTrusted.ItemViewHolder holder, int position) {
 
         TempStoreData tempStoreData = arrTempStoreData.get(position);
 
@@ -82,7 +82,6 @@ public class AdapterStoresNearMe extends RecyclerView.Adapter<AdapterStoresNearM
             @Override
             public void onClick(View view) {
 
-
                 Intent intent = new Intent(context, view_store_page.class);
                 intent.putExtra("storeId", storeId);
                 intent.putExtra("storeOwnersUserId", storeOwnersUserId);
@@ -90,19 +89,16 @@ public class AdapterStoresNearMe extends RecyclerView.Adapter<AdapterStoresNearM
             }
         });
 
-
     }
 
     @Override
     public int getItemCount() {
-
         if(arrTempStoreData.size() < 10)
         {
             return arrTempStoreData.size();
         }
         else
             return 10;
-
     }
 
     public interface  OnItemClickListener{

@@ -45,6 +45,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import Adapters.AdapterMostTrusted;
 import Adapters.AdapterStoresNearMe;
 import Models.Store;
 import Models.TempStoreData;
@@ -61,8 +62,10 @@ public class Home_Fragment extends Fragment {
     private RecyclerView rv_nearMe, rv_mostTrusted;
 
     private AdapterStoresNearMe adapterStoresNearMe;
+    private AdapterMostTrusted adapterMostTrusted;
     private List<Store> arrStore = new ArrayList<>();
     private List<TempStoreData> arrTempStoreData = new ArrayList<>();
+    private List<TempStoreData> arrTempStoreData2 = new ArrayList<>();
 
     private FirebaseUser user;
     private DatabaseReference userDatabase, storeDatabase;
@@ -193,12 +196,12 @@ public class Home_Fragment extends Fragment {
 
     private void generateRecyclerview() {
 
-        Collections.sort(arrTempStoreData, new Comparator<TempStoreData>() {
-            @Override
-            public int compare(TempStoreData tempStoreData, TempStoreData t1) {
-                return Double.compare(tempStoreData.getDistance(), t1.getDistance());
-            }
-        });
+        adapterStoresNearMe = new AdapterStoresNearMe(arrStore, arrTempStoreData, getContext());
+        adapterMostTrusted = new AdapterMostTrusted(arrStore, arrTempStoreData2, getContext());
+        rv_nearMe.setAdapter(adapterStoresNearMe);
+        rv_mostTrusted.setAdapter(adapterMostTrusted);
+
+
 
         rv_nearMe.setHasFixedSize(true);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext(),
@@ -206,38 +209,30 @@ public class Home_Fragment extends Fragment {
         rv_nearMe.setLayoutManager(linearLayoutManager);
 
 
-        Collections.sort(arrTempStoreData, new Comparator<TempStoreData>() {
-            @Override
-            public int compare(TempStoreData tempStoreData, TempStoreData t1) {
-                return Double.compare(tempStoreData.getRatings(), t1.getRatings());
-            }
-        });
-
 
         rv_mostTrusted.setHasFixedSize(true);
         LinearLayoutManager linearLayoutManager1 = new LinearLayoutManager(getContext(),
                 LinearLayoutManager.HORIZONTAL, false);
         rv_mostTrusted.setLayoutManager(linearLayoutManager1);
 
-        adapterStoresNearMe = new AdapterStoresNearMe(arrStore, arrTempStoreData);
-        rv_nearMe.setAdapter(adapterStoresNearMe);
-        rv_mostTrusted.setAdapter(adapterStoresNearMe);
+        adapterStoresNearMe.notifyDataSetChanged();
 
         getViewHolderValues();
     }
 
     private void getViewHolderValues() {
 
-        Query query = storeDatabase.orderByChild("storeOwnersUserId").equalTo(myUserId);
 
-        query.addValueEventListener(new ValueEventListener() {
+        storeDatabase.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
 
                 if(snapshot.exists())
                 {
                     arrTempStoreData.clear();
+                    arrTempStoreData2.clear();
                     arrStore.clear();
+
 
                     for(DataSnapshot dataSnapshot : snapshot.getChildren())
                     {
@@ -261,6 +256,7 @@ public class Home_Fragment extends Fragment {
 
                         arrStore.add(store);
                         arrTempStoreData.add(tempStoreData);
+                        arrTempStoreData2.add(tempStoreData);
 
 
                     }
@@ -280,8 +276,26 @@ public class Home_Fragment extends Fragment {
 
                 }
 
+                Collections.sort(arrTempStoreData, new Comparator<TempStoreData>() {
+                    @Override
+                    public int compare(TempStoreData tempStoreData, TempStoreData t1) {
+                        return Double.compare(tempStoreData.getDistance(), t1.getDistance());
+                    }
+                });
+
+                Collections.sort(arrTempStoreData2, new Comparator<TempStoreData>() {
+                    @Override
+                    public int compare(TempStoreData tempStoreData, TempStoreData t1) {
+                        return Double.compare(tempStoreData.getRatings(), t1.getRatings());
+                    }
+                });
+
+                Collections.reverse(arrTempStoreData2);
+
+
 
                 adapterStoresNearMe.notifyDataSetChanged();
+                adapterMostTrusted.notifyDataSetChanged();
 
             }
 

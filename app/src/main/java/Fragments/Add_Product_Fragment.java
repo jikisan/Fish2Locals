@@ -57,7 +57,7 @@ public class Add_Product_Fragment extends Fragment {
             "Sapsap (Pony Fish or Slipmouth Fish)","Hasahasa (Short Mackerel)","Apahap (Barramundi)",
             "Pompano","Bisugo (Threadfin Bream)","Tanigue (Spanish Mackerel)", "Bangus (Milkfish)"};
 
-    int images[] = {R.drawable.fish_tilapia_mayancichlids,R.drawable.fish_tambakol_yellowfintuna,
+    int images[] = {R.drawable.fish_tilapia_mayancichlids, R.drawable.fish_tulingan_mackereltuna,
             R.drawable.fish_lapulapu_leopardcoralgrouper, R.drawable.fish_tamban,
             R.drawable.fish_dilis_anchovy, R.drawable.fish_mayamaya_redsnapper,
             R.drawable.fish_tulingan_mackereltuna, R.drawable.fish_galunggong_roundscad,
@@ -78,7 +78,7 @@ public class Add_Product_Fragment extends Fragment {
     private StorageReference storeStorage;
 
     private ProgressDialog progressDialog;
-    private String myUserID, storeId;
+    private String myUserID, storeId, imageName;
     private int itemNumber;
     private boolean hasPickup, hasOwnDelivery, has3rdPartyDelivery;
 
@@ -141,11 +141,15 @@ public class Add_Product_Fragment extends Fragment {
 
                 itemNumber = i;
 
+                int imageResource = images[i];
+                imageName = getContext().getResources().getResourceEntryName(imageResource);
+
                 Picasso.get()
-                        .load(images[itemNumber])
+                        .load(images[i])
                         .fit()
                         .centerCrop()
                         .into(iv_fishPhoto);
+
 
 
             }
@@ -275,7 +279,7 @@ public class Add_Product_Fragment extends Fragment {
 
 
 
-        Products products = new Products(fishImageNumber, fishName, hasPickup, hasOwnDelivery,
+        Products products = new Products(imageName, fishName, hasPickup, hasOwnDelivery,
                 has3rdPartyDelivery, pricePerKilo, quantityByKilo, storeId, myUserID);
 
         productsDatabase.push().setValue(products).addOnCompleteListener(new OnCompleteListener<Void>() {
