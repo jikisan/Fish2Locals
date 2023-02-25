@@ -53,8 +53,6 @@ public class AdapterStoreProductsItem extends RecyclerView.Adapter<AdapterStoreP
 
 
         int imageResource = context.getResources().getIdentifier(fishImageName, "drawable", context.getPackageName());
-        Drawable drawable = ContextCompat.getDrawable(context, imageResource);
-
 
 
         Picasso.get()

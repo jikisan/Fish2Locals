@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -19,12 +20,15 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.squareup.picasso.Picasso;
 
 import Models.Products;
 
 public class ProductBottomSheetDialog extends BottomSheetDialogFragment {
 
-    private TextView tv_bottomSheet;
+    TextView tv_productName, tv_productQuantity, tv_productPrice, tv_hasPickup, tv_hasOwnDelivery,
+            tv_has3rdPartyDelivery;
+    ImageView iv_productPhoto;
 
     private FirebaseUser user;
     private DatabaseReference productDatabase;
@@ -62,10 +66,47 @@ public class ProductBottomSheetDialog extends BottomSheetDialogFragment {
                 if(snapshot.exists())
                 {
 
-                        Products products = snapshot.getValue(Products.class);
-                        String productName = products.getFishName();
+                    Products products = snapshot.getValue(Products.class);
 
-                        tv_bottomSheet.setText(productName);
+                    String fishImageName = products.getImageName();
+                    String productName = products.getFishName();
+                    int productQuantity = products.getQuantityByKilo();
+                    double productPrice = products.getPricePerKilo();
+                    boolean hasPickup = products.isHasPickup();
+                    boolean hasOwnDelivery = products.isHasOwnDelivery();
+                    boolean has3rdPartyDelivery = products.isHas3rdPartyDelivery();
+
+                    int imageResource = getContext().getResources().getIdentifier(fishImageName,
+                            "drawable", getContext().getPackageName());
+
+
+                    Picasso.get()
+                            .load(imageResource)
+                            .fit()
+                            .centerCrop()
+                            .into(iv_productPhoto);
+
+                    tv_productName.setText(productName);
+                    tv_productQuantity.setText(productQuantity + " kilogram/s remaining.");
+                    tv_productPrice.setText("₱ " + productPrice + " / Kg");
+
+                    if(hasPickup == true)
+                    {
+                        tv_hasPickup.setVisibility(View.VISIBLE);
+                        tv_hasPickup.setText("• Pickup");
+                    }
+
+                    if(hasOwnDelivery == true)
+                    {
+                        tv_hasOwnDelivery.setVisibility(View.VISIBLE);
+                        tv_hasOwnDelivery.setText("• We Deliver");
+                    }
+
+                    if(has3rdPartyDelivery == true)
+                    {
+                        tv_has3rdPartyDelivery.setVisibility(View.VISIBLE);
+                        tv_has3rdPartyDelivery.setText("• 3rd Party Delivery (Maxim, Angkas, etc.)");
+                    }
 
                 }
             }
@@ -81,7 +122,7 @@ public class ProductBottomSheetDialog extends BottomSheetDialogFragment {
 
 
     private void clicks() {
-        tv_bottomSheet.setOnClickListener(new View.OnClickListener() {
+        tv_productName.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Toast.makeText( getContext(), "bottom sheet clicked", Toast.LENGTH_SHORT).show();
@@ -90,6 +131,14 @@ public class ProductBottomSheetDialog extends BottomSheetDialogFragment {
     }
 
     private void setRef(View view) {
-        tv_bottomSheet = view.findViewById(R.id.tv_bottomSheet);
+        tv_productName = view.findViewById(R.id.tv_productName);
+
+        tv_productQuantity = view.findViewById(R.id.tv_productQuantity);
+        tv_productPrice = view.findViewById(R.id.tv_productPrice);
+        tv_hasPickup = view.findViewById(R.id.tv_hasPickup);
+        tv_hasOwnDelivery = view.findViewById(R.id.tv_hasOwnDelivery);
+        tv_has3rdPartyDelivery = view.findViewById(R.id.tv_has3rdPartyDelivery);
+
+        iv_productPhoto = view.findViewById(R.id.iv_productPhoto);
     }
 }

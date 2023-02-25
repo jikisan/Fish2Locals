@@ -73,21 +73,16 @@ public class StoreProductsFragment extends Fragment {
             @Override
             public void onItemClick(int position) {
 
-                arrProducts.get(position);
                 arrProductIds.get(position);
 
-                String fishName = arrProducts.get(position).getFishName();
                 String productId = arrProductIds.get(position);
 
-                Toast.makeText( getContext(), "Name: " + fishName, Toast.LENGTH_SHORT).show();
 
                 Bundle bundle = new Bundle();
                 bundle.putString("productId", productId);
-// set Fragmentclass Arguments
 
                 ProductBottomSheetDialog productBottomSheetDialog = new ProductBottomSheetDialog();
                 productBottomSheetDialog.setArguments(bundle);
-
                 productBottomSheetDialog.show(getActivity().getSupportFragmentManager(), "ModalBottomSheet");
             }
         });
