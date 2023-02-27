@@ -27,13 +27,14 @@ import Models.Products;
 public class ProductBottomSheetDialog extends BottomSheetDialogFragment {
 
     TextView tv_productName, tv_productQuantity, tv_productPrice, tv_hasPickup, tv_hasOwnDelivery,
-            tv_has3rdPartyDelivery;
-    ImageView iv_productPhoto;
+            tv_has3rdPartyDelivery, tv_quantity;
+    ImageView iv_productPhoto, iv_decreaseBtn, iv_increaseBtn;
 
     private FirebaseUser user;
     private DatabaseReference productDatabase;
 
     private String myUserId, storeOwnersUserId, storeId, productId;
+    private int productQuantity , intValue = 1;;
 
     @Nullable
     @Override
@@ -70,7 +71,7 @@ public class ProductBottomSheetDialog extends BottomSheetDialogFragment {
 
                     String fishImageName = products.getImageName();
                     String productName = products.getFishName();
-                    int productQuantity = products.getQuantityByKilo();
+                    productQuantity = products.getQuantityByKilo();
                     double productPrice = products.getPricePerKilo();
                     boolean hasPickup = products.isHasPickup();
                     boolean hasOwnDelivery = products.isHasOwnDelivery();
@@ -128,17 +129,58 @@ public class ProductBottomSheetDialog extends BottomSheetDialogFragment {
                 Toast.makeText( getContext(), "bottom sheet clicked", Toast.LENGTH_SHORT).show();
             }
         });
+
+        iv_decreaseBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+
+                if(intValue <= 1)
+                {
+                    Toast.makeText(getContext(), "Cannot be less than 1 kilo", Toast.LENGTH_SHORT).show();
+                }
+                else
+                {
+                    intValue--;
+                    tv_quantity.setText(intValue + "");
+                }
+
+
+            }
+        });
+
+        iv_increaseBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+
+
+
+                if(intValue >= productQuantity)
+                {
+                    Toast.makeText(getContext(), "Number exceeded the remaining quantity.", Toast.LENGTH_SHORT).show();
+                }
+                else
+                {
+                    intValue++;
+                    tv_quantity.setText(intValue + "");
+                }
+
+            }
+        });
     }
 
     private void setRef(View view) {
         tv_productName = view.findViewById(R.id.tv_productName);
-
         tv_productQuantity = view.findViewById(R.id.tv_productQuantity);
         tv_productPrice = view.findViewById(R.id.tv_productPrice);
         tv_hasPickup = view.findViewById(R.id.tv_hasPickup);
         tv_hasOwnDelivery = view.findViewById(R.id.tv_hasOwnDelivery);
         tv_has3rdPartyDelivery = view.findViewById(R.id.tv_has3rdPartyDelivery);
+        tv_quantity = view.findViewById(R.id.tv_quantity);
 
         iv_productPhoto = view.findViewById(R.id.iv_productPhoto);
+        iv_decreaseBtn = view.findViewById(R.id.iv_decreaseBtn);
+        iv_increaseBtn = view.findViewById(R.id.iv_increaseBtn);
     }
 }

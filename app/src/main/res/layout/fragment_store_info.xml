@@ -9,14 +9,116 @@
         android:id="@+id/textView14"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
+        android:layout_marginStart="8dp"
         android:layout_marginTop="16dp"
         android:text="Store Details"
-        android:textColor="@color/teal_200"
+        android:textColor="@color/white"
         android:textSize="24sp"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tv_storeName"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="8dp"
+        android:drawableStart="@drawable/marketplace"
+        android:drawablePadding="8dp"
+        android:drawableTint="@color/teal_200"
+        android:gravity="center_vertical"
+        android:text="Loading..."
+        android:textAllCaps="true"
+        android:textColor="@color/white"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toStartOf="@+id/iv_bookmarkOn"
+        app:layout_constraintStart_toStartOf="@+id/textView14"
+        app:layout_constraintTop_toBottomOf="@+id/textView14" />
+
+    <ImageView
+        android:id="@+id/iv_bookmarkOn"
+        android:layout_width="30dp"
+        android:layout_height="25dp"
+        android:layout_marginEnd="8dp"
+        android:src="@drawable/bookmark"
+        app:layout_constraintBottom_toBottomOf="@+id/iv_messageStoreBtn"
+        app:layout_constraintEnd_toStartOf="@+id/iv_messageStoreBtn"
+        app:layout_constraintTop_toTopOf="@+id/iv_messageStoreBtn"
+        app:layout_constraintVertical_bias="0.75"
+        app:tint="@color/white" />
+
+    <ImageView
+        android:id="@+id/iv_bookmarkCancel"
+        android:layout_width="30dp"
+        android:layout_height="25dp"
+        android:layout_marginEnd="8dp"
+        android:src="@drawable/bookmark"
+        app:layout_constraintBottom_toBottomOf="@+id/iv_messageStoreBtn"
+        app:layout_constraintEnd_toStartOf="@+id/iv_messageStoreBtn"
+        app:layout_constraintTop_toTopOf="@+id/iv_messageStoreBtn"
+        app:layout_constraintVertical_bias="0.75"
+        app:tint="@color/red_btn_bg_pressed_color" />
+
+    <ImageView
+        android:id="@+id/iv_messageStoreBtn"
+        android:layout_width="30dp"
+        android:layout_height="35dp"
+        android:layout_marginEnd="16dp"
+        android:src="@drawable/messages"
+        app:layout_constraintBottom_toBottomOf="@+id/tv_storeName"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/tv_storeName"
+        app:tint="@color/main_green_color" />
+
+    <TextView
+        android:id="@+id/tv_storeContactPerson"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:drawableStart="@drawable/person"
+        android:drawablePadding="8dp"
+        android:drawableTint="@color/blue_btn_bg_color"
+        android:text="Loading..."
+        android:textColor="@color/white"
+        android:textStyle="bold"
+        android:gravity="center_vertical"
+        app:layout_constraintStart_toStartOf="@+id/tv_storeName"
+        app:layout_constraintTop_toBottomOf="@+id/tv_storeName" />
+
+    <TextView
+        android:id="@+id/tv_storeContactNum"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:drawableStart="@drawable/contact_us"
+        android:drawablePadding="14dp"
+        android:drawableTint="@color/blue_btn_bg_color"
+        android:text="Loading..."
+        android:textColor="@color/white"
+        android:textStyle="bold"
+        android:gravity="center_vertical"
+        app:layout_constraintStart_toStartOf="@+id/tv_storeContactPerson"
+        app:layout_constraintTop_toBottomOf="@+id/tv_storeContactPerson" />
+
+    <TextView
+        android:id="@+id/tv_storeAddress"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:drawableStart="@drawable/location"
+        android:drawablePadding="8dp"
+        android:drawableTint="@color/red_btn_bg_color"
+        android:text="Loading..."
+        android:textColor="@color/white"
+        android:textStyle="italic"
+        android:gravity="center_vertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/tv_storeContactNum"
+        app:layout_constraintTop_toBottomOf="@+id/tv_storeContactNum" />
 
 
     <ProgressBar

@@ -183,7 +183,7 @@
             android:drawableStart="@drawable/edit_black"
             android:drawablePadding="16dp"
             android:padding="8dp"
-            android:text="Edit Profile"
+            android:text="Edit Store"
             android:textColor="@color/black"
             android:textSize="18sp" />
 

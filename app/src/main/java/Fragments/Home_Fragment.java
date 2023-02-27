@@ -222,7 +222,6 @@ public class Home_Fragment extends Fragment {
 
     private void getViewHolderValues() {
 
-
         storeDatabase.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -252,6 +251,11 @@ public class Home_Fragment extends Fragment {
 
                         TempStoreData tempStoreData = new TempStoreData(storeUrl, storeName,
                                 distance, ratings, storeId, storeOwnersUserId);
+
+                        if(storeOwnersUserId.equals(myUserId))
+                        {
+                            continue;
+                        }
 
 
                         arrStore.add(store);
