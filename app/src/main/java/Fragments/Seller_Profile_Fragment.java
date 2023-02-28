@@ -17,6 +17,7 @@ import android.widget.Toast;
 import com.example.fish2locals.R;
 import com.example.fish2locals.change_password_page;
 import com.example.fish2locals.edit_profile_page;
+import com.example.fish2locals.edit_store_page;
 import com.example.fish2locals.homepage;
 import com.example.fish2locals.intro_page;
 import com.example.fish2locals.view_my_wallet_page;
@@ -128,7 +129,7 @@ public class Seller_Profile_Fragment extends Fragment {
             @Override
             public void onClick(View view) {
 
-                Intent intent = new Intent(getContext(), edit_profile_page.class);
+                Intent intent = new Intent(getContext(), edit_store_page.class);
                 startActivity(intent);
             }
         });

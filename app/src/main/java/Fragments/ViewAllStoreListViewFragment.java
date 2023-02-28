@@ -1,5 +1,7 @@
 package Fragments;
 
+import static android.view.View.GONE;
+
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
@@ -9,7 +11,7 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Looper;
@@ -17,11 +19,15 @@ import android.provider.Settings;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
+import android.widget.ProgressBar;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.example.fish2locals.R;
-import com.example.fish2locals.view_all_stores;
+import com.example.fish2locals.view_my_bookmarks_page;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
@@ -39,102 +45,112 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.maps.android.SphericalUtil;
-import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import Adapters.AdapterMostTrusted;
+import Adapters.AdapterBookmarks;
 import Adapters.AdapterStoresNearMe;
+import Adapters.AdapterViewAllStores;
+import Adapters.Adapter_Spinner_Fish;
+import Models.Bookmark;
+import Models.Products;
 import Models.Store;
 import Models.TempStoreData;
-import Models.Users;
-import Objects.TextModifier;
 
-public class Home_Fragment extends Fragment {
+
+public class ViewAllStoreListViewFragment extends Fragment {
 
     private FusedLocationProviderClient client;
     private double myLatDouble, myLongDouble, distance;
 
-    private ImageView iv_userPhoto;
-    private TextView tv_fName, tv_loadingNearMe, tv_loadingMostTrusted, tv_nearMeViewAll,
-            tv_mostTrustedViewAll;
-    private RecyclerView rv_nearMe, rv_mostTrusted;
-
-    private AdapterStoresNearMe adapterStoresNearMe;
-    private AdapterMostTrusted adapterMostTrusted;
     private List<Store> arrStore = new ArrayList<>();
     private List<TempStoreData> arrTempStoreData = new ArrayList<>();
-    private List<TempStoreData> arrTempStoreData2 = new ArrayList<>();
+    private AdapterViewAllStores adapterViewAllStores;
+    private ArrayAdapter<String> dataAdapter;
+
+
+    private ProgressBar progressBar;
+    private RecyclerView rv_storeLists;
+    private TextView tv_back, tv_textPlaceholder;
+    private AutoCompleteTextView autoCompleteTextView;
 
     private FirebaseUser user;
-    private DatabaseReference userDatabase, storeDatabase;
+    private DatabaseReference bookmarkDatabase, storeDatabase;
 
-    private String myUserId;
+    private String myUserId, storeOwnersUserId, storeId;
+
+    String[] sortList ={"Near me", "Most Trusted"};
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_home, container, false);
+        View view = inflater.inflate(R.layout.fragment_view_all_store_list_view, container, false);
 
         user = FirebaseAuth.getInstance().getCurrentUser();
         myUserId = user.getUid();
-        userDatabase = FirebaseDatabase.getInstance().getReference("Users");
+        bookmarkDatabase = FirebaseDatabase.getInstance().getReference("Bookmark");
         storeDatabase = FirebaseDatabase.getInstance().getReference("Store");
 
         setRef(view);
-        generateUsersData();
         getCurrentLocation();
         clicks();
+
+        dataAdapter = new ArrayAdapter<String>(getContext(), R.layout.list_sorts, sortList);
+        autoCompleteTextView.setAdapter(dataAdapter);
 
 
         return view;
     }
 
-    private void generateUsersData() {
+    private void clicks() {
 
-        userDatabase.child(myUserId).addListenerForSingleValueEvent(new ValueEventListener() {
+        autoCompleteTextView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
 
-                if(snapshot.exists())
-                {
-                    Users users = snapshot.getValue(Users.class);
+                switch (i) {
 
-                    String imageUrl = users.getImageUrl();
+                    case 0:
+                        Collections.sort(arrTempStoreData, new Comparator<TempStoreData>() {
+                            @Override
+                            public int compare(TempStoreData tempStoreData, TempStoreData t1) {
+                                return Double.compare(tempStoreData.getDistance(), t1.getDistance());
+                            }
+                        });
 
-                    if(!imageUrl.isEmpty())
-                    {
-                        Picasso.get()
-                                .load(imageUrl)
-                                .into(iv_userPhoto);
-                    }
+                        adapterViewAllStores.notifyDataSetChanged();
+                        break;
 
+                    case 1:
+                        Collections.sort(arrTempStoreData, new Comparator<TempStoreData>() {
+                            @Override
+                            public int compare(TempStoreData tempStoreData, TempStoreData t1) {
+                                return Double.compare(tempStoreData.getRatings(), t1.getRatings());
+                            }
+                        });
 
-                    TextModifier textModifier = new TextModifier();
-                    textModifier.setSentenceCase(users.getFname());
-                    String fname = textModifier.getSentenceCase();
-                    tv_fName.setText(fname + "!");
+                        Collections.reverse(arrTempStoreData);
+
+                        adapterViewAllStores.notifyDataSetChanged();
+                        break;
+
 
                 }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
 
             }
         });
 
-
     }
+
 
     @SuppressLint("MissingPermission")
     private void getCurrentLocation() {
         // Initialize Location manager
-        LocationManager locationManager = (LocationManager) getActivity()
+        LocationManager locationManager = (LocationManager) getContext()
                 .getSystemService(Context.LOCATION_SERVICE);
         // Check condition
         if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
@@ -154,7 +170,7 @@ public class Home_Fragment extends Fragment {
                         // null set latitude
                         myLatDouble = location.getLatitude();
                         myLongDouble = location.getLongitude();
-                        generateRecyclerview();
+                        generateRecyclerLayout();
 
 
                     } else {
@@ -176,7 +192,7 @@ public class Home_Fragment extends Fragment {
                                 Location location1 = locationResult.getLastLocation();
                                 myLatDouble = location1.getLatitude();
                                 myLongDouble = location1.getLongitude();
-                                generateRecyclerview();
+                                generateRecyclerLayout();
 
 
                             }
@@ -196,30 +212,17 @@ public class Home_Fragment extends Fragment {
         }
     }
 
-    private void generateRecyclerview() {
+    private void generateRecyclerLayout() {
 
-        adapterStoresNearMe = new AdapterStoresNearMe(arrStore, arrTempStoreData, getContext());
-        adapterMostTrusted = new AdapterMostTrusted(arrStore, arrTempStoreData2, getContext());
-        rv_nearMe.setAdapter(adapterStoresNearMe);
-        rv_mostTrusted.setAdapter(adapterMostTrusted);
+        rv_storeLists.setHasFixedSize(true);
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(), 2, GridLayoutManager.VERTICAL, false);
+        rv_storeLists.setLayoutManager(gridLayoutManager);
 
-
-
-        rv_nearMe.setHasFixedSize(true);
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext(),
-                LinearLayoutManager.HORIZONTAL, false);
-        rv_nearMe.setLayoutManager(linearLayoutManager);
-
-
-
-        rv_mostTrusted.setHasFixedSize(true);
-        LinearLayoutManager linearLayoutManager1 = new LinearLayoutManager(getContext(),
-                LinearLayoutManager.HORIZONTAL, false);
-        rv_mostTrusted.setLayoutManager(linearLayoutManager1);
-
-        adapterStoresNearMe.notifyDataSetChanged();
+        adapterViewAllStores = new AdapterViewAllStores(arrStore, arrTempStoreData, getContext());
+        rv_storeLists.setAdapter(adapterViewAllStores);
 
         getViewHolderValues();
+
     }
 
     private void getViewHolderValues() {
@@ -231,7 +234,6 @@ public class Home_Fragment extends Fragment {
                 if(snapshot.exists())
                 {
                     arrTempStoreData.clear();
-                    arrTempStoreData2.clear();
                     arrStore.clear();
 
 
@@ -262,46 +264,13 @@ public class Home_Fragment extends Fragment {
 
                         arrStore.add(store);
                         arrTempStoreData.add(tempStoreData);
-                        arrTempStoreData2.add(tempStoreData);
 
 
                     }
                 }
 
-                if (arrTempStoreData.isEmpty()) {
-                    rv_mostTrusted.setVisibility(View.GONE);
-                    rv_nearMe.setVisibility(View.GONE);
-                    tv_loadingMostTrusted.setVisibility(View.VISIBLE);
-                    tv_loadingNearMe.setVisibility(View.VISIBLE);
-                }
-                else {
-                    rv_mostTrusted.setVisibility(View.VISIBLE);
-                    rv_nearMe.setVisibility(View.VISIBLE);
-                    tv_loadingMostTrusted.setVisibility(View.INVISIBLE);
-                    tv_loadingNearMe.setVisibility(View.INVISIBLE);
-
-                }
-
-                Collections.sort(arrTempStoreData, new Comparator<TempStoreData>() {
-                    @Override
-                    public int compare(TempStoreData tempStoreData, TempStoreData t1) {
-                        return Double.compare(tempStoreData.getDistance(), t1.getDistance());
-                    }
-                });
-
-                Collections.sort(arrTempStoreData2, new Comparator<TempStoreData>() {
-                    @Override
-                    public int compare(TempStoreData tempStoreData, TempStoreData t1) {
-                        return Double.compare(tempStoreData.getRatings(), t1.getRatings());
-                    }
-                });
-
-                Collections.reverse(arrTempStoreData2);
-
-
-
-                adapterStoresNearMe.notifyDataSetChanged();
-                adapterMostTrusted.notifyDataSetChanged();
+                progressBar.setVisibility(GONE);
+                adapterViewAllStores.notifyDataSetChanged();
 
             }
 
@@ -326,41 +295,15 @@ public class Home_Fragment extends Fragment {
         return distanceResult;
     }
 
-    private void clicks() {
-
-        tv_nearMeViewAll.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(getContext(), view_all_stores.class);
-                intent.putExtra("source", "1");
-                startActivity(intent);
-            }
-        });
-
-        tv_mostTrustedViewAll.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(getContext(), view_all_stores.class);
-                intent.putExtra("source", "2");
-                startActivity(intent);
-            }
-        });
-    }
-
     private void setRef(View view) {
 
-        client = LocationServices.getFusedLocationProviderClient(getActivity());
+        client = LocationServices.getFusedLocationProviderClient(getContext());
 
-        iv_userPhoto = view.findViewById(R.id.iv_userPhoto);
-        tv_fName = view.findViewById(R.id.tv_fName);
+        progressBar = view.findViewById(R.id.progressBar);
+        rv_storeLists = view.findViewById(R.id.rv_storeLists);
 
-        rv_nearMe = view.findViewById(R.id.rv_nearMe);
-        rv_mostTrusted = view.findViewById(R.id.rv_mostTrusted);
+        autoCompleteTextView = view.findViewById(R.id.AutoCompleteTextview);
 
-        tv_loadingNearMe = view.findViewById(R.id.tv_loadingNearMe);
-        tv_loadingMostTrusted = view.findViewById(R.id.tv_loadingMostTrusted);
-        tv_nearMeViewAll = view.findViewById(R.id.tv_nearMeViewAll);
-        tv_mostTrustedViewAll = view.findViewById(R.id.tv_mostTrustedViewAll);
 
     }
 }

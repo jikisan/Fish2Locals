@@ -237,7 +237,7 @@ public class view_my_wallet_page extends AppCompatActivity {
         double newFundValue = myFundAmount - myFundAmount;
 
         String transFundInString = tv_fundBalance.getText().toString();
-        double transFundInDouble = Double.parseDouble(transFundInString);
+        double transFundInDouble = Double.parseDouble(transFundInString.replace(",", ""));
 
         HashMap<String, Object> hashMap = new HashMap<String, Object>();
         hashMap.put("userID", myUserId);

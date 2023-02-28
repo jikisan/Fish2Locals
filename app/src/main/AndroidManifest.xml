@@ -22,6 +22,12 @@
         tools:replace="android:icon"
         tools:targetApi="31">
         <activity
+            android:name=".view_all_stores"
+            android:exported="false" />
+        <activity
+            android:name=".edit_store_page"
+            android:exported="false" />
+        <activity
             android:name=".add_funds_page"
             android:exported="false" />
         <activity
@@ -70,6 +76,11 @@
                 android:name="android.app.lib_name"
                 android:value="" />
         </activity>
+
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyCQdaPd6EyJuLoDMLGHX2vNLL18a8kdRH8" />
+
         <activity
             android:name=".intro_page"
             android:exported="true">

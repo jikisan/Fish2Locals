@@ -36,7 +36,7 @@ public class AdapterChatItem extends RecyclerView.Adapter<AdapterChatItem.ItemVi
 
     private List<Chats> arr;
     private OnItemClickListener onItemClickListener;
-    private DatabaseReference storeDatabase ;
+    private DatabaseReference userDatabase ;
     private FirebaseUser user;
     private TextModifier textModifier = new TextModifier();
 
@@ -57,30 +57,48 @@ public class AdapterChatItem extends RecyclerView.Adapter<AdapterChatItem.ItemVi
     @Override
     public void onBindViewHolder(@NonNull AdapterChatItem.ItemViewHolder holder, int position) {
 
-        Chats chats = arr.get(position);
+        Chats chat = arr.get(position);
 
-        String storeId = chats.getStoreID();
-        String chatId = chats.getChatID();
+        String userOne = chat.getUserIdOne();
+        String userTwo = chat.getUserIdTwo();
+        String chatId = chat.getChatID();
         user = FirebaseAuth.getInstance().getCurrentUser();
+        String myUserID = user.getUid();
+        String userID;
 
-        storeDatabase = FirebaseDatabase.getInstance().getReference("Store");
-        storeDatabase.child(storeId).addListenerForSingleValueEvent(new ValueEventListener() {
+        if(!userOne.equals(myUserID))
+        {
+            userID = userOne;
+        }
+        else
+        {
+            userID = userTwo;
+        }
+
+        userDatabase = FirebaseDatabase.getInstance().getReference("Users");
+        userDatabase.child(userID).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
 
-                Store store = snapshot.getValue(Store.class);
+                Users users = snapshot.getValue(Users.class);
 
-                if(snapshot.exists()){
 
-                    String storeUrl = store.getStoreUrl();
-                    String storeName = store.getStoreName();
+                if(users != null){
 
-                    holder.tv_storeName.setText(storeName);
+                    String imageUrl = users.getImageUrl();
+
+                    textModifier.setSentenceCase(users.getFname());
+                    String fname = textModifier.getSentenceCase();
+
+                    textModifier.setSentenceCase(users.getLname());
+                    String lname = textModifier.getSentenceCase();
+
+                    holder.tv_userName.setText(fname + " " + lname);
 
 
                     Picasso.get()
-                            .load(storeUrl)
-                            .into(holder.iv_storePhoto);
+                            .load(imageUrl)
+                            .into(holder.iv_userPhoto);
 
                 }
             }
@@ -177,16 +195,16 @@ public class AdapterChatItem extends RecyclerView.Adapter<AdapterChatItem.ItemVi
 
     public class ItemViewHolder extends RecyclerView.ViewHolder {
 
-        ImageView iv_storePhoto, iv_deleteChat;
-        TextView tv_category, tv_storeName;
+        ImageView iv_userPhoto, iv_deleteChat;
+        TextView tv_category, tv_userName;
 
 
         public ItemViewHolder(@NonNull View itemView) {
             super(itemView);
 
-            iv_storePhoto = itemView.findViewById(R.id.iv_storePhoto);
+            iv_userPhoto = itemView.findViewById(R.id.iv_userPhoto);
             iv_deleteChat = itemView.findViewById(R.id.iv_deleteChat);
-            tv_storeName = itemView.findViewById(R.id.tv_storeName);
+            tv_userName = itemView.findViewById(R.id.tv_userName);
 
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
