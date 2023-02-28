@@ -15,6 +15,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.fish2locals.R;
+import com.example.fish2locals.chat_activity_page;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -41,7 +42,7 @@ public class Messages_Fragment extends Fragment {
     private FirebaseUser user;
     private DatabaseReference chatDatabase, messageDatabase;
 
-    private String userID, userOne, userTwo, chatId;
+    private String myUserID, userOne, userTwo, chatId;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -50,7 +51,7 @@ public class Messages_Fragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_messages, container, false);
 
         user = FirebaseAuth.getInstance().getCurrentUser();
-        userID = user.getUid();
+        myUserID = user.getUid();
 
         chatDatabase = FirebaseDatabase.getInstance().getReference("Chats");
 
@@ -67,22 +68,31 @@ public class Messages_Fragment extends Fragment {
             @Override
             public void onItemClick(int position) {
 
-//                String clickedChatId = arrChat.get(position).getChatID();
-//                String currentUserOne;
-//                String currentUserTwo;
-//                String splitClickedChatId[] = clickedChatId.split("_");
-//                currentUserOne = splitClickedChatId[0];
-//                currentUserTwo = splitClickedChatId[1];
-//
-//                String chatUid1 = currentUserOne + "_" + currentUserTwo;
-//                String chatUid2 = currentUserTwo + "_" + currentUserOne;
-//
-//                Intent intent = new Intent(getActivity(), chat_activity.class);
-//                intent.putExtra("chatUid1", chatUid1);
-//                intent.putExtra("chatUid2", chatUid2);
-//                intent.putExtra("userIdFromSearch", userTwo);
-//                intent.putExtra("needNotification", "1");
-//                startActivity(intent);
+                String clickedChatId = arrChat.get(position).getChatID();
+                String storeId = arrChat.get(position).getStoreID();
+                String currentUserOne;
+                String currentUserTwo;
+                String splitClickedChatId[] = clickedChatId.split("_");
+                currentUserOne = splitClickedChatId[0];
+                currentUserTwo = splitClickedChatId[1];
+                String storeOwnersUserId = currentUserOne;
+
+                if(currentUserOne.equals(myUserID))
+                {
+                    storeOwnersUserId = currentUserTwo;
+                }
+
+                String chatUid1 = currentUserOne + "_" + currentUserTwo;
+                String chatUid2 = currentUserTwo + "_" + currentUserOne;
+
+                Intent intent = new Intent(getActivity(), chat_activity_page.class);
+                intent.putExtra("storeOwnersUserId", storeOwnersUserId);
+                intent.putExtra("storeId", storeId);
+                intent.putExtra("chatUid1", chatUid1);
+                intent.putExtra("chatUid2", chatUid2);
+                intent.putExtra("userIdFromSearch", userTwo);
+                intent.putExtra("needNotification", "1");
+                startActivity(intent);
             }
         });
     }
@@ -118,10 +128,13 @@ public class Messages_Fragment extends Fragment {
                         userOne = chats.getUserIdOne();
                         userTwo = chats.getUserIdTwo();
 
-                        if(userOne.equals(userID))
+                        String tempChatId = userOne + "_" + myUserID;
+
+                        if(chatId.equals(tempChatId))
                         {
                             arrChat.add(chats);
                         }
+
                     }
                 }
 

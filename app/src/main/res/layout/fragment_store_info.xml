@@ -12,7 +12,7 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="16dp"
         android:text="Store Details"
-        android:textColor="@color/white"
+        android:textColor="@color/teal_200"
         android:textSize="24sp"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
@@ -24,7 +24,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginTop="16dp"
-        android:layout_marginEnd="8dp"
+        android:layout_marginEnd="46dp"
         android:drawableStart="@drawable/marketplace"
         android:drawablePadding="8dp"
         android:drawableTint="@color/teal_200"
@@ -34,7 +34,7 @@
         android:textColor="@color/white"
         android:textSize="24sp"
         android:textStyle="bold"
-        app:layout_constraintEnd_toStartOf="@+id/iv_bookmarkOn"
+        app:layout_constraintEnd_toStartOf="@+id/iv_messageStoreBtn"
         app:layout_constraintStart_toStartOf="@+id/textView14"
         app:layout_constraintTop_toBottomOf="@+id/textView14" />
 
@@ -47,7 +47,6 @@
         app:layout_constraintBottom_toBottomOf="@+id/iv_messageStoreBtn"
         app:layout_constraintEnd_toStartOf="@+id/iv_messageStoreBtn"
         app:layout_constraintTop_toTopOf="@+id/iv_messageStoreBtn"
-        app:layout_constraintVertical_bias="0.75"
         app:tint="@color/white" />
 
     <ImageView
@@ -59,7 +58,6 @@
         app:layout_constraintBottom_toBottomOf="@+id/iv_messageStoreBtn"
         app:layout_constraintEnd_toStartOf="@+id/iv_messageStoreBtn"
         app:layout_constraintTop_toTopOf="@+id/iv_messageStoreBtn"
-        app:layout_constraintVertical_bias="0.75"
         app:tint="@color/red_btn_bg_pressed_color" />
 
     <ImageView
@@ -119,7 +117,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@+id/tv_storeContactNum"
         app:layout_constraintTop_toBottomOf="@+id/tv_storeContactNum" />
-
 
     <ProgressBar
         android:id="@+id/progressBar"

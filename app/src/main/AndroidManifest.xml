@@ -22,6 +22,15 @@
         tools:replace="android:icon"
         tools:targetApi="31">
         <activity
+            android:name=".add_funds_page"
+            android:exported="false" />
+        <activity
+            android:name=".view_my_wallet_page"
+            android:exported="false" />
+        <activity
+            android:name=".chat_activity_page"
+            android:exported="false" />
+        <activity
             android:name=".view_my_bookmarks_page"
             android:exported="false" />
         <activity

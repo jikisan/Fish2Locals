@@ -18,6 +18,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.fish2locals.R;
+import com.example.fish2locals.chat_activity_page;
 import com.example.fish2locals.view_store_page;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -243,7 +244,18 @@ public class StoreInfoFragment extends Fragment {
         iv_messageStoreBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(getContext(), "Message Button", Toast.LENGTH_SHORT).show();
+
+                String chatUid1 = storeOwnersUserId + "_" + myUserId;
+                String chatUid2 = myUserId + "_" + storeOwnersUserId;
+
+                Intent intent = new Intent(getContext(), chat_activity_page.class);
+                intent.putExtra("storeOwnersUserId", storeOwnersUserId);
+                intent.putExtra("storeId", storeId);
+                intent.putExtra("needNotification", "1");
+                intent.putExtra("chatUid1", chatUid1);
+                intent.putExtra("chatUid2", chatUid2);
+                startActivity(intent);
+
             }
         });
 

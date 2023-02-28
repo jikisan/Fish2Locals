@@ -19,6 +19,7 @@ import com.example.fish2locals.change_password_page;
 import com.example.fish2locals.edit_profile_page;
 import com.example.fish2locals.homepage;
 import com.example.fish2locals.intro_page;
+import com.example.fish2locals.view_my_wallet_page;
 import com.example.fish2locals.view_ratings_page;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -145,7 +146,8 @@ public class Seller_Profile_Fragment extends Fragment {
             @Override
             public void onClick(View view) {
 
-                Toast.makeText(getContext(), "My Wallet Page coming soon", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(getContext(), view_my_wallet_page.class);
+                startActivity(intent);
             }
         });
 

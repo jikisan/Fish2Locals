@@ -182,6 +182,8 @@ public class view_my_bookmarks_page extends AppCompatActivity {
 
                 if(snapshot.exists())
                 {
+                    arrTempStoreData.clear();
+
                     for(DataSnapshot dataSnapshot : snapshot.getChildren())
                     {
 

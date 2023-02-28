@@ -18,6 +18,7 @@ import android.widget.Toast;
 import com.example.fish2locals.R;
 import com.example.fish2locals.seller_homepage;
 import com.example.fish2locals.view_my_products_page;
+import com.example.fish2locals.view_my_wallet_page;
 import com.google.android.gms.location.LocationServices;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -135,7 +136,9 @@ public class Seller_Home_Fragment extends Fragment {
         layout_myWallet.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText( getContext(), "My Wallet", Toast.LENGTH_SHORT).show();
+
+                Intent intent = new Intent(getContext(), view_my_wallet_page.class);
+                startActivity(intent);
             }
         });
 

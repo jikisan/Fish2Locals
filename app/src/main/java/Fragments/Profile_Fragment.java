@@ -25,6 +25,7 @@ import com.example.fish2locals.intro_page;
 import com.example.fish2locals.seller_application;
 import com.example.fish2locals.seller_homepage;
 import com.example.fish2locals.view_my_bookmarks_page;
+import com.example.fish2locals.view_my_wallet_page;
 import com.example.fish2locals.view_ratings_page;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -197,7 +198,9 @@ public class Profile_Fragment extends Fragment {
         layout_myWallet.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(getContext(), "My Wallet Page Coming soon", Toast.LENGTH_SHORT).show();
+
+                Intent intent = new Intent(getContext(), view_my_wallet_page.class);
+                startActivity(intent);
             }
         });
 
