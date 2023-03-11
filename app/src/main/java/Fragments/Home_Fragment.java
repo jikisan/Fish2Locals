@@ -18,9 +18,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.SearchView;
 import android.widget.TextView;
 
 import com.example.fish2locals.R;
+import com.example.fish2locals.search_page;
 import com.example.fish2locals.view_all_stores;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
@@ -60,7 +62,7 @@ public class Home_Fragment extends Fragment {
 
     private ImageView iv_userPhoto;
     private TextView tv_fName, tv_loadingNearMe, tv_loadingMostTrusted, tv_nearMeViewAll,
-            tv_mostTrustedViewAll;
+            tv_mostTrustedViewAll, tv_search;
     private RecyclerView rv_nearMe, rv_mostTrusted;
 
     private AdapterStoresNearMe adapterStoresNearMe;
@@ -345,6 +347,15 @@ public class Home_Fragment extends Fragment {
                 startActivity(intent);
             }
         });
+
+        tv_search.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                Intent intent = new Intent(getContext(), search_page.class);
+                startActivity(intent);
+            }
+        });
     }
 
     private void setRef(View view) {
@@ -361,6 +372,8 @@ public class Home_Fragment extends Fragment {
         tv_loadingMostTrusted = view.findViewById(R.id.tv_loadingMostTrusted);
         tv_nearMeViewAll = view.findViewById(R.id.tv_nearMeViewAll);
         tv_mostTrustedViewAll = view.findViewById(R.id.tv_mostTrustedViewAll);
+
+        tv_search = view.findViewById(R.id.tv_search);
 
     }
 }

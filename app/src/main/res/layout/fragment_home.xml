@@ -42,6 +42,7 @@
                 android:layout_marginTop="16dp"
                 android:layout_marginEnd="16dp"
                 android:src="@drawable/cart_icon"
+                android:visibility="invisible"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:tint="@color/white" />
@@ -69,19 +70,20 @@
                 app:layout_constraintStart_toEndOf="@+id/iv_userPhoto"
                 app:layout_constraintTop_toBottomOf="@+id/textView3" />
 
-            <SearchView
-                android:id="@+id/sv_search"
+            <TextView
+                android:id="@+id/tv_search"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="16dp"
                 android:layout_marginEnd="16dp"
-                android:layout_weight="10"
                 android:background="@drawable/rounded100"
-                android:focusable="false"
-                android:iconifiedByDefault="false"
-                android:paddingRight="16dp"
-                android:queryHint="Search Stores"
+                android:hint="Search Stores"
+                android:textSize="18sp"
+                android:gravity="center|left"
+                android:paddingLeft="16dp"
+                android:drawableStart="@drawable/search_icon"
+                android:drawablePadding="8dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/iv_userPhoto" />
@@ -97,7 +99,7 @@
                 android:visibility="gone"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/sv_search">
+                app:layout_constraintTop_toBottomOf="@+id/tv_search">
 
 
                 <androidx.cardview.widget.CardView
@@ -232,7 +234,7 @@
                 android:textColor="@color/teal_200"
                 android:textSize="16sp"
                 app:layout_constraintBottom_toBottomOf="@+id/textView6"
-                app:layout_constraintEnd_toEndOf="@+id/sv_search"
+                app:layout_constraintEnd_toEndOf="@+id/tv_search"
                 app:layout_constraintTop_toTopOf="@+id/textView6" />
 
             <androidx.recyclerview.widget.RecyclerView

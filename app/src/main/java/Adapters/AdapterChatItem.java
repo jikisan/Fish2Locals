@@ -112,6 +112,7 @@ public class AdapterChatItem extends RecyclerView.Adapter<AdapterChatItem.ItemVi
         holder.iv_deleteChat.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
                 DatabaseReference chatDatabase = FirebaseDatabase.getInstance().getReference("Chats");
 
                 new SweetAlertDialog(view.getContext(), SweetAlertDialog.WARNING_TYPE)

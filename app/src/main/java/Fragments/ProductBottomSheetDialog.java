@@ -1,10 +1,13 @@
 package Fragments;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -12,6 +15,12 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.example.fish2locals.R;
+import com.example.fish2locals.intro_page;
+import com.example.fish2locals.login_page;
+import com.example.fish2locals.sign_up_page;
+import com.example.fish2locals.view_store_page;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -22,29 +31,46 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
+import Models.Basket;
 import Models.Products;
+import cn.pedant.SweetAlert.SweetAlertDialog;
 
 public class ProductBottomSheetDialog extends BottomSheetDialogFragment {
 
-    TextView tv_productName, tv_productQuantity, tv_productPrice, tv_hasPickup, tv_hasOwnDelivery,
-            tv_has3rdPartyDelivery, tv_quantity;
-    ImageView iv_productPhoto, iv_decreaseBtn, iv_increaseBtn;
+    private TextView tv_productName, tv_productQuantity, tv_productPrice, tv_hasPickup, tv_hasOwnDelivery,
+            tv_has3rdPartyDelivery, tv_quantity, tv_submitBtn;
+    private ImageView iv_productPhoto, iv_decreaseBtn, iv_increaseBtn;
+    private LinearLayout layout_hasPickup, layout_hasOwnDelivery, layout_has3rdPartyDelivery;
+    private CheckBox cb_hasPickup, cb_hasOwnDelivery, cb_has3rdPartyDelivery;
 
     private FirebaseUser user;
-    private DatabaseReference productDatabase;
+    private DatabaseReference productDatabase, basketDatabase;
 
     private String myUserId, storeOwnersUserId, storeId, productId;
     private int productQuantity , intValue = 1;;
 
+    String fishImageName;
+    String productName;
+    double productPrice;
+    boolean hasPickup;
+    boolean hasOwnDelivery;
+    boolean has3rdPartyDelivery;
+
+    boolean pickup;
+    boolean ownDelivery;
+    boolean thirdPartyDelivery;
+
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.product_bottom_sheet,
                 container, false);
 
         user = FirebaseAuth.getInstance().getCurrentUser();
         myUserId = user.getUid();
         productDatabase = FirebaseDatabase.getInstance().getReference("Products");
+        basketDatabase = FirebaseDatabase.getInstance().getReference("Basket");
 
         productId = getArguments().getString("productId");
         storeOwnersUserId = getActivity().getIntent().getStringExtra("storeOwnersUserId");
@@ -69,13 +95,13 @@ public class ProductBottomSheetDialog extends BottomSheetDialogFragment {
 
                     Products products = snapshot.getValue(Products.class);
 
-                    String fishImageName = products.getImageName();
-                    String productName = products.getFishName();
+                    fishImageName = products.getImageName();
+                    productName = products.getFishName();
                     productQuantity = products.getQuantityByKilo();
-                    double productPrice = products.getPricePerKilo();
-                    boolean hasPickup = products.isHasPickup();
-                    boolean hasOwnDelivery = products.isHasOwnDelivery();
-                    boolean has3rdPartyDelivery = products.isHas3rdPartyDelivery();
+                    productPrice = products.getPricePerKilo();
+                    hasPickup = products.isHasPickup();
+                    hasOwnDelivery = products.isHasOwnDelivery();
+                    has3rdPartyDelivery = products.isHas3rdPartyDelivery();
 
                     int imageResource = getContext().getResources().getIdentifier(fishImageName,
                             "drawable", getContext().getPackageName());
@@ -93,19 +119,19 @@ public class ProductBottomSheetDialog extends BottomSheetDialogFragment {
 
                     if(hasPickup == true)
                     {
-                        tv_hasPickup.setVisibility(View.VISIBLE);
+                        layout_hasPickup.setVisibility(View.VISIBLE);
                         tv_hasPickup.setText("• Pickup");
                     }
 
                     if(hasOwnDelivery == true)
                     {
-                        tv_hasOwnDelivery.setVisibility(View.VISIBLE);
+                        layout_hasOwnDelivery.setVisibility(View.VISIBLE);
                         tv_hasOwnDelivery.setText("• We Deliver");
                     }
 
                     if(has3rdPartyDelivery == true)
                     {
-                        tv_has3rdPartyDelivery.setVisibility(View.VISIBLE);
+                        layout_has3rdPartyDelivery.setVisibility(View.VISIBLE);
                         tv_has3rdPartyDelivery.setText("• 3rd Party Delivery (Maxim, Angkas, etc.)");
                     }
 
@@ -120,7 +146,6 @@ public class ProductBottomSheetDialog extends BottomSheetDialogFragment {
 
 
     }
-
 
     private void clicks() {
         tv_productName.setOnClickListener(new View.OnClickListener() {
@@ -168,6 +193,126 @@ public class ProductBottomSheetDialog extends BottomSheetDialogFragment {
 
             }
         });
+
+        tv_submitBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                if(!cb_hasPickup.isChecked() && !cb_hasOwnDelivery.isChecked()
+                        && !cb_has3rdPartyDelivery.isChecked())
+                {
+                    Toast.makeText(getContext(), "Please choose a delivery option", Toast.LENGTH_SHORT).show();
+                }
+                else
+                {
+                    SweetAlertDialog sDialog;
+
+                    sDialog = new SweetAlertDialog(getContext(), SweetAlertDialog.NORMAL_TYPE);
+                    sDialog.setTitleText("ADD PRODUCT");
+                    sDialog.setCancelText("Cancel");
+                    sDialog.setConfirmButton("Add", new SweetAlertDialog.OnSweetClickListener() {
+                        @Override
+                        public void onClick(SweetAlertDialog sweetAlertDialog) {
+
+                            sDialog.dismiss();
+                            addProductToBasket();
+
+
+                        }
+                    });
+                    sDialog.setContentText("Add this product\n to your basket?");
+                    sDialog.show();
+                }
+
+
+
+            }
+        });
+
+        cb_hasPickup.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                cb_hasOwnDelivery.setChecked(false);
+                cb_has3rdPartyDelivery.setChecked(false);
+            }
+        });
+
+        cb_hasOwnDelivery.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                cb_hasPickup.setChecked(false);
+                cb_has3rdPartyDelivery.setChecked(false);
+
+            }
+        });
+
+        cb_has3rdPartyDelivery.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                cb_hasPickup.setChecked(false);
+                cb_hasOwnDelivery.setChecked(false);
+
+            }
+        });
+
+    }
+
+    private void addProductToBasket() {
+
+        int quantity = Integer.parseInt(tv_quantity.getText().toString());
+
+        if(cb_hasPickup.isChecked())
+        {
+            pickup = true;
+            ownDelivery = false;
+            thirdPartyDelivery = false;
+
+        }
+        else if(cb_hasOwnDelivery.isChecked())
+        {
+            pickup = false;
+            ownDelivery = true;
+            thirdPartyDelivery = false;
+        }
+        else if(cb_has3rdPartyDelivery.isChecked())
+        {
+            pickup = false;
+            ownDelivery = false;
+            thirdPartyDelivery = true;
+        }
+
+        Basket basket = new Basket(fishImageName, productName, productPrice, pickup,
+                ownDelivery, thirdPartyDelivery, quantity, storeId, storeOwnersUserId, myUserId);
+
+        String databaseName = myUserId + "-" + productName;
+
+        basketDatabase.child(databaseName).setValue(basket).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+
+                if(task.isSuccessful())
+                {
+                    SweetAlertDialog sDialog;
+                    sDialog = new SweetAlertDialog(getContext(), SweetAlertDialog.SUCCESS_TYPE);
+                    sDialog.setTitleText("The product is added to your basket.");
+                    sDialog.setConfirmButton("Continue", new SweetAlertDialog.OnSweetClickListener() {
+                                @Override
+                                public void onClick(SweetAlertDialog sweetAlertDialog) {
+                                    dismiss();
+                                    sDialog.dismiss();
+                                }
+                            });
+                    sDialog.show();
+
+                }
+
+            }
+        });
+
+
     }
 
     private void setRef(View view) {
@@ -178,9 +323,19 @@ public class ProductBottomSheetDialog extends BottomSheetDialogFragment {
         tv_hasOwnDelivery = view.findViewById(R.id.tv_hasOwnDelivery);
         tv_has3rdPartyDelivery = view.findViewById(R.id.tv_has3rdPartyDelivery);
         tv_quantity = view.findViewById(R.id.tv_quantity);
+        tv_submitBtn = view.findViewById(R.id.tv_submitBtn);
 
         iv_productPhoto = view.findViewById(R.id.iv_productPhoto);
         iv_decreaseBtn = view.findViewById(R.id.iv_decreaseBtn);
         iv_increaseBtn = view.findViewById(R.id.iv_increaseBtn);
+
+        layout_hasPickup = view.findViewById(R.id.layout_hasPickup);
+        layout_hasOwnDelivery = view.findViewById(R.id.layout_hasOwnDelivery);
+        layout_has3rdPartyDelivery = view.findViewById(R.id.layout_has3rdPartyDelivery);
+
+        cb_hasPickup = view.findViewById(R.id.cb_hasPickup);
+        cb_hasOwnDelivery = view.findViewById(R.id.cb_hasOwnDelivery);
+        cb_has3rdPartyDelivery = view.findViewById(R.id.cb_has3rdPartyDelivery);
+
     }
 }

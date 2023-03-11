@@ -11,7 +11,7 @@
         android:icon="@drawable/messages"/>
 
     <item android:id="@+id/add_product"
-        android:title="Add"
+        android:title="Add Product"
         android:icon="@drawable/add_box"/>
 
     <item android:id="@+id/notification"

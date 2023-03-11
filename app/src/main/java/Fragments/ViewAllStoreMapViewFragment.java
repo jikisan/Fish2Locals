@@ -215,7 +215,7 @@ public class ViewAllStoreMapViewFragment extends Fragment implements GoogleMap.O
 
                     }
 
-                    BitmapDrawable bitmapdraw=(BitmapDrawable)getResources().getDrawable(R.drawable.custom_marker);
+                    BitmapDrawable bitmapdraw=(BitmapDrawable)getResources().getDrawable(R.drawable.custom_marker2);
                     Bitmap b=bitmapdraw.getBitmap();
                     Bitmap smallMarker = Bitmap.createScaledBitmap(b, 150, 150, false);
 
