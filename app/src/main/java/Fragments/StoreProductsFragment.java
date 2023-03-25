@@ -2,6 +2,7 @@ package Fragments;
 
 import static android.view.View.GONE;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -17,6 +18,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.fish2locals.R;
+import com.example.fish2locals.add_to_basket_page;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -77,13 +79,22 @@ public class StoreProductsFragment extends Fragment {
 
                 String productId = arrProductIds.get(position);
 
+                Intent intent = new Intent(getContext(), add_to_basket_page.class);
+                intent.putExtra("productId", productId);
+                intent.putExtra("storeOwnersUserId", storeOwnersUserId);
+                intent.putExtra("storeId", storeId);
+                startActivity(intent);
 
-                Bundle bundle = new Bundle();
-                bundle.putString("productId", productId);
 
-                ProductBottomSheetDialog productBottomSheetDialog = new ProductBottomSheetDialog();
-                productBottomSheetDialog.setArguments(bundle);
-                productBottomSheetDialog.show(getActivity().getSupportFragmentManager(), "ModalBottomSheet");
+//                Bundle bundle = new Bundle();
+//                bundle.putString("productId", productId);
+//                bundle.putString("context", getContext().toString());
+//
+//                ProductBottomSheetDialog productBottomSheetDialog = new ProductBottomSheetDialog();
+//                productBottomSheetDialog.setArguments(bundle);
+//                productBottomSheetDialog.show(getParentFragmentManager(), "ModalBottomSheet");
+
+
             }
         });
     }
@@ -112,6 +123,8 @@ public class StoreProductsFragment extends Fragment {
 
                 if(snapshot.exists())
                 {
+                    arrProducts.clear();
+
                     for(DataSnapshot dataSnapshot : snapshot.getChildren())
                     {
                         Products products = dataSnapshot.getValue(Products.class);

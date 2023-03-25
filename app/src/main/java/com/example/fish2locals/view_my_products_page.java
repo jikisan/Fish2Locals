@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ProgressBar;
@@ -69,6 +70,21 @@ public class view_my_products_page extends AppCompatActivity {
             }
         });
 
+        adapterStoreProductsItem.setOnItemClickListener(new AdapterStoreProductsItem.OnItemClickListener() {
+            @Override
+            public void onItemClick(int position) {
+
+                arrProducts.get(position);
+                String productId = arrProductIds.get(position);
+
+                Intent intent = new Intent(view_my_products_page.this, edit_product_page.class);
+                intent.putExtra("productId", productId);
+                startActivity(intent);
+
+
+            }
+        });
+
     }
 
     private void generateRecyclerLayout() {
@@ -95,6 +111,9 @@ public class view_my_products_page extends AppCompatActivity {
 
                 if(snapshot.exists())
                 {
+                    arrProducts.clear();
+                    arrProductIds.clear();
+
                     for(DataSnapshot dataSnapshot : snapshot.getChildren())
                     {
                         Products products = dataSnapshot.getValue(Products.class);

@@ -53,7 +53,8 @@ public class AdapterViewAllStores extends RecyclerView.Adapter<AdapterViewAllSto
         String storeUrl = tempStoreData.getStoreUrl();
         String storeName = tempStoreData.getStoreName();
         double distance = tempStoreData.getDistance();
-        long ratings = tempStoreData.getRatings();
+        double averageRating = tempStoreData.getRatings();
+        int count = tempStoreData.getRatingsCount();
         String storeId = tempStoreData.getStoreId();
         String storeOwnersUserId = tempStoreData.getStoreOwnersUserId();
 
@@ -73,8 +74,8 @@ public class AdapterViewAllStores extends RecyclerView.Adapter<AdapterViewAllSto
                 .into(holder.iv_storePhoto);
 
         holder.tv_storeName.setText(storeName);
-        holder.rb_userRating.setRating(ratings);
-        holder.tv_userRatingCount.setText("(" + ratings + ")");
+        holder.tv_userRatingCount.setText(averageRating + "");
+        holder.rb_userRating.setRating((float) averageRating);
 
         holder.tv_visitStoreBtn.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -1,7 +1,9 @@
 package Fragments;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +17,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.example.fish2locals.R;
+import com.example.fish2locals.add_to_basket_page;
 import com.example.fish2locals.intro_page;
 import com.example.fish2locals.login_page;
 import com.example.fish2locals.sign_up_page;
@@ -22,6 +25,7 @@ import com.example.fish2locals.view_store_page;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
+import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -64,6 +68,7 @@ public class ProductBottomSheetDialog extends BottomSheetDialogFragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
+
         View view = inflater.inflate(R.layout.product_bottom_sheet,
                 container, false);
 
@@ -103,15 +108,20 @@ public class ProductBottomSheetDialog extends BottomSheetDialogFragment {
                     hasOwnDelivery = products.isHasOwnDelivery();
                     has3rdPartyDelivery = products.isHas3rdPartyDelivery();
 
-                    int imageResource = getContext().getResources().getIdentifier(fishImageName,
-                            "drawable", getContext().getPackageName());
+
+//                        int imageResource = getActivity().getApplicationContext().getResources().getIdentifier(fishImageName,
+//                                "drawable", getActivity().getApplicationContext().getPackageName());
+
+//                        int imageResource = getContext().getResources().getIdentifier(fishImageName,
+//                                "drawable", getContext().getPackageName());
+//
+//                        Picasso.get()
+//                                .load(imageResource)
+//                                .fit()
+//                                .centerCrop()
+//                                .into(iv_productPhoto);
 
 
-                    Picasso.get()
-                            .load(imageResource)
-                            .fit()
-                            .centerCrop()
-                            .into(iv_productPhoto);
 
                     tv_productName.setText(productName);
                     tv_productQuantity.setText(productQuantity + " kilogram/s remaining.");
@@ -190,6 +200,60 @@ public class ProductBottomSheetDialog extends BottomSheetDialogFragment {
                     intValue++;
                     tv_quantity.setText(intValue + "");
                 }
+
+            }
+        });
+
+        tv_quantity.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                TextInputEditText et_quantity = new TextInputEditText(view.getContext());
+                et_quantity.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_SIGNED);
+                et_quantity.setPadding(24, 8, 8, 8);
+                et_quantity.setText("1");
+
+                androidx.appcompat.app.AlertDialog.Builder quantityDialog = new androidx.appcompat.app.AlertDialog.Builder(view.getContext());
+                quantityDialog.setTitle("Please enter quantity");
+                quantityDialog.setView(et_quantity);
+
+                quantityDialog.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+
+                        String quantity = et_quantity.getText().toString();
+
+                        int quantityInInt = 1;
+                        if(!quantity.isEmpty())
+                        {
+                            quantityInInt = Integer.parseInt(quantity);
+                        }
+
+                        if(quantityInInt <= 1 || quantity.isEmpty())
+                        {
+                            Toast.makeText(getContext(),
+                                    "Cannot be less than 1 kilo", Toast.LENGTH_SHORT).show();
+
+                        }
+                        else if(quantityInInt > productQuantity)
+                        {
+                            Toast.makeText(getContext(), "Number exceeded the remaining quantity.", Toast.LENGTH_SHORT).show();
+                        }
+                        else
+                        {
+                            tv_quantity.setText(quantity);
+                        }
+
+                    }
+                });
+                quantityDialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+
+                    }
+                });
+
+                quantityDialog.create().show();
 
             }
         });
@@ -285,7 +349,8 @@ public class ProductBottomSheetDialog extends BottomSheetDialogFragment {
         }
 
         Basket basket = new Basket(fishImageName, productName, productPrice, pickup,
-                ownDelivery, thirdPartyDelivery, quantity, storeId, storeOwnersUserId, myUserId);
+                ownDelivery, thirdPartyDelivery, quantity, storeId, storeOwnersUserId,
+                myUserId, productId);
 
         String databaseName = myUserId + "-" + productName;
 
@@ -293,21 +358,21 @@ public class ProductBottomSheetDialog extends BottomSheetDialogFragment {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
 
-                if(task.isSuccessful())
-                {
+
                     SweetAlertDialog sDialog;
                     sDialog = new SweetAlertDialog(getContext(), SweetAlertDialog.SUCCESS_TYPE);
                     sDialog.setTitleText("The product is added to your basket.");
                     sDialog.setConfirmButton("Continue", new SweetAlertDialog.OnSweetClickListener() {
                                 @Override
                                 public void onClick(SweetAlertDialog sweetAlertDialog) {
+
                                     dismiss();
                                     sDialog.dismiss();
+
                                 }
                             });
                     sDialog.show();
 
-                }
 
             }
         });

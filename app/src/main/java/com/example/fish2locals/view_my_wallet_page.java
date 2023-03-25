@@ -172,13 +172,11 @@ public class view_my_wallet_page extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-//                Intent intent = new Intent(view_my_wallet_page.this, homepage.class);
-//                intent.putExtra("pageNumber", "5");
-//                intent.putExtra("myCategory", "Event Organizer");
-//                intent.putExtra("myPosts", "1");
-//                startActivity(intent);
-
                 onBackPressed();
+
+//            Intent intent = new Intent(view_my_wallet_page.this, homepage.class);
+//            intent.putExtra("pageNumber", "5");
+//            startActivity(intent);
             }
         });
 
@@ -218,7 +216,6 @@ public class view_my_wallet_page extends AppCompatActivity {
             }
         });
     }
-
 
     private void deductFunds() {
 

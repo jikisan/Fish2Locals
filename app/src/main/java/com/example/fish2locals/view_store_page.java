@@ -75,7 +75,7 @@ public class view_store_page extends AppCompatActivity {
         generateTabs();
     }
 
-    private void clicks() {
+    private void clicks(){
 
         iv_back.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -89,8 +89,8 @@ public class view_store_page extends AppCompatActivity {
                 {
                     new SweetAlertDialog(view_store_page.this, SweetAlertDialog.WARNING_TYPE)
                             .setTitleText("Warning!")
-                            .setCancelText("Continue Buying")
-                            .setConfirmButton("Cancel Transaction", new SweetAlertDialog.OnSweetClickListener() {
+                            .setCancelText("No")
+                            .setConfirmButton("End", new SweetAlertDialog.OnSweetClickListener() {
                                 @Override
                                 public void onClick(SweetAlertDialog sweetAlertDialog) {
 
@@ -98,8 +98,9 @@ public class view_store_page extends AppCompatActivity {
                                 }
                             })
                             .setContentText("Your basket has\n" +
-                                    arrBasket.size() + " item/s\n" +
-                                    "are you sure you want to cancel?")
+                                    arrBasket.size() + " item/s.\n" +
+                                    "Are you sure you want to end\n" +
+                                    "the transaction?")
                             .show();
                 }
 
@@ -131,7 +132,7 @@ public class view_store_page extends AppCompatActivity {
 
         Query query = basketDatabase.orderByChild("buyerUserId").equalTo(myUserId);
 
-        query.addValueEventListener(new ValueEventListener() {
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
 
@@ -273,12 +274,24 @@ public class view_store_page extends AppCompatActivity {
                     {
                         Basket basket = dataSnapshot.getValue(Basket.class);
 
-                        arrBasket.add(basket);
+                        String buyerUserId = basket.getBuyerUserId();
+
+                        if(buyerUserId.equals(myUserId))
+                        {
+                            arrBasket.add(basket);
+                        }
+
                     }
 
                     int basketCount = arrBasket.size();
 
-                    tv_myBasketButton.setText("GO TO MY BASKET (" + basketCount + "item/s )");
+                    if(basketCount == 0)
+                    {
+                        tv_myBasketButton.setText("Empty basket");
+                    }
+
+                    tv_myBasketButton.setText("GO TO MY BASKET (" + basketCount + " item/s )");
+
                 }
                 else
                 {
@@ -338,8 +351,8 @@ public class view_store_page extends AppCompatActivity {
 
     private void generateTabs() {
 
-        tab_layout.addTab(tab_layout.newTab().setText("Info"));
         tab_layout.addTab(tab_layout.newTab().setText("Products"));
+        tab_layout.addTab(tab_layout.newTab().setText("Info"));
         tab_layout.addTab(tab_layout.newTab().setText("Reviews"));
 
         FragmentManager fragmentManager = getSupportFragmentManager();

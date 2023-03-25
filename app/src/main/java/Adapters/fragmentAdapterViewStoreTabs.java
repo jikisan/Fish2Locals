@@ -22,12 +22,13 @@ public class fragmentAdapterViewStoreTabs extends FragmentStateAdapter {
 
         switch (position) {
             case 1:
-                return new  StoreProductsFragment();
+                return new StoreInfoFragment();
             case 2:
                 return new StoreReviewsFragment();
         }
 
-        return new StoreInfoFragment();
+        return new  StoreProductsFragment();
+
     }
 
     @Override

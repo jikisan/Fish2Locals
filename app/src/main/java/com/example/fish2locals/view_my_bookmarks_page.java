@@ -46,6 +46,7 @@ import Adapters.AdapterMostTrusted;
 import Adapters.AdapterStoreProductsItem;
 import Models.Bookmark;
 import Models.Products;
+import Models.Ratings;
 import Models.Store;
 import Models.TempStoreData;
 
@@ -65,9 +66,11 @@ public class view_my_bookmarks_page extends AppCompatActivity {
     private TextView tv_back, tv_textPlaceholder;
 
     private FirebaseUser user;
-    private DatabaseReference bookmarkDatabase, storeDatabase;
+    private DatabaseReference bookmarkDatabase, storeDatabase, ratingDatabase;
 
-    private String myUserId, storeOwnersUserId, storeId;
+    private String myUserId, ratingCounter;
+    int counter = 0;
+    double totalRating = 0, tempRatingValue = 0, averageRating = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,6 +81,8 @@ public class view_my_bookmarks_page extends AppCompatActivity {
         myUserId = user.getUid();
         bookmarkDatabase = FirebaseDatabase.getInstance().getReference("Bookmark");
         storeDatabase = FirebaseDatabase.getInstance().getReference("Store");
+        ratingDatabase = FirebaseDatabase.getInstance().getReference("Ratings");
+
 
         setRef();
         getCurrentLocation();
@@ -200,8 +205,9 @@ public class view_my_bookmarks_page extends AppCompatActivity {
 
                         long ratings = bookmark.getRatings();
 
+
                         TempStoreData tempStoreData = new TempStoreData(storeUrl, storeName,
-                                distance, ratings, storeId, myUserId);
+                                distance, ratings, counter, storeId, myUserId);
 
                         arrTempStoreData.add(tempStoreData);
                     }
@@ -224,6 +230,40 @@ public class view_my_bookmarks_page extends AppCompatActivity {
             }
         });
 
+    }
+
+    private void generateReviews(String storeId) {
+
+        Query query = ratingDatabase.orderByChild("ratingOfId").equalTo(storeId);
+
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+
+
+                if(snapshot.exists())
+                {
+                    for(DataSnapshot dataSnapshot : snapshot.getChildren())
+                    {
+                        Ratings ratings = dataSnapshot.getValue(Ratings.class);
+                        tempRatingValue = ratings.getRatingValue();
+                        totalRating = totalRating + tempRatingValue;
+                        counter++;
+                    }
+
+                    averageRating = totalRating / counter;
+                    ratingCounter = "(" + String.valueOf(counter) + ")";
+
+
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
 
     private double generateDistance(LatLng location) {

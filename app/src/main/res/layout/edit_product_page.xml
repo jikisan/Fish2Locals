@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".edit_product_page">
+
+    <TextView
+        android:id="@+id/tv_back"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:drawableStart="@drawable/back_arrow"
+        android:drawableTint="@color/teal_200"
+        android:text="Edit Product"
+        android:textColor="@color/teal_200"
+        android:textStyle="bold"
+        android:gravity="center_vertical"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ScrollView
+        android:id="@+id/scrollview"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="16dp"
+        android:paddingBottom="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tv_back"
+        app:layout_constraintVertical_bias="0.0">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingBottom="16dp">
+
+
+            <ImageView
+                android:id="@+id/iv_fishPhoto"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:background="@color/edit_text_background"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/textView9"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:text="Fish Name"
+                android:textColor="@color/teal_200"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/iv_fishPhoto" />
+
+            <TextView
+                android:id="@+id/tv_productName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="16dp"
+                android:text="@string/LOADING"
+                android:textStyle="bold"
+                android:textSize="20sp"
+                android:textColor="@color/white"
+                android:gravity="center"
+                app:layout_constraintEnd_toEndOf="@+id/iv_fishPhoto"
+                app:layout_constraintStart_toStartOf="@+id/iv_fishPhoto"
+                app:layout_constraintTop_toBottomOf="@+id/textView9" />
+
+            <TextView
+                android:id="@+id/tv_viewPhotos"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:gravity="center"
+                android:drawableLeft="@android:drawable/ic_menu_gallery"
+                android:drawableTint="@color/black"
+                android:background="@color/teal_200"
+                android:padding="8dp"
+                android:text="VIEW PHOTOS"
+                android:textColor="@color/black"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="@+id/tv_productName"
+                app:layout_constraintStart_toStartOf="@+id/tv_productName"
+                app:layout_constraintTop_toBottomOf="@+id/tv_productName" />
+
+            <TextView
+                android:id="@+id/textView10"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="Select Delivery Options (Can choose more than 1)"
+                android:textColor="@color/teal_200"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="@+id/tv_productName"
+                app:layout_constraintTop_toBottomOf="@+id/tv_viewPhotos" />
+
+
+            <CheckBox
+                android:id="@+id/cb_pickUp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:checked="true"
+                android:text="Pick Up"
+                android:textColor="@color/white"
+                app:layout_constraintStart_toStartOf="@+id/textView10"
+                app:layout_constraintTop_toBottomOf="@+id/textView10" />
+
+            <CheckBox
+                android:id="@+id/cb_ownDelivery"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Delivery"
+                android:textColor="@color/white"
+                app:layout_constraintStart_toStartOf="@+id/cb_pickUp"
+                app:layout_constraintTop_toBottomOf="@+id/cb_pickUp" />
+
+            <CheckBox
+                android:id="@+id/cb_3rdPartyDelivery"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="3rd Party Delivery (Maxim, Angkas, etc.)"
+                android:textColor="@color/white"
+                android:visibility="gone"
+                app:layout_constraintStart_toStartOf="@+id/cb_ownDelivery"
+                app:layout_constraintTop_toBottomOf="@+id/cb_ownDelivery" />
+
+            <TextView
+                android:id="@+id/textView12"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="32dp"
+                android:text="Product Price per kilogram"
+                android:textColor="@color/teal_200"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="@+id/tv_productName"
+                app:layout_constraintTop_toBottomOf="@+id/cb_ownDelivery" />
+
+            <TextView
+                android:id="@+id/textViewPesos"
+                android:layout_width="wrap_content"
+                android:layout_height="32dp"
+                android:layout_marginTop="8dp"
+                android:gravity="center"
+                android:text="@string/peso_sign"
+                android:textColor="@color/teal_200"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="@+id/cb_3rdPartyDelivery"
+                app:layout_constraintTop_toBottomOf="@+id/textView12" />
+
+            <EditText
+                android:id="@+id/et_price"
+                android:layout_width="wrap_content"
+                android:layout_height="32dp"
+                android:layout_marginStart="8dp"
+                android:background="@drawable/rounded5"
+                android:gravity="center"
+                android:hint="0.00"
+                android:inputType="numberDecimal"
+                android:paddingLeft="16dp"
+                android:paddingRight="16dp"
+                android:textColor="@color/black"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="@+id/textViewPesos"
+                app:layout_constraintStart_toEndOf="@+id/textViewPesos"
+                app:layout_constraintTop_toTopOf="@+id/textViewPesos" />
+
+            <TextView
+                android:id="@+id/textView11"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="32dp"
+                android:text="Quantity (by Kilogram)"
+                android:textColor="@color/teal_200"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="@+id/textView12"
+                app:layout_constraintTop_toBottomOf="@+id/textViewPesos" />
+
+
+            <ImageView
+                android:id="@+id/iv_decreaseBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:src="@drawable/minus"
+                app:layout_constraintStart_toStartOf="@+id/textViewPesos"
+                app:layout_constraintTop_toBottomOf="@+id/textView11"
+                app:tint="@color/teal_200" />
+
+            <TextView
+                android:id="@+id/tv_quantity"
+                android:layout_width="36dp"
+                android:layout_height="32dp"
+                android:layout_marginStart="24dp"
+                android:layout_marginLeft="24dp"
+                android:background="@drawable/rounded5"
+                android:gravity="center"
+                android:text="1"
+                android:textColor="@color/black"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="@+id/iv_decreaseBtn"
+                app:layout_constraintStart_toEndOf="@+id/iv_decreaseBtn"
+                app:layout_constraintTop_toTopOf="@+id/iv_decreaseBtn"
+                app:layout_constraintVertical_bias="0.375" />
+
+            <ImageView
+                android:id="@+id/iv_increaseBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="24dp"
+                android:layout_marginLeft="24dp"
+                android:src="@drawable/add"
+                app:layout_constraintBottom_toBottomOf="@+id/tv_quantity"
+                app:layout_constraintStart_toEndOf="@+id/tv_quantity"
+                app:layout_constraintTop_toTopOf="@+id/tv_quantity"
+                app:layout_constraintVertical_bias="0.375"
+                app:tint="@color/teal_200" />
+
+            <TextView
+                android:id="@+id/tv_submitBtn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="32dp"
+                android:layout_marginEnd="16dp"
+                android:background="@drawable/gradient_button_background"
+                android:gravity="center"
+                android:paddingTop="16dp"
+                android:paddingBottom="16dp"
+                android:text="SUBMIT"
+                android:textColor="@color/white"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tv_quantity" />
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

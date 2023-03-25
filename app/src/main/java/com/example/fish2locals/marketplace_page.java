@@ -41,30 +41,45 @@ import java.util.ArrayList;
 import java.util.List;
 
 import Adapters.AdapterBookmarks;
+import Adapters.AdapterMarketPlace;
 import Models.Bookmark;
 import Models.Products;
+import Models.Ratings;
 import Models.Store;
 import Models.TempStoreData;
 
 public class marketplace_page extends AppCompatActivity {
 
-    private FusedLocationProviderClient client;
-    private double myLatDouble, myLongDouble, distance;
+    String[] fish={"Tilapia (Mayan Cichlids)","Tambakol (Yellowfin Tuna)",
+            "Lapu lapu (Leopard Coral Grouper)","Tamban","Dilis (Anchovy)","Maya maya (Red Snapper)",
+            "Tulingan (Mackerel Tuna)","Galunggong (Round Scad)","Dalagang Bukid (Yellow Tail Fusilier)",
+            "Sapsap (Pony Fish or Slipmouth Fish)","Hasahasa (Short Mackerel)","Apahap (Barramundi)",
+            "Pompano","Bisugo (Threadfin Bream)","Tanigue (Spanish Mackerel)", "Bangus (Milkfish)"};
 
-    private List<Products> arrBookmarks = new ArrayList<>();
-    private List<String> arrStoreId = new ArrayList<>();
-    private List<Store> arrStore = new ArrayList<>();
+    int images[] = {R.drawable.fish_tilapia_mayancichlids, R.drawable.fish_tambakol_yellowfintuna,
+            R.drawable.fish_lapulapu_leopardcoralgrouper, R.drawable.fish_tamban,
+            R.drawable.fish_dilis_anchovy, R.drawable.fish_mayamaya_redsnapper,
+            R.drawable.fish_tulingan_mackereltuna, R.drawable.fish_galunggong_roundscad,
+            R.drawable.fish_dalagangbukid_yellowtailfusilier,
+            R.drawable.fish_sapsap_ponyfishorslipmouthfish, R.drawable.fish_hasahasa_shortmackerel,
+            R.drawable.fish_apahap_barramundi, R.drawable.fish_pompano,
+            R.drawable.fish_bisugo_threadfinbream, R.drawable.fish_tanigue_spanishmackerel,
+            R.drawable.fish_bangus_milkfish };
+
+
     private List<TempStoreData> arrTempStoreData = new ArrayList<>();
-    private AdapterBookmarks adapterMostTrusted;
+    private AdapterMarketPlace adapterMarketPlace;
 
     private ProgressBar progressBar;
     private RecyclerView rv_marketplace;
     private TextView tv_back, tv_textPlaceholder;
 
     private FirebaseUser user;
-    private DatabaseReference bookmarkDatabase, storeDatabase;
+    private DatabaseReference bookmarkDatabase, storeDatabase, ratingDatabase;
 
-    private String myUserId, storeOwnersUserId, storeId;
+    private String myUserId, storeOwnersUserId, storeId, ratingCounter;
+    int counter = 0;
+    double totalRating = 0, tempRatingValue = 0, averageRating = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,9 +90,11 @@ public class marketplace_page extends AppCompatActivity {
         myUserId = user.getUid();
         bookmarkDatabase = FirebaseDatabase.getInstance().getReference("Bookmark");
         storeDatabase = FirebaseDatabase.getInstance().getReference("Store");
+        ratingDatabase = FirebaseDatabase.getInstance().getReference("Ratings");
+
 
         setRef();
-        getCurrentLocation();
+        generateRecyclerLayout();
         clicks();
 
     }
@@ -92,70 +109,6 @@ public class marketplace_page extends AppCompatActivity {
         });
     }
 
-    @SuppressLint("MissingPermission")
-    private void getCurrentLocation() {
-        // Initialize Location manager
-        LocationManager locationManager = (LocationManager) marketplace_page.this
-                .getSystemService(Context.LOCATION_SERVICE);
-        // Check condition
-        if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
-                || locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
-            // When location service is enabled
-            // Get last location
-
-            client.getLastLocation().addOnCompleteListener(new OnCompleteListener<Location>() {
-                @Override
-                public void onComplete(
-                        @NonNull Task<Location> task) {
-
-                    // Initialize location
-                    Location location = task.getResult();                    // Check condition
-                    if (location != null) {
-                        // When location result is not
-                        // null set latitude
-                        myLatDouble = location.getLatitude();
-                        myLongDouble = location.getLongitude();
-                        generateRecyclerLayout();
-
-
-                    } else {
-                        // When location result is null
-                        // initialize location request
-                        LocationRequest locationRequest = new LocationRequest()
-                                .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
-                                .setInterval(10000)
-                                .setFastestInterval(1000)
-                                .setNumUpdates(1);
-
-                        // Initialize location call back
-                        LocationCallback locationCallback = new LocationCallback() {
-                            @Override
-                            public void
-                            onLocationResult(LocationResult locationResult) {
-                                // Initialize
-                                // location
-                                Location location1 = locationResult.getLastLocation();
-                                myLatDouble = location1.getLatitude();
-                                myLongDouble = location1.getLongitude();
-                                generateRecyclerLayout();
-
-
-                            }
-                        };
-
-                        // Request location updates
-                        client.requestLocationUpdates(locationRequest, locationCallback,
-                                Looper.myLooper());
-                    }
-                }
-            });
-        } else {
-            // When location service is not enabled
-            // open location setting
-            startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
-                    .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
-        }
-    }
 
     private void generateRecyclerLayout() {
 
@@ -163,10 +116,14 @@ public class marketplace_page extends AppCompatActivity {
         GridLayoutManager gridLayoutManager = new GridLayoutManager(marketplace_page.this, 2, GridLayoutManager.VERTICAL, false);
         rv_marketplace.setLayoutManager(gridLayoutManager);
 
-        adapterMostTrusted = new AdapterBookmarks(arrTempStoreData, marketplace_page.this);
-        rv_marketplace.setAdapter(adapterMostTrusted);
+        adapterMarketPlace = new AdapterMarketPlace(fish, images, marketplace_page.this);
+        rv_marketplace.setAdapter(adapterMarketPlace);
+        adapterMarketPlace.notifyDataSetChanged();
+        progressBar.setVisibility(GONE);
 
-        getViewHolderValues();
+
+
+//        getViewHolderValues();
 
     }
 
@@ -200,14 +157,14 @@ public class marketplace_page extends AppCompatActivity {
                         double latDouble = Double.parseDouble(store.getStoreLat());
                         double longDouble = Double.parseDouble(store.getStoreLang());
                         LatLng location = new LatLng(latDouble, longDouble);
-                        double distance = generateDistance(location);
 
                         long ratings = store.getRatings();
 
-                        TempStoreData tempStoreData = new TempStoreData(storeUrl, storeName,
-                                distance, ratings, storeId, myUserId);
 
-                        arrTempStoreData.add(tempStoreData);
+//                        TempStoreData tempStoreData = new TempStoreData(storeUrl, storeName,
+//                                distance, ratings, counter, storeId, storeOwnersUserId);
+
+//                        arrTempStoreData.add(tempStoreData);
                     }
                 }
 
@@ -219,7 +176,6 @@ public class marketplace_page extends AppCompatActivity {
                     tv_textPlaceholder.setText("Empty");
                 }
 
-                adapterMostTrusted.notifyDataSetChanged();
             }
 
             @Override
@@ -230,21 +186,10 @@ public class marketplace_page extends AppCompatActivity {
 
     }
 
-    private double generateDistance(LatLng location) {
 
-        LatLng myLatLng = new LatLng(myLatDouble, myLongDouble);
-
-//        LatLng myLatLng = new LatLng(10.320066961476325, 123.89681572928217);
-
-
-        double distanceResult = SphericalUtil.computeDistanceBetween(myLatLng, location);
-
-        return distanceResult;
-    }
 
     private void setRef() {
 
-        client = LocationServices.getFusedLocationProviderClient(marketplace_page.this);
 
         progressBar = findViewById(R.id.progressBar);
         rv_marketplace = findViewById(R.id.rv_marketplace);

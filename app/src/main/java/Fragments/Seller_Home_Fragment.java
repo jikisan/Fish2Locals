@@ -17,6 +17,8 @@ import android.widget.Toast;
 
 import com.example.fish2locals.R;
 import com.example.fish2locals.seller_homepage;
+import com.example.fish2locals.sellers_order_page;
+import com.example.fish2locals.view_my_order_page;
 import com.example.fish2locals.view_my_products_page;
 import com.example.fish2locals.view_my_wallet_page;
 import com.google.android.gms.location.LocationServices;
@@ -129,7 +131,9 @@ public class Seller_Home_Fragment extends Fragment {
         layout_myOrders.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText( getContext(), "My Orders", Toast.LENGTH_SHORT).show();
+
+                Intent intent = new Intent(getContext(), sellers_order_page.class);
+                startActivity(intent);
             }
         });
 

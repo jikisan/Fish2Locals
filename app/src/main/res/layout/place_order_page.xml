@@ -7,6 +7,20 @@
     tools:context=".place_order_page">
 
     <TextView
+        android:id="@+id/tv_myWallet"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:drawableLeft="@drawable/wallet"
+        android:drawableTint="@color/teal_200"
+        android:text="@string/LOADING"
+        android:textColor="@color/teal_200"
+        android:gravity="center"
+        app:layout_constraintBottom_toBottomOf="@+id/tv_back"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/tv_back" />
+
+    <TextView
         android:id="@+id/tv_back"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

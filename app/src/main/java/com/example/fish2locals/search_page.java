@@ -18,6 +18,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
@@ -26,6 +27,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import Adapters.AdapterStoreItem;
+import Models.Ratings;
 import Models.Store;
 import Models.TempStoreData;
 import Models.Users;
@@ -42,10 +44,12 @@ public class search_page extends AppCompatActivity {
     private List<String> arrStoreId = new ArrayList<>();
 
     private FirebaseUser user;
-    private DatabaseReference userDatabase, storeDatabase;
+    private DatabaseReference userDatabase, storeDatabase, ratingDatabase;
     private AdapterStoreItem adapterStoreItem;
 
-    private String myUserId;
+    private String myUserId, ratingCounter;
+    int counter = 0;
+    double totalRating = 0, tempRatingValue = 0, averageRating = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,6 +60,8 @@ public class search_page extends AppCompatActivity {
         myUserId = user.getUid();
         userDatabase = FirebaseDatabase.getInstance().getReference("Users");
         storeDatabase = FirebaseDatabase.getInstance().getReference("Store");
+        ratingDatabase = FirebaseDatabase.getInstance().getReference("Ratings");
+
 
         setRef();
         generateStoreData();
@@ -118,7 +124,7 @@ public class search_page extends AppCompatActivity {
                         String storeOwnersUserId = store.getStoreOwnersUserId();
 
                         TempStoreData tempStoreData = new TempStoreData(storeUrl, storeName,
-                                distance, ratings, storeId, storeOwnersUserId);
+                                distance, ratings, counter, storeId, storeOwnersUserId);
 
                         if(storeOwnersUserId.equals(myUserId))
                         {
@@ -134,6 +140,40 @@ public class search_page extends AppCompatActivity {
 
 
 
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
+    private void generateReviews(String storeId) {
+
+        Query query = ratingDatabase.orderByChild("ratingOfId").equalTo(storeId);
+
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+
+
+                if(snapshot.exists())
+                {
+                    for(DataSnapshot dataSnapshot : snapshot.getChildren())
+                    {
+                        Ratings ratings = dataSnapshot.getValue(Ratings.class);
+                        tempRatingValue = ratings.getRatingValue();
+                        totalRating = totalRating + tempRatingValue;
+                        counter++;
+                    }
+
+                    averageRating = totalRating / counter;
+                    ratingCounter = "(" + String.valueOf(counter) + ")";
+
+
+                }
             }
 
             @Override

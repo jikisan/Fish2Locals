@@ -22,6 +22,33 @@
         tools:replace="android:icon"
         tools:targetApi="31">
         <activity
+            android:name=".view_stores_of_best_sellers_page"
+            android:exported="false" />
+        <activity
+            android:name=".rate_buyer_page"
+            android:exported="false" />
+        <activity
+            android:name=".edit_product_page"
+            android:exported="false" />
+        <activity
+            android:name=".seller_order_details_page"
+            android:exported="false" />
+        <activity
+            android:name=".sellers_order_page"
+            android:exported="false" />
+        <activity
+            android:name=".add_to_basket_page"
+            android:exported="false" />
+        <activity
+            android:name=".rate_store_seller_page"
+            android:exported="false" />
+        <activity
+            android:name=".order_details_page"
+            android:exported="false" />
+        <activity
+            android:name=".view_my_order_page"
+            android:exported="false" />
+        <activity
             android:name=".order_summary_page"
             android:exported="false" />
         <activity

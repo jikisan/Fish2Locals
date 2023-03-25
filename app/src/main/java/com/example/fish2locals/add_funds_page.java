@@ -89,8 +89,10 @@ public class add_funds_page extends AppCompatActivity {
         tv_back.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(add_funds_page.this, view_my_wallet_page.class);
-                startActivity(intent);
+//                Intent intent = new Intent(add_funds_page.this, view_my_wallet_page.class);
+//                startActivity(intent);
+
+                onBackPressed();
 
             }
         });
@@ -180,7 +182,7 @@ public class add_funds_page extends AppCompatActivity {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
 
-                Toast.makeText(add_funds_page.this, "PHP " + myFundAmountString +
+                Toast.makeText(add_funds_page.this, "PHP " + addFundInDouble +
                         " amount" +  " is successfully added.", Toast.LENGTH_SHORT).show();
                 generateWalletData();
                 imageUri = null;
@@ -194,8 +196,6 @@ public class add_funds_page extends AppCompatActivity {
         });
 
     }
-
-
 
     private void generateWalletData() {
 

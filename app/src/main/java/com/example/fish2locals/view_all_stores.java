@@ -93,4 +93,5 @@ public class view_all_stores extends AppCompatActivity {
         vp_viewPager2 = findViewById(R.id.vp_viewPager2);
         tv_back = findViewById(R.id.tv_back);
     }
+
 }

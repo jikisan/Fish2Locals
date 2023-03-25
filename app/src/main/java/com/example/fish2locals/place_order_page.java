@@ -4,12 +4,13 @@ import static android.view.View.GONE;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.location.Address;
 import android.location.Geocoder;
@@ -35,34 +36,37 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.storage.UploadTask;
-import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
 import java.text.DateFormat;
+import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
-import Adapters.AdapterMyBasketItem;
 import Adapters.AdapterPlaceOrderItem;
 import Models.Basket;
 import Models.Orders;
+import Models.Products;
+import Models.Transactions;
 import Models.Users;
+import Models.Wallets;
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
 public class place_order_page extends AppCompatActivity {
 
     private List<Basket> arrBasket = new ArrayList<>();
     private List<Orders> arrOrders = new ArrayList<>();
+    private List<Products> arrProducts = new ArrayList<>();
 
     private ProgressBar progressBar;
     private RecyclerView rv_myBasket;
-    private TextView tv_back, tv_placeOrderBtn, tv_enterDeviveryAddress;
+    private TextView tv_back, tv_placeOrderBtn, tv_enterDeviveryAddress, tv_myWallet;
     private EditText et_contactNum;
     private ProgressDialog progressDialog;
 
@@ -71,11 +75,13 @@ public class place_order_page extends AppCompatActivity {
     private AdapterPlaceOrderItem adapterPlaceOrderItem;
 
     private FirebaseUser user;
-    private DatabaseReference basketDatabase, userDatabase, orderDatabase;
+    private DatabaseReference basketDatabase, userDatabase, orderDatabase, walletDatabase, transactionDatabase,
+            productDatabase;
     private Task addTask;
 
     private String myUserId, storeOwnersUserId, storeId, latLng, latString, longString;
-    private String timeCreated, dateCreated, childName, orderId;
+    private String timeCreated, dateCreated, childName, orderId, walletId, myFundAmountString;
+    private double myFundAmount;
     private long dateTimeInMillis;
     double totalPrice = 0;
 
@@ -89,12 +95,18 @@ public class place_order_page extends AppCompatActivity {
         basketDatabase = FirebaseDatabase.getInstance().getReference("Basket");
         userDatabase = FirebaseDatabase.getInstance().getReference("Users");
         orderDatabase = FirebaseDatabase.getInstance().getReference("Orders");
+        walletDatabase = FirebaseDatabase.getInstance().getReference("Wallets");
+        productDatabase = FirebaseDatabase.getInstance().getReference("Products");
+        transactionDatabase = FirebaseDatabase.getInstance().getReference("Transactions");
+
 
         storeOwnersUserId = getIntent().getStringExtra("storeOwnersUserId");
         storeId = getIntent().getStringExtra("storeId");
 
         setRef();
+
         generateMyData();
+        generateMyWalletData();
         generateRecyclerLayout();
         clicks();
     }
@@ -124,6 +136,127 @@ public class place_order_page extends AppCompatActivity {
         });
 
     }
+
+    private void generateMyWalletData() {
+
+        walletDatabase.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+                if(snapshot.exists())
+                {
+                    for(DataSnapshot dataSnapshot : snapshot.getChildren())
+                    {
+                        Wallets wallets = dataSnapshot.getValue(Wallets.class);
+                        String walletUserId = wallets.getUserID();
+
+                        if(walletUserId.equals(myUserId))
+                        {
+                            walletId = dataSnapshot.getKey().toString();
+                            myFundAmount = wallets.getFundAmount();
+                            myFundAmountString = NumberFormat.getNumberInstance(Locale.US).format(myFundAmount);
+                            tv_myWallet.setText("My Balance: ₱ " + myFundAmountString);
+                        }
+
+                    }
+
+                }
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+    }
+
+    private void generateRecyclerLayout() {
+
+        rv_myBasket.setHasFixedSize(true);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(place_order_page.this);
+        rv_myBasket.setLayoutManager(linearLayoutManager);
+
+        adapterPlaceOrderItem = new AdapterPlaceOrderItem(arrBasket, getApplicationContext());
+        rv_myBasket.setAdapter(adapterPlaceOrderItem);
+
+        getViewHolderValues();
+    }
+
+    private void getViewHolderValues() {
+
+        Query query = basketDatabase
+                .orderByChild("storeId")
+                .equalTo(storeId);
+
+        query.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+                if(snapshot.exists())
+                {
+                    arrBasket.clear();
+
+                    for(DataSnapshot dataSnapshot : snapshot.getChildren())
+                    {
+                        Basket basket = dataSnapshot.getValue(Basket.class);
+
+                        String productId = basket.getProductId();
+                        String buyerUserId = basket.getBuyerUserId();
+                        double pricePerKilo = basket.getPricePerKilo();
+                        int basketQuantity = basket.getQuantityByKilo();
+
+                        if(buyerUserId.equals(myUserId))
+                        {
+                            arrBasket.add(basket);
+                            totalPrice = totalPrice + (pricePerKilo*basketQuantity);
+
+                            generateProductData(productId);
+                        }
+                    }
+
+
+                    tv_placeOrderBtn.setText("PLACE ORDER (Total Amount: ₱ " +totalPrice+ ")");
+
+                }
+
+
+                progressBar.setVisibility(GONE);
+                adapterPlaceOrderItem.notifyDataSetChanged();
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+    }
+
+    private void generateProductData(String productId) {
+
+        productDatabase.child(productId).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+                if(snapshot.exists())
+                {
+                    Products products = snapshot.getValue(Products.class);
+
+                    arrProducts.add(products);
+                }
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
 
     private void clicks() {
 
@@ -176,23 +309,30 @@ public class place_order_page extends AppCompatActivity {
                     tv_enterDeviveryAddress.setError("This field is required");
                     Toast.makeText(place_order_page.this, "Please enter delivery address", Toast.LENGTH_SHORT).show();
                 }
+                else if(myFundAmount < totalPrice)
+                {
+                    Toast.makeText(place_order_page.this, "Insufficient fund.", Toast.LENGTH_SHORT).show();
+
+                }
                 else
                 {
-                    SweetAlertDialog sDialog;
+//                    SweetAlertDialog sDialog;
+//
+//                    sDialog = new SweetAlertDialog(place_order_page.this, SweetAlertDialog.NORMAL_TYPE);
+//                    sDialog.setTitleText("Place order?");
+//                    sDialog.setCancelText("Cancel");
+//                    sDialog.setConfirmButton("Place Order", new SweetAlertDialog.OnSweetClickListener() {
+//                        @Override
+//                        public void onClick(SweetAlertDialog sweetAlertDialog) {
+//
+//                            sDialog.dismiss();
+//                            addOrdersToDatabase();
+//
+//                        }
+//                    });
+//                    sDialog.show();
 
-                    sDialog = new SweetAlertDialog(place_order_page.this, SweetAlertDialog.NORMAL_TYPE);
-                    sDialog.setTitleText("Place order?");
-                    sDialog.setCancelText("Cancel");
-                    sDialog.setConfirmButton("Place Order", new SweetAlertDialog.OnSweetClickListener() {
-                        @Override
-                        public void onClick(SweetAlertDialog sweetAlertDialog) {
-
-                            sDialog.dismiss();
-                            addOrdersToDatabase();
-
-                        }
-                    });
-                    sDialog.show();
+                    addOrdersToDatabase();
                 }
 
 
@@ -202,6 +342,7 @@ public class place_order_page extends AppCompatActivity {
         });
 
     }
+
 
     private void addOrdersToDatabase() {
 
@@ -218,101 +359,79 @@ public class place_order_page extends AppCompatActivity {
             childName = dateTimeInMillis + "_Order_" + orderCount;
             orderId = String.valueOf(dateTimeInMillis);
 
+            String productId = arrBasket.get(i).getProductId();
             String imageName = arrBasket.get(i).getImageName();
             String fishName = arrBasket.get(i).getFishName();
             double price = arrBasket.get(i).getPricePerKilo();
             boolean pickup = arrBasket.get(i).isPickup();
             boolean ownDelivery = arrBasket.get(i).isOwnDelivery();
-            boolean thirdPartyDelivery = arrBasket.get(i).isThirrdPartyDelivery();
+            boolean thirdPartyDelivery = arrBasket.get(i).isThirdPartyDelivery();
             int quantity = arrBasket.get(i).getQuantityByKilo();
 
             String deliveryAddress = tv_enterDeviveryAddress.getText().toString();
             String buyerContactNum = et_contactNum.getText().toString();
 
-            Orders orders = new Orders(orderId, storeId, storeOwnersUserId, myUserId,
+            String orderStatus = "1";
+            boolean rated = false;
+
+            Orders orders = new Orders(productId, orderId, storeId, storeOwnersUserId, myUserId,
                     timeCreated, dateCreated, imageName, fishName, price, pickup, ownDelivery,
                     thirdPartyDelivery, quantity, deliveryAddress, latString, longString,
-                    buyerContactNum, totalPrice);
-
+                    buyerContactNum, totalPrice, orderStatus, rated);
             addTask = orderDatabase.child(childName).setValue(orders);
+
+
+
         }
 
 
-        progressDialog.dismiss();
+        updateProduct(progressDialog);
 
-        SweetAlertDialog sDialog;
-        sDialog = new SweetAlertDialog(place_order_page.this, SweetAlertDialog.SUCCESS_TYPE);
-        sDialog.setTitleText("Your order has been placed.");
-        sDialog.setConfirmButton("Continue", new SweetAlertDialog.OnSweetClickListener() {
-            @Override
-            public void onClick(SweetAlertDialog sweetAlertDialog) {
-
-
-                sDialog.dismiss();
-                Intent intent = new Intent(place_order_page.this, order_summary_page.class);
-                intent.putExtra("storeOwnersUserId", storeOwnersUserId);
-                intent.putExtra("orderId", orderId);
-                intent.putExtra("storeId", storeId);
-                startActivity(intent);
-
-
-            }
-        });
-        sDialog.show();
 
 
     }
 
-    private void generateRecyclerLayout() {
+    private void updateProduct(ProgressDialog progressDialog) {
 
-        rv_myBasket.setHasFixedSize(true);
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(place_order_page.this);
-        rv_myBasket.setLayoutManager(linearLayoutManager);
+        for(int i = 0; i < arrBasket.size(); i++)
+        {
+            String productId = arrBasket.get(i).getProductId();
+            int basketQuantityCount = arrBasket.get(i).getQuantityByKilo();
+            int productQuantity = arrProducts.get(i).getQuantityByKilo();
 
-        adapterPlaceOrderItem = new AdapterPlaceOrderItem(arrBasket, place_order_page.this);
-        rv_myBasket.setAdapter(adapterPlaceOrderItem);
+            int newQuantity = productQuantity - basketQuantityCount;
 
-        getViewHolderValues();
+            HashMap<String, Object> hashMap = new HashMap<String, Object>();
+            hashMap.put("quantityByKilo", newQuantity);
+
+
+            productDatabase.child(productId).updateChildren(hashMap);
+
+        }
+
+        deleteBasket(progressDialog);
+
     }
 
-    private void getViewHolderValues() {
+    private void deleteBasket(ProgressDialog progressDialog) {
 
-        Query query = basketDatabase
-                .orderByChild("storeId")
-                .equalTo(storeId);
+        Query query = basketDatabase.orderByChild("buyerUserId").equalTo(myUserId);
 
         query.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
 
-
-
                 if(snapshot.exists())
                 {
-                    arrBasket.clear();
-
                     for(DataSnapshot dataSnapshot : snapshot.getChildren())
                     {
-                        Basket basket = dataSnapshot.getValue(Basket.class);
-
-                        String buyerUserId = basket.getBuyerUserId();
-                        double pricePerKilo = basket.getPricePerKilo();
-                        int quantity = basket.getQuantityByKilo();
-
-                        if(buyerUserId.equals(myUserId))
-                        {
-                            arrBasket.add(basket);
-                            totalPrice = totalPrice + (pricePerKilo*quantity);
-                        }
+                        dataSnapshot.getRef().removeValue();
                     }
 
-                    tv_placeOrderBtn.setText("PLACE ORDER (Total Amount: ₱ " +totalPrice+ ")");
+                    updateBuyersWallet(progressDialog);
+
 
                 }
-
-                progressBar.setVisibility(GONE);
-                adapterPlaceOrderItem.notifyDataSetChanged();
-
             }
 
             @Override
@@ -320,8 +439,93 @@ public class place_order_page extends AppCompatActivity {
 
             }
         });
+    }
+
+    private void updateBuyersWallet(ProgressDialog progressDialog) {
+
+        double newFundValue = myFundAmount - totalPrice;
+
+
+        HashMap<String, Object> hashMap = new HashMap<String, Object>();
+        hashMap.put("userID", myUserId);
+        hashMap.put("fundAmount", newFundValue);
+
+        walletDatabase.child(walletId).updateChildren(hashMap).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+
+                if(task.isSuccessful())
+                {
+
+                    updateTransactionData(totalPrice, progressDialog);
+
+
+                }
+
+            }
+        });
 
     }
+
+    private void updateTransactionData(double totalPrice, ProgressDialog progressDialog) {
+
+
+        String transactionType = "deduct";
+        String transactionNote = "Orders Payment";
+
+        Transactions transactions = new Transactions(dateTimeInMillis, dateCreated, timeCreated,
+                transactionType, transactionNote, totalPrice, myUserId);
+
+        transactionDatabase.push().setValue(transactions).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+
+                progressDialog.dismiss();
+
+//                new SweetAlertDialog(place_order_page.this, SweetAlertDialog.SUCCESS_TYPE)
+//                .setTitleText("Your order has been placed.")
+//                .setConfirmButton("Continue", new SweetAlertDialog.OnSweetClickListener() {
+//                    @Override
+//                    public void onClick(SweetAlertDialog sweetAlertDialog) {
+//
+//                        Intent intent = new Intent(place_order_page.this, order_summary_page.class);
+//                        intent.putExtra("storeOwnersUserId", storeOwnersUserId);
+//                        intent.putExtra("orderId", orderId);
+//                        intent.putExtra("storeId", storeId);
+//                        startActivity(intent);
+//                        finish();
+//
+//                    }
+//                })
+//                .show();
+
+//                AlertDialog.Builder builder = new AlertDialog.Builder(place_order_page.this);
+//                builder.setTitle("Your order has been placed.");
+//                builder.setPositiveButton("Continue", new DialogInterface.OnClickListener() {
+//                            public void onClick(DialogInterface dialog, int id) {
+//
+//                                dialog.dismiss();
+//
+//
+//                            }
+//                        });
+//                AlertDialog dialog = builder.create();
+//                dialog.show();
+
+                Intent intent = new Intent(place_order_page.this, order_summary_page.class);
+                intent.putExtra("storeOwnersUserId", storeOwnersUserId);
+                intent.putExtra("orderId", orderId);
+                intent.putExtra("storeId", storeId);
+                startActivity(intent);
+                finish();
+
+
+            }
+        });
+
+    }
+
+
 
     private void setUpDate() {
 
@@ -337,6 +541,7 @@ public class place_order_page extends AppCompatActivity {
         dateCreated = formatDate.format(Date.parse(dateTime));
 
     }
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
@@ -375,6 +580,7 @@ public class place_order_page extends AppCompatActivity {
         tv_back = findViewById(R.id.tv_back);
         tv_enterDeviveryAddress = findViewById(R.id.tv_enterDeviveryAddress);
         tv_placeOrderBtn = findViewById(R.id.tv_placeOrderBtn);
+        tv_myWallet = findViewById(R.id.tv_myWallet);
 
         et_contactNum = findViewById(R.id.et_contactNum);
 

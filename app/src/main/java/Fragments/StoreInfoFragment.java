@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -37,6 +38,7 @@ import java.util.List;
 import Adapters.AdapterStoreProductsItem;
 import Models.Bookmark;
 import Models.Products;
+import Models.Ratings;
 import Models.Store;
 
 
@@ -47,10 +49,11 @@ public class StoreInfoFragment extends Fragment {
     private ProgressBar progressBar;
     private ImageView iv_bookmarkOn, iv_bookmarkCancel, iv_messageStoreBtn;
     private TextView tv_storeName, tv_storeContactPerson, tv_storeContactNum,
-            tv_storeAddress;
+            tv_storeAddress, tv_userRating;
+    private RatingBar rb_userRating;
 
     private FirebaseUser user;
-    private DatabaseReference storeDatabase, bookmarkDatabase;
+    private DatabaseReference storeDatabase, bookmarkDatabase, ratingDatabase;
 
     private String myUserId, storeOwnersUserId, storeId, bookmarkId;
 
@@ -64,15 +67,52 @@ public class StoreInfoFragment extends Fragment {
         myUserId = user.getUid();
         storeDatabase = FirebaseDatabase.getInstance().getReference("Store");
         bookmarkDatabase = FirebaseDatabase.getInstance().getReference("Bookmark");
+        ratingDatabase = FirebaseDatabase.getInstance().getReference("Ratings");
 
         storeOwnersUserId = getActivity().getIntent().getStringExtra("storeOwnersUserId");
         storeId = getActivity().getIntent().getStringExtra("storeId");
 
         setRef(view);
+        generateReviews();
         checkIfBookmarked();
         generateStoreData();
         click();
         return view;
+    }
+
+    private void generateReviews() {
+
+        Query query = ratingDatabase.orderByChild("ratingOfId").equalTo(storeOwnersUserId);
+
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+                int counter = 0;
+                double totalRating = 0, tempRatingValue = 0, averageRating = 0;
+
+                if(snapshot.exists())
+                {
+                    for(DataSnapshot dataSnapshot : snapshot.getChildren())
+                    {
+                        Ratings ratings = dataSnapshot.getValue(Ratings.class);
+                        tempRatingValue = ratings.getRatingValue();
+                        totalRating = totalRating + tempRatingValue;
+                        counter++;
+                    }
+
+                    averageRating = totalRating / counter;
+                    String ratingCounter = "(" + String.valueOf(counter) + ")";
+                    tv_userRating.setText(ratingCounter);
+                    rb_userRating.setRating((float) averageRating);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
 
     private void checkIfBookmarked() {
@@ -273,6 +313,8 @@ public class StoreInfoFragment extends Fragment {
         tv_storeContactPerson = view.findViewById(R.id.tv_storeContactPerson);
         tv_storeContactNum = view.findViewById(R.id.tv_storeContactNum);
         tv_storeAddress = view.findViewById(R.id.tv_storeAddress);
+        tv_userRating = view.findViewById(R.id.tv_userRating);
 
+        rb_userRating = view.findViewById(R.id.rb_userRating);
     }
 }

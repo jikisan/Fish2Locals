@@ -73,6 +73,8 @@
                 app:layout_constraintStart_toStartOf="@+id/iv_fishPhoto"
                 app:layout_constraintTop_toBottomOf="@+id/textView9" />
 
+
+
             <TextView
                 android:id="@+id/textView10"
                 android:layout_width="wrap_content"
@@ -100,7 +102,7 @@
                 android:id="@+id/cb_ownDelivery"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Own Delivery Service"
+                android:text="Delivery"
                 android:textColor="@color/white"
                 app:layout_constraintStart_toStartOf="@+id/cb_pickUp"
                 app:layout_constraintTop_toBottomOf="@+id/cb_pickUp" />
@@ -111,6 +113,7 @@
                 android:layout_height="wrap_content"
                 android:text="3rd Party Delivery (Maxim, Angkas, etc.)"
                 android:textColor="@color/white"
+                android:visibility="gone"
                 app:layout_constraintStart_toStartOf="@+id/cb_ownDelivery"
                 app:layout_constraintTop_toBottomOf="@+id/cb_ownDelivery" />
 

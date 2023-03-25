@@ -37,6 +37,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import Models.Users;
+import Models.Wallets;
 
 public class intro_page extends AppCompatActivity {
 
@@ -44,7 +45,7 @@ public class intro_page extends AppCompatActivity {
     private double myLatDouble, myLongDouble, distance;
 
     private FirebaseUser user;
-    private DatabaseReference userDatabase;
+    private DatabaseReference userDatabase, walletDatabase, basketDatabase;
 
     private ProgressBar progressbar;
     private String myUserId;
@@ -58,6 +59,9 @@ public class intro_page extends AppCompatActivity {
         user = FirebaseAuth.getInstance().getCurrentUser();
 
         userDatabase = FirebaseDatabase.getInstance().getReference("Users");
+        walletDatabase = FirebaseDatabase.getInstance().getReference("Wallets");
+        basketDatabase = FirebaseDatabase.getInstance().getReference("Basket");
+
 
         progressbar = findViewById(R.id.progressbar);
 
@@ -99,8 +103,7 @@ public class intro_page extends AppCompatActivity {
         if(!(user == null))
         {
             myUserId = user.getUid();
-            checkSellerModeStatus();
-
+            deleteBasketData(myUserId);
 
         }else{
 
@@ -109,6 +112,81 @@ public class intro_page extends AppCompatActivity {
             startActivity(intent);
             finish();
         }
+    }
+
+    private void deleteBasketData(String myUserId) {
+
+        Query query = basketDatabase.orderByChild("buyerUserId").equalTo(myUserId);
+
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+                if(snapshot.exists())
+                {
+                    for(DataSnapshot dataSnapshot : snapshot.getChildren())
+                    {
+                        dataSnapshot.getRef().removeValue();
+                    }
+
+                    checkIfWalletExist(myUserId);
+
+                }
+                else {
+                    checkIfWalletExist(myUserId);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
+    private void checkIfWalletExist(String myUserId) {
+
+        Query query = walletDatabase.orderByChild("userID").equalTo(myUserId);
+
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+                if(snapshot.exists())
+                {
+                    checkSellerModeStatus();
+
+
+                }
+                else
+                {
+                    createWallet(myUserId);
+                }
+
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
+    private void createWallet(String myUserId) {
+
+        double i = 0;
+
+        Wallets wallets = new Wallets(myUserId, i);
+
+        walletDatabase.push().setValue(wallets).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+
+                checkSellerModeStatus();
+
+            }
+        });
     }
 
     private void checkSellerModeStatus() {

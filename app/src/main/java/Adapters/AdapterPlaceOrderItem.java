@@ -72,7 +72,7 @@ public class AdapterPlaceOrderItem extends RecyclerView.Adapter<AdapterPlaceOrde
 
         boolean pickup = basket.isPickup();
         boolean ownDelivery = basket.isOwnDelivery();
-        boolean thirdPartyDelivery = basket.isThirrdPartyDelivery();
+        boolean thirdPartyDelivery = basket.isThirdPartyDelivery();
 
         if(pickup == true)
         {
@@ -80,7 +80,7 @@ public class AdapterPlaceOrderItem extends RecyclerView.Adapter<AdapterPlaceOrde
         }
         else if(ownDelivery == true)
         {
-            holder.tv_deliveryOption.setText("Store Own Delivery");
+            holder.tv_deliveryOption.setText("Delivery");
         }
         else if(thirdPartyDelivery == true)
         {

@@ -20,12 +20,11 @@
 
     <TextView
         android:id="@+id/tv_storeName"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginTop="16dp"
-        android:layout_marginEnd="46dp"
-        android:drawableStart="@drawable/marketplace"
+        android:layout_marginEnd="8dp"
         android:drawablePadding="8dp"
         android:drawableTint="@color/teal_200"
         android:gravity="center_vertical"
@@ -34,57 +33,108 @@
         android:textColor="@color/white"
         android:textSize="24sp"
         android:textStyle="bold"
-        app:layout_constraintEnd_toStartOf="@+id/iv_messageStoreBtn"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@+id/textView14"
         app:layout_constraintTop_toBottomOf="@+id/textView14" />
 
-    <ImageView
-        android:id="@+id/iv_bookmarkOn"
-        android:layout_width="30dp"
-        android:layout_height="25dp"
-        android:layout_marginEnd="8dp"
-        android:src="@drawable/bookmark"
-        app:layout_constraintBottom_toBottomOf="@+id/iv_messageStoreBtn"
-        app:layout_constraintEnd_toStartOf="@+id/iv_messageStoreBtn"
-        app:layout_constraintTop_toTopOf="@+id/iv_messageStoreBtn"
-        app:tint="@color/white" />
+    <LinearLayout
+        android:id="@+id/linearLayout5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        app:layout_constraintEnd_toEndOf="@+id/tv_storeName"
+        app:layout_constraintStart_toStartOf="@+id/tv_storeName"
+        app:layout_constraintTop_toBottomOf="@+id/tv_storeName">
 
-    <ImageView
-        android:id="@+id/iv_bookmarkCancel"
-        android:layout_width="30dp"
-        android:layout_height="25dp"
-        android:layout_marginEnd="8dp"
-        android:src="@drawable/bookmark"
-        app:layout_constraintBottom_toBottomOf="@+id/iv_messageStoreBtn"
-        app:layout_constraintEnd_toStartOf="@+id/iv_messageStoreBtn"
-        app:layout_constraintTop_toTopOf="@+id/iv_messageStoreBtn"
-        app:tint="@color/red_btn_bg_pressed_color" />
+        <RatingBar
+            android:id="@+id/rb_userRating"
+            style="@style/Widget.AppCompat.RatingBar.Small"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:numStars="5"
+            android:theme="@style/RatingBar" />
 
-    <ImageView
-        android:id="@+id/iv_messageStoreBtn"
-        android:layout_width="30dp"
-        android:layout_height="35dp"
+
+        <TextView
+            android:id="@+id/tv_userRating"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="(0)"
+            android:textColor="@color/duskYellow"
+            android:textSize="12sp" />
+
+
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:id="@+id/linearLayout12"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
-        android:src="@drawable/messages"
-        app:layout_constraintBottom_toBottomOf="@+id/tv_storeName"
+        android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/tv_storeName"
-        app:tint="@color/main_green_color" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout5">
+
+        <ImageView
+            android:id="@+id/iv_bookmarkOn"
+            android:layout_width="30dp"
+            android:layout_height="25dp"
+            android:layout_marginEnd="8dp"
+            android:layout_weight="1"
+            android:src="@drawable/bookmark"
+            android:layout_gravity="center_vertical"
+            app:layout_constraintBottom_toBottomOf="@+id/iv_messageStoreBtn"
+            app:layout_constraintEnd_toStartOf="@+id/iv_messageStoreBtn"
+            app:layout_constraintTop_toTopOf="@+id/iv_messageStoreBtn"
+            app:tint="@color/white" />
+
+
+        <ImageView
+            android:id="@+id/iv_bookmarkCancel"
+            android:layout_width="30dp"
+            android:layout_height="25dp"
+            android:layout_marginEnd="8dp"
+            android:layout_weight="1"
+            android:src="@drawable/bookmark"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="@+id/iv_messageStoreBtn"
+            app:layout_constraintEnd_toStartOf="@+id/iv_messageStoreBtn"
+            app:layout_constraintTop_toTopOf="@+id/iv_messageStoreBtn"
+            app:tint="@color/red_btn_bg_pressed_color" />
+
+        <ImageView
+            android:id="@+id/iv_messageStoreBtn"
+            android:layout_width="30dp"
+            android:layout_height="35dp"
+            android:layout_marginEnd="16dp"
+            android:layout_weight="1"
+            android:src="@drawable/messages"
+            app:layout_constraintBottom_toBottomOf="@+id/tv_storeName"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/tv_storeName"
+            app:tint="@color/main_green_color" />
+
+    </LinearLayout>
+
 
     <TextView
         android:id="@+id/tv_storeContactPerson"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="32dp"
         android:drawableStart="@drawable/person"
         android:drawablePadding="8dp"
         android:drawableTint="@color/blue_btn_bg_color"
+        android:gravity="center_vertical"
         android:text="Loading..."
         android:textColor="@color/white"
         android:textStyle="bold"
-        android:gravity="center_vertical"
-        app:layout_constraintStart_toStartOf="@+id/tv_storeName"
-        app:layout_constraintTop_toBottomOf="@+id/tv_storeName" />
+        app:layout_constraintStart_toStartOf="@+id/linearLayout12"
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout12" />
 
     <TextView
         android:id="@+id/tv_storeContactNum"

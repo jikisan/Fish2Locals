@@ -15,11 +15,18 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.fish2locals.R;
 import com.example.fish2locals.view_store_page;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
 import java.text.DecimalFormat;
 import java.util.List;
 
+import Models.Ratings;
 import Models.Store;
 import Models.TempStoreData;
 
@@ -55,7 +62,8 @@ public class AdapterMostTrusted extends RecyclerView.Adapter<AdapterMostTrusted.
         String storeUrl = tempStoreData.getStoreUrl();
         String storeName = tempStoreData.getStoreName();
         double distance = tempStoreData.getDistance();
-        long ratings = tempStoreData.getRatings();
+        double averageRating = tempStoreData.getRatings();
+        int count = tempStoreData.getRatingsCount();
         String storeId = tempStoreData.getStoreId();
         String storeOwnersUserId = tempStoreData.getStoreOwnersUserId();
 
@@ -75,8 +83,8 @@ public class AdapterMostTrusted extends RecyclerView.Adapter<AdapterMostTrusted.
                 .into(holder.iv_storePhoto);
 
         holder.tv_storeName.setText(storeName);
-        holder.rb_userRating.setRating(ratings);
-        holder.tv_userRatingCount.setText("(" + ratings + ")");
+        holder.tv_userRatingCount.setText(averageRating + "");
+        holder.rb_userRating.setRating((float) averageRating);
 
         holder.tv_visitStoreBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -85,10 +93,50 @@ public class AdapterMostTrusted extends RecyclerView.Adapter<AdapterMostTrusted.
                 Intent intent = new Intent(context, view_store_page.class);
                 intent.putExtra("storeId", storeId);
                 intent.putExtra("storeOwnersUserId", storeOwnersUserId);
+                intent.putExtra("ratingsId", storeId);
                 view.getContext().startActivity(intent);
             }
         });
 
+    }
+
+    private void generateStoreReview(ItemViewHolder holder, String storeId) {
+
+        DatabaseReference ratingDatabase = FirebaseDatabase.getInstance().getReference("Ratings");
+
+        Query query = ratingDatabase.orderByChild("ratingOfId").equalTo(storeId);
+
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+                int counter = 0;
+                double totalRating = 0, tempRatingValue = 0, averageRating = 0;
+
+                if(snapshot.exists())
+                {
+                    for(DataSnapshot dataSnapshot : snapshot.getChildren())
+                    {
+                        Ratings ratings = dataSnapshot.getValue(Ratings.class);
+                        tempRatingValue = ratings.getRatingValue();
+                        totalRating = totalRating + tempRatingValue;
+                        counter++;
+                    }
+
+                    averageRating = totalRating / counter;
+                    String ratingCounter = "(" + String.valueOf(counter) + ")";
+
+                    holder.tv_userRatingCount.setText(ratingCounter);
+                    holder.rb_userRating.setRating((float) averageRating);
+
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
 
     @Override

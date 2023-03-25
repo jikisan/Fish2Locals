@@ -7,28 +7,31 @@ public class Basket {
     private double pricePerKilo;
     private boolean pickup;
     private boolean ownDelivery;
-    private boolean thirrdPartyDelivery;
+    private boolean thirdPartyDelivery;
     private int quantityByKilo;
     private String storeId;
     private String sellerUserId;
     private String buyerUserId;
+    private String productId;
 
     public Basket() {
     }
 
     public Basket(String imageName, String fishName, double pricePerKilo, boolean pickup,
-                  boolean ownDelivery, boolean thirrdPartyDelivery, int quantityByKilo,
-                  String storeId, String sellerUserId, String buyerUserId) {
+                  boolean ownDelivery, boolean thirdPartyDelivery, int quantityByKilo,
+                  String storeId, String sellerUserId, String buyerUserId, String productId)
+    {
         this.imageName = imageName;
         this.fishName = fishName;
         this.pricePerKilo = pricePerKilo;
         this.pickup = pickup;
         this.ownDelivery = ownDelivery;
-        this.thirrdPartyDelivery = thirrdPartyDelivery;
+        this.thirdPartyDelivery = thirdPartyDelivery;
         this.quantityByKilo = quantityByKilo;
         this.storeId = storeId;
         this.sellerUserId = sellerUserId;
         this.buyerUserId = buyerUserId;
+        this.productId = productId;
     }
 
     public String getImageName() {
@@ -71,12 +74,12 @@ public class Basket {
         this.ownDelivery = ownDelivery;
     }
 
-    public boolean isThirrdPartyDelivery() {
-        return thirrdPartyDelivery;
+    public boolean isThirdPartyDelivery() {
+        return thirdPartyDelivery;
     }
 
-    public void setThirrdPartyDelivery(boolean thirrdPartyDelivery) {
-        this.thirrdPartyDelivery = thirrdPartyDelivery;
+    public void setThirdPartyDelivery(boolean thirdPartyDelivery) {
+        this.thirdPartyDelivery = thirdPartyDelivery;
     }
 
     public int getQuantityByKilo() {
@@ -109,5 +112,13 @@ public class Basket {
 
     public void setBuyerUserId(String buyerUserId) {
         this.buyerUserId = buyerUserId;
+    }
+
+    public String getProductId() {
+        return productId;
+    }
+
+    public void setProductId(String productId) {
+        this.productId = productId;
     }
 }

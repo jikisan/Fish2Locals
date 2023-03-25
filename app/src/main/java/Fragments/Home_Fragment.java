@@ -44,12 +44,19 @@ import com.google.maps.android.SphericalUtil;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
+import Adapters.AdapterBestSellers;
 import Adapters.AdapterMostTrusted;
 import Adapters.AdapterStoresNearMe;
+import Models.Products;
+import Models.Ratings;
 import Models.Store;
 import Models.TempStoreData;
 import Models.Users;
@@ -57,24 +64,32 @@ import Objects.TextModifier;
 
 public class Home_Fragment extends Fragment {
 
+
     private FusedLocationProviderClient client;
     private double myLatDouble, myLongDouble, distance;
 
     private ImageView iv_userPhoto;
     private TextView tv_fName, tv_loadingNearMe, tv_loadingMostTrusted, tv_nearMeViewAll,
-            tv_mostTrustedViewAll, tv_search;
-    private RecyclerView rv_nearMe, rv_mostTrusted;
+            tv_mostTrustedViewAll, tv_search, tv_loadingBestSeller;
+    private RecyclerView rv_nearMe, rv_mostTrusted, rv_bestSeller;
 
     private AdapterStoresNearMe adapterStoresNearMe;
     private AdapterMostTrusted adapterMostTrusted;
+    private AdapterBestSellers adapterBestSellers;
+
     private List<Store> arrStore = new ArrayList<>();
     private List<TempStoreData> arrTempStoreData = new ArrayList<>();
     private List<TempStoreData> arrTempStoreData2 = new ArrayList<>();
+    private List<String> arrProductNames = new ArrayList<>();
+    private List<String> arrProductImageNames = new ArrayList<>();
+//    private List<String> newList, newImageList;
 
     private FirebaseUser user;
-    private DatabaseReference userDatabase, storeDatabase;
+    private DatabaseReference userDatabase, storeDatabase, ratingDatabase, productsDatabase;
 
-    private String myUserId;
+    private String myUserId, ratingCounter;
+    int counter = 0;
+    double totalRating = 0, tempRatingValue = 0, averageRating = 0;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -86,14 +101,67 @@ public class Home_Fragment extends Fragment {
         myUserId = user.getUid();
         userDatabase = FirebaseDatabase.getInstance().getReference("Users");
         storeDatabase = FirebaseDatabase.getInstance().getReference("Store");
+        ratingDatabase = FirebaseDatabase.getInstance().getReference("Ratings");
+        productsDatabase = FirebaseDatabase.getInstance().getReference("Products");
+
+
 
         setRef(view);
         generateUsersData();
+        generateProductsList();
         getCurrentLocation();
         clicks();
 
 
         return view;
+    }
+
+    private void generateProductsList() {
+
+        productsDatabase.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+                if(snapshot.exists())
+                {
+                    for(DataSnapshot dataSnapshot : snapshot.getChildren())
+                    {
+                        Products products = dataSnapshot.getValue(Products.class);
+
+                        String productName = products.getFishName();
+                        String imageName = products.getImageName();
+                        arrProductNames.add(productName);
+                        arrProductImageNames.add(imageName);
+                    }
+
+                    tv_loadingBestSeller.setVisibility(View.GONE);
+                }
+
+
+                Set<String> productNameSet = new HashSet<String>(arrProductNames);
+                List<String> newProductNameList = new ArrayList<String>(productNameSet);
+
+
+                Set<String> imageNameSet = new HashSet<String>(arrProductImageNames);
+                List<String> newImageNameList = new ArrayList<String>(imageNameSet);
+
+
+                adapterBestSellers = new AdapterBestSellers(newProductNameList, newImageNameList, getContext());
+                rv_bestSeller.setAdapter(adapterBestSellers);
+                rv_bestSeller.setHasFixedSize(true);
+                LinearLayoutManager linearLayoutManager2 = new LinearLayoutManager(getContext(),
+                        LinearLayoutManager.HORIZONTAL, false);
+                rv_bestSeller.setLayoutManager(linearLayoutManager2);
+
+                adapterBestSellers.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
     }
 
     private void generateUsersData() {
@@ -200,6 +268,7 @@ public class Home_Fragment extends Fragment {
 
     private void generateRecyclerview() {
 
+
         adapterStoresNearMe = new AdapterStoresNearMe(arrStore, arrTempStoreData, getContext());
         adapterMostTrusted = new AdapterMostTrusted(arrStore, arrTempStoreData2, getContext());
         rv_nearMe.setAdapter(adapterStoresNearMe);
@@ -219,6 +288,8 @@ public class Home_Fragment extends Fragment {
                 LinearLayoutManager.HORIZONTAL, false);
         rv_mostTrusted.setLayoutManager(linearLayoutManager1);
 
+
+
         adapterStoresNearMe.notifyDataSetChanged();
 
         getViewHolderValues();
@@ -236,14 +307,12 @@ public class Home_Fragment extends Fragment {
                     arrTempStoreData2.clear();
                     arrStore.clear();
 
-
                     for(DataSnapshot dataSnapshot : snapshot.getChildren())
                     {
                         Store store = dataSnapshot.getValue(Store.class);
 
                         String storeUrl = store.getStoreUrl();
                         String storeName = store.getStoreName();
-
                         double latDouble = Double.parseDouble(store.getStoreLat());
                         double longDouble = Double.parseDouble(store.getStoreLang());
                         LatLng location = new LatLng(latDouble, longDouble);
@@ -254,17 +323,16 @@ public class Home_Fragment extends Fragment {
                         String storeOwnersUserId = store.getStoreOwnersUserId();
 
                         TempStoreData tempStoreData = new TempStoreData(storeUrl, storeName,
-                                distance, ratings, storeId, storeOwnersUserId);
+                                distance, ratings, counter, storeId, storeOwnersUserId);
+
+                        arrStore.add(store);
+                        arrTempStoreData.add(tempStoreData);
+                        arrTempStoreData2.add(tempStoreData);
 
                         if(storeOwnersUserId.equals(myUserId))
                         {
                             continue;
                         }
-
-
-                        arrStore.add(store);
-                        arrTempStoreData.add(tempStoreData);
-                        arrTempStoreData2.add(tempStoreData);
 
 
                     }
@@ -290,20 +358,18 @@ public class Home_Fragment extends Fragment {
                         return Double.compare(tempStoreData.getDistance(), t1.getDistance());
                     }
                 });
-
                 Collections.sort(arrTempStoreData2, new Comparator<TempStoreData>() {
                     @Override
                     public int compare(TempStoreData tempStoreData, TempStoreData t1) {
                         return Double.compare(tempStoreData.getRatings(), t1.getRatings());
                     }
                 });
-
                 Collections.reverse(arrTempStoreData2);
-
-
 
                 adapterStoresNearMe.notifyDataSetChanged();
                 adapterMostTrusted.notifyDataSetChanged();
+
+
 
             }
 
@@ -314,6 +380,43 @@ public class Home_Fragment extends Fragment {
         });
 
 
+    }
+
+    private void generateReviews(String storeId) {
+
+
+        Query query = ratingDatabase.orderByChild("ratingOfId").equalTo(storeId);
+
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+                if(snapshot.exists())
+                {
+                    for(DataSnapshot dataSnapshot : snapshot.getChildren())
+                    {
+                        Ratings ratings = dataSnapshot.getValue(Ratings.class);
+                        tempRatingValue = ratings.getRatingValue();
+                        totalRating = totalRating + tempRatingValue;
+                        counter++;
+                    }
+
+                    averageRating = totalRating / counter;
+                    ratingCounter = "(" + String.valueOf(counter) + ")";
+
+
+                }
+
+
+
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
 
     private double generateDistance(LatLng location) {
@@ -367,9 +470,11 @@ public class Home_Fragment extends Fragment {
 
         rv_nearMe = view.findViewById(R.id.rv_nearMe);
         rv_mostTrusted = view.findViewById(R.id.rv_mostTrusted);
+        rv_bestSeller = view.findViewById(R.id.rv_bestSeller);
 
         tv_loadingNearMe = view.findViewById(R.id.tv_loadingNearMe);
         tv_loadingMostTrusted = view.findViewById(R.id.tv_loadingMostTrusted);
+        tv_loadingBestSeller = view.findViewById(R.id.tv_loadingBestSeller);
         tv_nearMeViewAll = view.findViewById(R.id.tv_nearMeViewAll);
         tv_mostTrustedViewAll = view.findViewById(R.id.tv_mostTrustedViewAll);
 

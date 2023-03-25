@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.RatingBar;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -28,11 +29,14 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
 import java.util.HashMap;
 
+import Models.Ratings;
+import Models.Store;
 import Models.Users;
 import Objects.TextModifier;
 import cn.pedant.SweetAlert.SweetAlertDialog;
@@ -42,12 +46,13 @@ public class Seller_Profile_Fragment extends Fragment {
     private Switch sw_switchBtn;
     private ImageView iv_bannerPhoto;
     private TextView tv_logout, tv_fName, tv_editProfile, tv_myRatings, tv_changePassword,
-            tv_myWallet, tv_aboutUs, tv_privacyPolicy;
+            tv_myWallet, tv_aboutUs, tv_privacyPolicy, tv_userRating;
+    private RatingBar rb_userRating;
 
     private FirebaseUser user;
-    private DatabaseReference userDatabase;
+    private DatabaseReference userDatabase, storeDatabase, ratingDatabase;
 
-    private String myUserId;
+    private String myUserId, storeId;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -57,12 +62,79 @@ public class Seller_Profile_Fragment extends Fragment {
         user = FirebaseAuth.getInstance().getCurrentUser();
         myUserId = user.getUid();
         userDatabase = FirebaseDatabase.getInstance().getReference("Users");
+        storeDatabase = FirebaseDatabase.getInstance().getReference("Store");
+        ratingDatabase = FirebaseDatabase.getInstance().getReference("Ratings");
 
+        
         setRef(view);
+        generateReviews();
+        generateStoreId();
         generateUsersData();
         clicks();
 
         return view;
+    }
+
+    private void generateReviews() {
+
+        Query query = ratingDatabase.orderByChild("ratingOfId").equalTo(myUserId);
+
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+                int counter = 0;
+                double totalRating = 0, tempRatingValue = 0, averageRating = 0;
+
+                if(snapshot.exists())
+                {
+                    for(DataSnapshot dataSnapshot : snapshot.getChildren())
+                    {
+                        Ratings ratings = dataSnapshot.getValue(Ratings.class);
+                        tempRatingValue = ratings.getRatingValue();
+                        totalRating = totalRating + tempRatingValue;
+                        counter++;
+                    }
+
+                    averageRating = totalRating / counter;
+                    String ratingCounter = "(" + String.valueOf(counter) + ")";
+                    tv_userRating.setText(ratingCounter);
+                    rb_userRating.setRating((float) averageRating);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
+    private void generateStoreId() {
+
+        Query query = storeDatabase.orderByChild("storeOwnersUserId").equalTo(myUserId);
+
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if(snapshot.exists())
+                {
+                    for (DataSnapshot dataSnapshot : snapshot.getChildren())
+                    {
+                        Store store = dataSnapshot.getValue(Store.class);
+
+                        storeId = dataSnapshot.getKey();
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+
     }
 
     private void generateUsersData() {
@@ -139,6 +211,7 @@ public class Seller_Profile_Fragment extends Fragment {
             public void onClick(View view) {
 
                 Intent intent = new Intent(getContext(), view_ratings_page.class);
+                intent.putExtra("ratingsId", storeId);
                 startActivity(intent);
             }
         });
@@ -213,6 +286,8 @@ public class Seller_Profile_Fragment extends Fragment {
         tv_aboutUs = view.findViewById(R.id.tv_aboutUs);
         tv_privacyPolicy = view.findViewById(R.id.tv_privacyPolicy);
         tv_logout = view.findViewById(R.id.tv_logout);
+        tv_userRating = view.findViewById(R.id.tv_userRating);
 
+        rb_userRating = view.findViewById(R.id.rb_userRating);
     }
 }

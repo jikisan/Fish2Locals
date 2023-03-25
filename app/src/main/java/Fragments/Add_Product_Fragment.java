@@ -9,6 +9,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
+import android.text.InputType;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,11 +23,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.fish2locals.R;
+import com.example.fish2locals.edit_product_page;
 import com.example.fish2locals.homepage;
 import com.example.fish2locals.seller_application;
 import com.example.fish2locals.seller_homepage;
+import com.example.fish2locals.view_my_products_page;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -57,7 +61,7 @@ public class Add_Product_Fragment extends Fragment {
             "Sapsap (Pony Fish or Slipmouth Fish)","Hasahasa (Short Mackerel)","Apahap (Barramundi)",
             "Pompano","Bisugo (Threadfin Bream)","Tanigue (Spanish Mackerel)", "Bangus (Milkfish)"};
 
-    int images[] = {R.drawable.fish_tilapia_mayancichlids, R.drawable.fish_tulingan_mackereltuna,
+    int images[] = {R.drawable.fish_tilapia_mayancichlids, R.drawable.fish_tambakol_yellowfintuna,
             R.drawable.fish_lapulapu_leopardcoralgrouper, R.drawable.fish_tamban,
             R.drawable.fish_dilis_anchovy, R.drawable.fish_mayamaya_redsnapper,
             R.drawable.fish_tulingan_mackereltuna, R.drawable.fish_galunggong_roundscad,
@@ -201,6 +205,56 @@ public class Add_Product_Fragment extends Fragment {
             }
         });
 
+        tv_quantity.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                TextInputEditText et_quantity = new TextInputEditText(view.getContext());
+                et_quantity.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_SIGNED);
+                et_quantity.setPadding(24, 8, 8, 8);
+                et_quantity.setText("1");
+
+                androidx.appcompat.app.AlertDialog.Builder quantityDialog = new androidx.appcompat.app.AlertDialog.Builder(view.getContext());
+                quantityDialog.setTitle("Please enter quantity");
+                quantityDialog.setView(et_quantity);
+
+                quantityDialog.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+
+                        String quantity = et_quantity.getText().toString();
+                        int quantityInInt = 1;
+                        if(!quantity.isEmpty())
+                        {
+                            quantityInInt = Integer.parseInt(quantity);
+                        }
+
+
+                        if(quantityInInt <= 1 || quantity.isEmpty())
+                        {
+                            Toast.makeText(getContext(),
+                                    "Cannot be less than 1 kilo", Toast.LENGTH_SHORT).show();
+
+                        }
+                        else
+                        {
+                            tv_quantity.setText(quantity);
+                        }
+
+                    }
+                });
+                quantityDialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+
+                    }
+                });
+
+                quantityDialog.create().show();
+
+            }
+        });
+
         tv_submitBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -290,9 +344,9 @@ public class Add_Product_Fragment extends Fragment {
 
                 SweetAlertDialog pdialog;
                 pdialog = new SweetAlertDialog(getContext(), SweetAlertDialog.SUCCESS_TYPE);
-                pdialog.setTitleText("ADDED!");
+                pdialog.setTitleText("PRODUCT ADDED!");
                 pdialog.setContentText("Product is submitted successfully \n for admin review.");
-                pdialog.setConfirmButton("Complete", new SweetAlertDialog.OnSweetClickListener() {
+                pdialog.setConfirmButton("View My Product/s", new SweetAlertDialog.OnSweetClickListener() {
                     @Override
                     public void onClick(SweetAlertDialog sweetAlertDialog) {
 
@@ -308,6 +362,9 @@ public class Add_Product_Fragment extends Fragment {
 
                         et_price.setText("");
                         tv_quantity.setText("1");
+
+                        Intent intent = new Intent(getContext(), view_my_products_page.class);
+                        startActivity(intent);
 
                     }
                 });

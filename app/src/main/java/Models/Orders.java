@@ -2,6 +2,7 @@ package Models;
 
 public class Orders {
 
+    private String productId;
     private String orderId;
     private String storeId;
     private String sellerUserId;
@@ -23,16 +24,19 @@ public class Orders {
     private String buyerContactNum;
     private double totalPrice;
 
+    private String orderStatus;
+    private boolean rated;
+
     public Orders() {
     }
 
-    public Orders(String orderId, String storeId, String sellerUserId, String buyerUserId,
-                  String timeCreated, String dateCreated, String imageName, String fishName,
-                  double pricePerKilo, boolean pickup, boolean ownDelivery,
+    public Orders(String productId, String orderId, String storeId, String sellerUserId,
+                  String buyerUserId, String timeCreated, String dateCreated, String imageName,
+                  String fishName, double pricePerKilo, boolean pickup, boolean ownDelivery,
                   boolean thirdPartyDelivery, int quantity, String deliveryAddress,
                   String deliveryLat, String deliveryLong, String buyerContactNum,
-                  double totalPrice) {
-
+                  double totalPrice, String orderStatus, boolean rated) {
+        this.productId = productId;
         this.orderId = orderId;
         this.storeId = storeId;
         this.sellerUserId = sellerUserId;
@@ -51,6 +55,16 @@ public class Orders {
         this.deliveryLong = deliveryLong;
         this.buyerContactNum = buyerContactNum;
         this.totalPrice = totalPrice;
+        this.orderStatus = orderStatus;
+        this.rated = rated;
+    }
+
+    public String getProductId() {
+        return productId;
+    }
+
+    public void setProductId(String productId) {
+        this.productId = productId;
     }
 
     public String getOrderId() {
@@ -195,5 +209,21 @@ public class Orders {
 
     public void setTotalPrice(double totalPrice) {
         this.totalPrice = totalPrice;
+    }
+
+    public String getOrderStatus() {
+        return orderStatus;
+    }
+
+    public void setOrderStatus(String orderStatus) {
+        this.orderStatus = orderStatus;
+    }
+
+    public boolean isRated() {
+        return rated;
+    }
+
+    public void setRated(boolean rated) {
+        this.rated = rated;
     }
 }

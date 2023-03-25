@@ -48,7 +48,7 @@ public class order_summary_page extends AppCompatActivity {
 
     private ProgressBar progressBar;
     private RecyclerView rv_myBasket;
-    private TextView tv_back, tv_placeOrderBtn, tv_contactNum, tv_deviveryAddress;
+    private TextView tv_back, tv_viewMyOrderBtn, tv_contactNum, tv_deviveryAddress;
 
 
 
@@ -127,6 +127,16 @@ public class order_summary_page extends AppCompatActivity {
             }
         });
 
+        tv_viewMyOrderBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                Intent intent = new Intent(order_summary_page.this, view_my_order_page.class);
+                startActivity(intent);
+
+            }
+        });
+
     }
 
     private void generateRecyclerLayout() {
@@ -155,6 +165,7 @@ public class order_summary_page extends AppCompatActivity {
                     {
                         Orders orders = snapshot.getValue(Orders.class);
 
+                        String productId = orders.getProductId();
                         String imageName = orders.getImageName();
                         String fishName = orders.getFishName();
                         double pricePerKilo = orders.getPricePerKilo();
@@ -168,7 +179,7 @@ public class order_summary_page extends AppCompatActivity {
 
                         Basket basket = new Basket(imageName, fishName, pricePerKilo, pickup,
                                 ownDelivery, thirrdPartyDelivery, quantityByKilo, storeId,
-                                sellerUserId, buyerUserId);
+                                sellerUserId, buyerUserId, productId);
 
                         arrBasket.add(basket);
 
@@ -192,8 +203,6 @@ public class order_summary_page extends AppCompatActivity {
 
     }
 
-
-
     private void setRef() {
 
         progressBar = findViewById(R.id.progressBar);
@@ -201,7 +210,7 @@ public class order_summary_page extends AppCompatActivity {
 
         tv_back = findViewById(R.id.tv_back);
         tv_deviveryAddress = findViewById(R.id.tv_deviveryAddress);
-        tv_placeOrderBtn = findViewById(R.id.tv_placeOrderBtn);
+        tv_viewMyOrderBtn = findViewById(R.id.tv_viewMyOrderBtn);
         tv_contactNum = findViewById(R.id.tv_contactNum);
 
 
