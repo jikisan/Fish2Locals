@@ -36,6 +36,7 @@ import java.util.List;
 
 import Adapters.AdapterPlaceOrderItem;
 import Models.Basket;
+import Models.Notifications;
 import Models.Orders;
 import Models.Store;
 import Models.Transactions;
@@ -367,7 +368,9 @@ public class seller_order_details_page extends AppCompatActivity {
             ordersDatabase.child(orderSnapshotIds).updateChildren(hashMap);
         }
 
-        progressDialog.dismiss();
+        String notifType = "order cancelled";
+        String notifMessage = "seller has cancelled the order";
+        generateNotification(notifType, notifMessage);
 
         SweetAlertDialog s2Dialog;
         s2Dialog = new SweetAlertDialog(seller_order_details_page.this, SweetAlertDialog.SUCCESS_TYPE);
@@ -377,6 +380,7 @@ public class seller_order_details_page extends AppCompatActivity {
             public void onClick(SweetAlertDialog sweetAlertDialog) {
 
                 s2Dialog.dismiss();
+                progressDialog.dismiss();
                 Intent intent = new Intent(seller_order_details_page.this, sellers_order_page.class);
                 startActivity(intent);
 
@@ -384,6 +388,16 @@ public class seller_order_details_page extends AppCompatActivity {
         });
         s2Dialog.show();
 
+    }
+
+    private void generateNotification(String notifType, String notifMessage) {
+
+        DatabaseReference notificationDatabase = FirebaseDatabase.getInstance().getReference("Notifications");
+
+        Notifications notifications = new Notifications(dateTimeInMillis, dateCreated, timeCreated, notifType,
+                notifMessage, buyerUserId);
+
+        notificationDatabase.push().setValue(notifications);
     }
 
 

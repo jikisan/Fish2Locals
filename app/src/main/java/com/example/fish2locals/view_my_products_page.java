@@ -53,8 +53,7 @@ public class view_my_products_page extends AppCompatActivity {
         myUserId = user.getUid();
         productDatabase = FirebaseDatabase.getInstance().getReference("Products");
 
-        storeOwnersUserId = getIntent().getStringExtra("storeOwnersUserId");
-        storeId = getIntent().getStringExtra("storeId");
+
 
         setRef();
         generateRecyclerLayout();
@@ -66,7 +65,10 @@ public class view_my_products_page extends AppCompatActivity {
         tv_back.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                onBackPressed();
+
+                Intent intent = new Intent(view_my_products_page.this,
+                        seller_homepage.class);
+                startActivity(intent);
             }
         });
 

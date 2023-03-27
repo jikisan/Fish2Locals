@@ -30,6 +30,7 @@ import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import Adapters.fragmentAdapterViewStoreTabs;
 import Models.Basket;
@@ -52,7 +53,7 @@ public class view_store_page extends AppCompatActivity {
     private FirebaseUser user;
     private DatabaseReference userDatabase, storeDatabase, basketDatabase;
 
-    private String storeId, storeOwnersUserId, myUserId;
+    private String storeId, storeOwnersUserId, myUserId, fromWherePage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,6 +68,7 @@ public class view_store_page extends AppCompatActivity {
 
         storeOwnersUserId = getIntent().getStringExtra("storeOwnersUserId");
         storeId = getIntent().getStringExtra("storeId");
+        fromWherePage = getIntent().getStringExtra("fromWherePage");
 
         setRef();
         clicks();
@@ -83,7 +85,19 @@ public class view_store_page extends AppCompatActivity {
 
                 if(arrBasket.isEmpty())
                 {
-                    onBackPressed();
+
+                    if(fromWherePage == null || fromWherePage.isEmpty())
+                    {
+                        onBackPressed();
+                    }
+                    else if(fromWherePage.equals("fromAddToBasketPage"))
+                    {
+                        Intent intent = new Intent(view_store_page.this, homepage.class);
+                        startActivity(intent);
+
+                    }
+
+
                 }
                 else
                 {

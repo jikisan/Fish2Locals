@@ -36,9 +36,11 @@ import java.util.List;
 
 import Adapters.AdapterPlaceOrderItem;
 import Models.Basket;
+import Models.Notifications;
 import Models.Orders;
 import Models.Store;
 import Models.Transactions;
+import Models.Users;
 import Models.Wallets;
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
@@ -58,10 +60,11 @@ public class order_details_page extends AppCompatActivity {
 
 
     private FirebaseUser user;
-    private DatabaseReference ordersDatabase, storeDatabase, walletDatabase, transactionDatabase;
+    private DatabaseReference ordersDatabase, storeDatabase, walletDatabase, transactionDatabase,
+            userDatabase;
 
     private String myUserId, orderId, storeId, sellerUserId, buyerUserId, productId;
-    private String walletId, buyerWalletId, timeCreated, dateCreated;
+    private String walletId, buyerWalletId, timeCreated, dateCreated, myFullName;
     private double fundAmount, buyerfundAmount;
     private long dateTimeInMillis;
 
@@ -76,6 +79,8 @@ public class order_details_page extends AppCompatActivity {
         storeDatabase = FirebaseDatabase.getInstance().getReference("Store");
         walletDatabase = FirebaseDatabase.getInstance().getReference("Wallets");
         transactionDatabase = FirebaseDatabase.getInstance().getReference("Transactions");
+        userDatabase = FirebaseDatabase.getInstance().getReference("Users");
+
 
 
         orderId = getIntent().getStringExtra("orderId");
@@ -83,7 +88,7 @@ public class order_details_page extends AppCompatActivity {
         productId = getIntent().getStringExtra("productId");
 
         setRef();
-
+        generateMyData();
         generateRecyclerLayout();
         click();
 
@@ -187,7 +192,34 @@ public class order_details_page extends AppCompatActivity {
 
     }
 
+    private void generateMyData() {
 
+        userDatabase.child(myUserId).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+                if(snapshot.exists())
+                {
+
+                    Users users = snapshot.getValue(Users.class);
+
+                    String contactNum = users.getContactNum();
+                    String fname = users.getFname();
+                    String lname = users.getLname();
+
+                    myFullName = fname + " " + lname;
+
+
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+    }
 
     private void generateSellerWallet(String sellerUserId) {
 
@@ -422,6 +454,12 @@ public class order_details_page extends AppCompatActivity {
             ordersDatabase.child(orderSnapshotIds).updateChildren(hashMap);
         }
 
+
+        String notifType = "order received";
+        String notifMessage = myFullName + " has received the order";
+        generateNotification(notifType, notifMessage);
+
+
         SweetAlertDialog s2Dialog;
         s2Dialog = new SweetAlertDialog(order_details_page.this, SweetAlertDialog.SUCCESS_TYPE);
         s2Dialog.setTitleText("Order Received!");
@@ -440,6 +478,8 @@ public class order_details_page extends AppCompatActivity {
         s2Dialog.show();
 
     }
+
+
 
 
     // Cancel Order
@@ -502,7 +542,11 @@ public class order_details_page extends AppCompatActivity {
             ordersDatabase.child(orderSnapshotIds).updateChildren(hashMap);
         }
 
-        progressDialog.dismiss();
+
+        String notifType = "order cancelled";
+        String notifMessage = myFullName + " has cancelled the order";
+        generateNotification(notifType, notifMessage);
+
 
         SweetAlertDialog s2Dialog;
         s2Dialog = new SweetAlertDialog(order_details_page.this, SweetAlertDialog.SUCCESS_TYPE);
@@ -512,6 +556,7 @@ public class order_details_page extends AppCompatActivity {
             public void onClick(SweetAlertDialog sweetAlertDialog) {
 
                 s2Dialog.dismiss();
+                progressDialog.dismiss();
                 Intent intent = new Intent(order_details_page.this, view_my_order_page.class);
                 startActivity(intent);
 
@@ -519,6 +564,18 @@ public class order_details_page extends AppCompatActivity {
         });
         s2Dialog.show();
 
+    }
+
+
+
+    private void generateNotification(String notifType, String notifMessage) {
+
+        DatabaseReference notificationDatabase = FirebaseDatabase.getInstance().getReference("Notifications");
+
+        Notifications notifications = new Notifications(dateTimeInMillis, dateCreated, timeCreated, notifType,
+                notifMessage, sellerUserId);
+
+        notificationDatabase.push().setValue(notifications);
     }
 
 

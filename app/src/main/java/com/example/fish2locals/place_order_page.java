@@ -51,6 +51,7 @@ import java.util.Locale;
 
 import Adapters.AdapterPlaceOrderItem;
 import Models.Basket;
+import Models.Notifications;
 import Models.Orders;
 import Models.Products;
 import Models.Transactions;
@@ -79,7 +80,7 @@ public class place_order_page extends AppCompatActivity {
             productDatabase;
     private Task addTask;
 
-    private String myUserId, storeOwnersUserId, storeId, latLng, latString, longString;
+    private String myUserId, storeOwnersUserId, storeId, latLng, latString, longString, myFullName;
     private String timeCreated, dateCreated, childName, orderId, walletId, myFundAmountString;
     private double myFundAmount;
     private long dateTimeInMillis;
@@ -123,6 +124,10 @@ public class place_order_page extends AppCompatActivity {
                     Users users = snapshot.getValue(Users.class);
 
                     String contactNum = users.getContactNum();
+                    String fname = users.getFname();
+                    String lname = users.getLname();
+
+                    myFullName = fname + " " + lname;
 
                     et_contactNum.setText(contactNum);
 
@@ -469,6 +474,7 @@ public class place_order_page extends AppCompatActivity {
 
     private void updateTransactionData(double totalPrice, ProgressDialog progressDialog) {
 
+        generateNotification();
 
         String transactionType = "deduct";
         String transactionNote = "Orders Payment";
@@ -482,35 +488,6 @@ public class place_order_page extends AppCompatActivity {
 
                 progressDialog.dismiss();
 
-//                new SweetAlertDialog(place_order_page.this, SweetAlertDialog.SUCCESS_TYPE)
-//                .setTitleText("Your order has been placed.")
-//                .setConfirmButton("Continue", new SweetAlertDialog.OnSweetClickListener() {
-//                    @Override
-//                    public void onClick(SweetAlertDialog sweetAlertDialog) {
-//
-//                        Intent intent = new Intent(place_order_page.this, order_summary_page.class);
-//                        intent.putExtra("storeOwnersUserId", storeOwnersUserId);
-//                        intent.putExtra("orderId", orderId);
-//                        intent.putExtra("storeId", storeId);
-//                        startActivity(intent);
-//                        finish();
-//
-//                    }
-//                })
-//                .show();
-
-//                AlertDialog.Builder builder = new AlertDialog.Builder(place_order_page.this);
-//                builder.setTitle("Your order has been placed.");
-//                builder.setPositiveButton("Continue", new DialogInterface.OnClickListener() {
-//                            public void onClick(DialogInterface dialog, int id) {
-//
-//                                dialog.dismiss();
-//
-//
-//                            }
-//                        });
-//                AlertDialog dialog = builder.create();
-//                dialog.show();
 
                 Intent intent = new Intent(place_order_page.this, order_summary_page.class);
                 intent.putExtra("storeOwnersUserId", storeOwnersUserId);
@@ -525,6 +502,18 @@ public class place_order_page extends AppCompatActivity {
 
     }
 
+    private void generateNotification() {
+
+        DatabaseReference notificationDatabase = FirebaseDatabase.getInstance().getReference("Notifications");
+
+        String notificationType = "order placed";
+        String notificationMessage = myFullName + " has placed an order";
+
+        Notifications notifications = new Notifications(dateTimeInMillis, dateCreated, timeCreated, notificationType,
+                notificationMessage, storeOwnersUserId);
+
+        notificationDatabase.push().setValue(notifications);
+    }
 
 
     private void setUpDate() {

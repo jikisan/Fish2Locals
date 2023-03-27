@@ -5,6 +5,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.InputType;
 import android.util.Log;
@@ -37,7 +38,7 @@ import cn.pedant.SweetAlert.SweetAlertDialog;
 public class add_to_basket_page extends AppCompatActivity {
 
     private TextView tv_productName, tv_productQuantity, tv_productPrice, tv_hasPickup, tv_hasOwnDelivery,
-            tv_has3rdPartyDelivery, tv_quantity, tv_addToBasketBtn, tv_back;
+            tv_has3rdPartyDelivery, tv_quantity, tv_addToBasketBtn, tv_back, tv_viewPhotos;
     private ImageView iv_productPhoto, iv_decreaseBtn, iv_increaseBtn;
     private LinearLayout layout_hasPickup, layout_hasOwnDelivery, layout_has3rdPartyDelivery;
     private CheckBox cb_hasPickup, cb_hasOwnDelivery, cb_has3rdPartyDelivery;
@@ -149,7 +150,25 @@ public class add_to_basket_page extends AppCompatActivity {
         tv_back.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                onBackPressed();
+
+                Intent intent = new Intent(add_to_basket_page.this, view_store_page.class);
+                intent.putExtra("fromWherePage", "fromAddToBasketPage");
+                intent.putExtra("storeOwnersUserId", storeOwnersUserId);
+                intent.putExtra("storeId", storeId);
+                startActivity(intent);
+            }
+        });
+
+        tv_viewPhotos.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                Intent intent = new Intent(add_to_basket_page.this, add_photos_page.class);
+                intent.putExtra("productId", productId);
+                intent.putExtra("category", "buyer");
+                intent.putExtra("storeOwnersUserId", storeOwnersUserId);
+                intent.putExtra("storeId", storeId);
+                startActivity(intent);
             }
         });
 
@@ -378,7 +397,10 @@ public class add_to_basket_page extends AppCompatActivity {
 
                         Log.d("Click 2", "sDialog close");
                         sDialog.dismiss();
-                        onBackPressed();
+                        Intent intent = new Intent(add_to_basket_page.this, view_store_page.class);
+                        intent.putExtra("storeOwnersUserId", storeOwnersUserId);
+                        intent.putExtra("storeId", storeId);
+                        startActivity(intent);
 
                     }
                 });
@@ -387,8 +409,6 @@ public class add_to_basket_page extends AppCompatActivity {
 
             }
         });
-
-
 
 
     }
@@ -404,6 +424,7 @@ public class add_to_basket_page extends AppCompatActivity {
         tv_has3rdPartyDelivery = findViewById(R.id.tv_has3rdPartyDelivery);
         tv_quantity = findViewById(R.id.tv_quantity);
         tv_addToBasketBtn = findViewById(R.id.tv_addToBasketBtn);
+        tv_viewPhotos = findViewById(R.id.tv_viewPhotos);
 
         iv_productPhoto = findViewById(R.id.iv_productPhoto);
         iv_decreaseBtn = findViewById(R.id.iv_decreaseBtn);

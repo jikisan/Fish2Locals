@@ -63,6 +63,28 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tv_productName" />
 
+    <TextView
+        android:id="@+id/tv_viewPhotos"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:layout_marginLeft="16dp"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        android:background="@drawable/rounded100"
+        android:drawableLeft="@android:drawable/ic_menu_gallery"
+        android:drawableTint="@color/black"
+        android:gravity="center"
+        android:text="VIEW PHOTOS"
+        android:textColor="@color/black"
+        android:textStyle="bold"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/tv_productName"
+        app:layout_constraintTop_toBottomOf="@+id/tv_productPrice" />
+
+
     <LinearLayout
         android:id="@+id/linearLayout4"
         android:layout_width="match_parent"
@@ -73,7 +95,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tv_productPrice"
+        app:layout_constraintTop_toBottomOf="@+id/tv_viewPhotos"
         app:layout_constraintVertical_bias="0.0">
 
         <TextView

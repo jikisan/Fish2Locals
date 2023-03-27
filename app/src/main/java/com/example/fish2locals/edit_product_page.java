@@ -196,7 +196,21 @@ public class edit_product_page extends AppCompatActivity {
         tv_back.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                onBackPressed();
+
+                Intent intent = new Intent(edit_product_page.this,
+                        view_my_products_page.class);
+                startActivity(intent);
+            }
+        });
+
+        tv_viewPhotos.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                Intent intent = new Intent(edit_product_page.this, add_photos_page.class);
+                intent.putExtra("productId", productId);
+                intent.putExtra("category", "seller");
+                startActivity(intent);
             }
         });
 

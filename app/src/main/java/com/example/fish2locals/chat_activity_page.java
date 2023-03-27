@@ -28,9 +28,15 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+
 import Models.Chat;
 import Models.Chats;
 import Models.Messages;
+import Models.Notifications;
 import Models.Store;
 import Models.Users;
 import Objects.TextModifier;
@@ -187,7 +193,7 @@ public class chat_activity_page extends AppCompatActivity {
 
                 if(needNotification.equals("1"))
                 {
-//                    generateNotification();
+                    generateNotification();
                     messageArea.setText("");
                     needNotification = "2";
                 }
@@ -198,6 +204,29 @@ public class chat_activity_page extends AppCompatActivity {
 
                 }
 
+            }
+        });
+
+    }
+
+    private void generateNotification() {
+
+        setUpDate();
+
+        DatabaseReference notificationDatabase = FirebaseDatabase.getInstance().getReference("Notifications");
+
+        String notificationType = "Message";
+        String notificationMessage = myFullName + " sent you a message";
+
+        Notifications notifications = new Notifications(dateTimeInMillis, dateCreated, timeCreated, notificationType,
+                notificationMessage, receiver);
+
+        notificationDatabase.push().setValue(notifications).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+
+                messageArea.setText("");
+                needNotification = "2";
             }
         });
 
@@ -393,6 +422,21 @@ public class chat_activity_page extends AppCompatActivity {
 
         layout1 = findViewById(R.id.layout1);
 
+
+    }
+
+    private void setUpDate() {
+
+        Date currentTime = Calendar.getInstance().getTime();
+        String dateTime = DateFormat.getDateTimeInstance().format(currentTime);
+
+        SimpleDateFormat formatDateTimeInMillis = new SimpleDateFormat("yyyyMMddhhmma");
+        SimpleDateFormat formatDate = new SimpleDateFormat("MMM-dd-yyyy");
+        SimpleDateFormat formatTime = new SimpleDateFormat("hh:mm a");
+
+        dateTimeInMillis = Calendar.getInstance().getTimeInMillis();
+        timeCreated = formatTime.format(Date.parse(dateTime));
+        dateCreated = formatDate.format(Date.parse(dateTime));
 
     }
 }
