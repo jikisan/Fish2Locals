@@ -37,8 +37,6 @@ import Models.Products;
 
 public class view_my_order_page extends AppCompatActivity {
 
-
-
     private TabLayout tab_layout;
     private ViewPager2 vp_viewPager2;
     private TextView tv_back;

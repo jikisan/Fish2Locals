@@ -1,14 +1,12 @@
 package com.example.fish2locals;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.InputType;
-import android.util.Log;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.ImageView;
@@ -17,7 +15,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
@@ -29,13 +26,10 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
-import java.util.HashMap;
-
 import Models.Basket;
 import Models.Products;
-import cn.pedant.SweetAlert.SweetAlertDialog;
 
-public class add_to_basket_page extends AppCompatActivity {
+public class add_to_basket_page2 extends AppCompatActivity {
 
     private TextView tv_productName, tv_productQuantity, tv_productPrice, tv_hasPickup, tv_hasOwnDelivery,
             tv_has3rdPartyDelivery, tv_quantity, tv_addToBasketBtn, tv_back, tv_viewPhotos;
@@ -43,11 +37,10 @@ public class add_to_basket_page extends AppCompatActivity {
     private LinearLayout layout_hasPickup, layout_hasOwnDelivery, layout_has3rdPartyDelivery;
     private CheckBox cb_hasPickup, cb_hasOwnDelivery, cb_has3rdPartyDelivery;
 
-    private FirebaseUser user;
     private DatabaseReference productDatabase, basketDatabase;
 
     private String myUserId, storeOwnersUserId, storeId, productId;
-    private int productQuantity , intValue = 1;;
+    private int productQuantity , intValue = 1;
 
     String fishImageName;
     String productName;
@@ -63,9 +56,9 @@ public class add_to_basket_page extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.add_to_basket_page);
+        setContentView(R.layout.add_to_basket_page2);
 
-        user = FirebaseAuth.getInstance().getCurrentUser();
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         myUserId = user.getUid();
         productDatabase = FirebaseDatabase.getInstance().getReference("Products");
         basketDatabase = FirebaseDatabase.getInstance().getReference("Basket");
@@ -100,8 +93,8 @@ public class add_to_basket_page extends AppCompatActivity {
 
                     if(!fishImageName.isEmpty())
                     {
-                        int imageResource = add_to_basket_page.this.getResources().getIdentifier(fishImageName,
-                                "drawable", add_to_basket_page.this.getPackageName());
+                        int imageResource = add_to_basket_page2.this.getResources().getIdentifier(fishImageName,
+                                "drawable", add_to_basket_page2.this.getPackageName());
 
                         Picasso.get()
                                 .load(imageResource)
@@ -151,7 +144,7 @@ public class add_to_basket_page extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                Intent intent = new Intent(add_to_basket_page.this, view_store_page.class);
+                Intent intent = new Intent(add_to_basket_page2.this, view_store_page.class);
                 intent.putExtra("fromWherePage", "fromAddToBasketPage");
                 intent.putExtra("storeOwnersUserId", storeOwnersUserId);
                 intent.putExtra("storeId", storeId);
@@ -163,7 +156,7 @@ public class add_to_basket_page extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                Intent intent = new Intent(add_to_basket_page.this, add_photos_page.class);
+                Intent intent = new Intent(add_to_basket_page2.this, add_photos_page.class);
                 intent.putExtra("productId", productId);
                 intent.putExtra("category", "buyer");
                 intent.putExtra("storeOwnersUserId", storeOwnersUserId);
@@ -179,7 +172,7 @@ public class add_to_basket_page extends AppCompatActivity {
 
                 if(intValue <= 1)
                 {
-                    Toast.makeText(add_to_basket_page.this, "Cannot be less than 1 kilo", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(add_to_basket_page2.this, "Cannot be less than 1 kilo", Toast.LENGTH_SHORT).show();
                 }
                 else
                 {
@@ -200,7 +193,7 @@ public class add_to_basket_page extends AppCompatActivity {
 
                 if(intValue >= productQuantity)
                 {
-                    Toast.makeText(add_to_basket_page.this, "Number exceeded the remaining quantity.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(add_to_basket_page2.this, "Number exceeded the remaining quantity.", Toast.LENGTH_SHORT).show();
                 }
                 else
                 {
@@ -238,13 +231,13 @@ public class add_to_basket_page extends AppCompatActivity {
 
                         if(quantityInInt <= 1 || quantity.isEmpty())
                         {
-                            Toast.makeText(add_to_basket_page.this,
+                            Toast.makeText(add_to_basket_page2.this,
                                     "Cannot be less than 1 kilo", Toast.LENGTH_SHORT).show();
 
                         }
                         else if(quantityInInt > productQuantity)
                         {
-                            Toast.makeText(add_to_basket_page.this, "Number exceeded the remaining quantity.", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(add_to_basket_page2.this, "Number exceeded the remaining quantity.", Toast.LENGTH_SHORT).show();
                         }
                         else
                         {
@@ -272,47 +265,11 @@ public class add_to_basket_page extends AppCompatActivity {
                 if(!cb_hasPickup.isChecked() && !cb_hasOwnDelivery.isChecked()
                         && !cb_has3rdPartyDelivery.isChecked())
                 {
-                    Toast.makeText(add_to_basket_page.this, "Please choose a delivery option", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(add_to_basket_page2.this, "Please choose a delivery option", Toast.LENGTH_SHORT).show();
                 }
                 else
                 {
-//                    SweetAlertDialog sDialog;
-//
-//                    sDialog = new SweetAlertDialog(add_to_basket_page.this, SweetAlertDialog.NORMAL_TYPE);
-//                    sDialog.setTitleText("ADD PRODUCT");
-//                    sDialog.setCancelText("Cancel");
-//                    sDialog.setConfirmButton("Add", new SweetAlertDialog.OnSweetClickListener() {
-//                        @Override
-//                        public void onClick(SweetAlertDialog sweetAlertDialog) {
-//
-//                            sDialog.dismiss();
-//                            addProductToBasket();
-//
-//
-//                        }
-//                    });
-//                    sDialog.setContentText("Add this product\n to your basket?");
-//                    sDialog.show();
-
                     addProductToBasket();
-//                    AlertDialog.Builder builder = new AlertDialog.Builder(add_to_basket_page.this);
-//                    builder.setTitle("ADD PRODUCT");
-//                    builder.setMessage("Add this product to your basket?");
-//                    builder.setPositiveButton("Add", new DialogInterface.OnClickListener() {
-//                                public void onClick(DialogInterface dialog, int id) {
-//
-//                                    dialog.dismiss();
-//
-//                                }
-//                            })
-//                            .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-//                                public void onClick(DialogInterface dialog, int id) {
-//                                    dialog.dismiss();
-//                                }
-//                            });
-//                    AlertDialog dialog = builder.create();
-//                    dialog.show();
-
                 }
 
 
@@ -389,28 +346,12 @@ public class add_to_basket_page extends AppCompatActivity {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
 
-                if(task.isSuccessful() )
-                {
-//                    SweetAlertDialog sDialog;
-//                    sDialog = new SweetAlertDialog(add_to_basket_page.this, SweetAlertDialog.SUCCESS_TYPE);
-//                    sDialog.setTitleText("The product is added to your basket.");
-//                    sDialog.setConfirmButton("Continue", new SweetAlertDialog.OnSweetClickListener() {
-//                        @Override
-//                        public void onClick(SweetAlertDialog sweetAlertDialog) {
-//
-//                            Log.d("Click 2", "sDialog close");
-//                            sDialog.dismiss();
-//
-//
-//                        }
-//                    });
-//                    sDialog.show();
 
-                    Intent intent = new Intent(add_to_basket_page.this, view_store_page2.class);
-                    intent.putExtra("storeOwnersUserId", storeOwnersUserId);
-                    intent.putExtra("storeId", storeId);
-                    startActivity(intent);
-                }
+                Intent intent = new Intent(add_to_basket_page2.this, view_store_page.class);
+                intent.putExtra("storeOwnersUserId", storeOwnersUserId);
+                intent.putExtra("storeId", storeId);
+                startActivity(intent);
+
 
 
             }

@@ -17,6 +17,7 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.Place;
 import com.google.android.libraries.places.widget.Autocomplete;
@@ -55,7 +56,7 @@ public class order_summary_page extends AppCompatActivity {
     private AdapterPlaceOrderItem adapterPlaceOrderItem;
 
     private FirebaseUser user;
-    private DatabaseReference userDatabase, orderDatabase;
+    private DatabaseReference basketDatabase, orderDatabase;
 
     private String myUserId, storeOwnersUserId, storeId, orderId;
 
@@ -67,7 +68,7 @@ public class order_summary_page extends AppCompatActivity {
 
         user = FirebaseAuth.getInstance().getCurrentUser();
         myUserId = user.getUid();
-        userDatabase = FirebaseDatabase.getInstance().getReference("Users");
+        basketDatabase = FirebaseDatabase.getInstance().getReference("Basket");
         orderDatabase = FirebaseDatabase.getInstance().getReference("Orders");
 
         storeOwnersUserId = getIntent().getStringExtra("storeOwnersUserId");
@@ -131,12 +132,42 @@ public class order_summary_page extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                Intent intent = new Intent(order_summary_page.this, view_my_order_page.class);
-                startActivity(intent);
+//                Intent intent = new Intent(order_summary_page.this, view_my_order_page.class);
+//                startActivity(intent);
+                deleteBasket();
 
             }
         });
 
+    }
+
+    private void deleteBasket() {
+
+        Query query = basketDatabase.orderByChild("buyerUserId").equalTo(myUserId);
+
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+                for(DataSnapshot dataSnapshot : snapshot.getChildren())
+                {
+                    dataSnapshot.getRef().removeValue();
+                }
+
+                Intent intent = new Intent(order_summary_page.this, view_my_order_page.class);
+                intent.putExtra("storeOwnersUserId", storeOwnersUserId);
+                intent.putExtra("orderId", orderId);
+                intent.putExtra("storeId", storeId);
+                startActivity(intent);
+
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
 
     private void generateRecyclerLayout() {

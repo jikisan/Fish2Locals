@@ -4,13 +4,11 @@ import static android.view.View.GONE;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.ProgressDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.location.Address;
 import android.location.Geocoder;
@@ -23,6 +21,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.Place;
@@ -48,6 +47,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import Adapters.AdapterPlaceOrderItem;
 import Models.Basket;
@@ -57,13 +58,12 @@ import Models.Products;
 import Models.Transactions;
 import Models.Users;
 import Models.Wallets;
-import cn.pedant.SweetAlert.SweetAlertDialog;
 
-public class place_order_page extends AppCompatActivity {
+public class place_order_page2 extends AppCompatActivity {
 
-    private List<Basket> arrBasket = new ArrayList<>();
-    private List<Orders> arrOrders = new ArrayList<>();
-    private List<Products> arrProducts = new ArrayList<>();
+    private final List<Basket> arrBasket = new ArrayList<>();
+    private final List<Orders> arrOrders = new ArrayList<>();
+    private final List<Products> arrProducts = new ArrayList<>();
 
     private ProgressBar progressBar;
     private RecyclerView rv_myBasket;
@@ -72,16 +72,26 @@ public class place_order_page extends AppCompatActivity {
     private ProgressDialog progressDialog;
 
     private Geocoder geocoder;
+    private Task task;
+    private int progress = 0;
 
     private AdapterPlaceOrderItem adapterPlaceOrderItem;
 
     private FirebaseUser user;
     private DatabaseReference basketDatabase, userDatabase, orderDatabase, walletDatabase, transactionDatabase,
             productDatabase;
-    private Task addTask;
 
-    private String myUserId, storeOwnersUserId, storeId, latLng, latString, longString, myFullName;
-    private String timeCreated, dateCreated, childName, orderId, walletId, myFundAmountString;
+    private String myUserId;
+    private String storeOwnersUserId;
+    private String storeId;
+    private String latString;
+    private String longString;
+    private String myFullName;
+    private String timeCreated;
+    private String dateCreated;
+    private String orderId;
+    private String walletId;
+    private String myFundAmountString;
     private double myFundAmount;
     private long dateTimeInMillis;
     double totalPrice = 0;
@@ -89,7 +99,7 @@ public class place_order_page extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.place_order_page);
+        setContentView(R.layout.place_order_page2);
 
         user = FirebaseAuth.getInstance().getCurrentUser();
         myUserId = user.getUid();
@@ -180,7 +190,7 @@ public class place_order_page extends AppCompatActivity {
     private void generateRecyclerLayout() {
 
         rv_myBasket.setHasFixedSize(true);
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(place_order_page.this);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(place_order_page2.this);
         rv_myBasket.setLayoutManager(linearLayoutManager);
 
         adapterPlaceOrderItem = new AdapterPlaceOrderItem(arrBasket, getApplicationContext());
@@ -286,7 +296,7 @@ public class place_order_page extends AppCompatActivity {
                         com.google.android.libraries.places.api.model.Place.Field.LAT_LNG, com.google.android.libraries.places.api.model.Place.Field.NAME);
 
                 //Create intent
-                Intent intent = new Autocomplete.IntentBuilder(AutocompleteActivityMode.OVERLAY, fieldList).build(place_order_page.this);
+                Intent intent = new Autocomplete.IntentBuilder(AutocompleteActivityMode.OVERLAY, fieldList).build(place_order_page2.this);
 
                 //Start Activity result
                 startActivityForResult(intent, 100);
@@ -312,31 +322,15 @@ public class place_order_page extends AppCompatActivity {
                 else if(TextUtils.isEmpty(storeAddress))
                 {
                     tv_enterDeviveryAddress.setError("This field is required");
-                    Toast.makeText(place_order_page.this, "Please enter delivery address", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(place_order_page2.this, "Please enter delivery address", Toast.LENGTH_SHORT).show();
                 }
                 else if(myFundAmount < totalPrice)
                 {
-                    Toast.makeText(place_order_page.this, "Insufficient fund.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(place_order_page2.this, "Insufficient fund.", Toast.LENGTH_SHORT).show();
 
                 }
                 else
                 {
-//                    SweetAlertDialog sDialog;
-//
-//                    sDialog = new SweetAlertDialog(place_order_page.this, SweetAlertDialog.NORMAL_TYPE);
-//                    sDialog.setTitleText("Place order?");
-//                    sDialog.setCancelText("Cancel");
-//                    sDialog.setConfirmButton("Place Order", new SweetAlertDialog.OnSweetClickListener() {
-//                        @Override
-//                        public void onClick(SweetAlertDialog sweetAlertDialog) {
-//
-//                            sDialog.dismiss();
-//                            addOrdersToDatabase();
-//
-//                        }
-//                    });
-//                    sDialog.show();
-
                     addOrdersToDatabase();
                 }
 
@@ -352,7 +346,8 @@ public class place_order_page extends AppCompatActivity {
     private void addOrdersToDatabase() {
 
         progressDialog = new ProgressDialog(this);
-        progressDialog.setTitle("Processing Application");
+        progressDialog.setTitle("Processing order...");
+        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         progressDialog.setCancelable(false);
         progressDialog.show();
 
@@ -361,7 +356,7 @@ public class place_order_page extends AppCompatActivity {
         for(int i = 0; i < arrBasket.size(); i++)
         {
             int orderCount = i+1;
-            childName = dateTimeInMillis + "_Order_" + orderCount;
+            String childName = dateTimeInMillis + "_Order_" + orderCount;
             orderId = String.valueOf(dateTimeInMillis);
 
             String productId = arrBasket.get(i).getProductId();
@@ -383,14 +378,21 @@ public class place_order_page extends AppCompatActivity {
                     timeCreated, dateCreated, imageName, fishName, price, pickup, ownDelivery,
                     thirdPartyDelivery, quantity, deliveryAddress, latString, longString,
                     buyerContactNum, totalPrice, orderStatus, rated);
-            addTask = orderDatabase.child(childName).setValue(orders);
+            orderDatabase.child(childName).setValue(orders).addOnCompleteListener(new OnCompleteListener<Void>() {
+                @Override
+                public void onComplete(@NonNull Task<Void> task) {
+
+                    if(task.isSuccessful())
+                    {
+                        updateProduct();
+                    }
+
+                }
+            });
 
 
 
         }
-
-
-        updateProduct();
 
 
 
@@ -414,37 +416,11 @@ public class place_order_page extends AppCompatActivity {
 
         }
 
-        deleteBasket();
+        updateBuyersWallet();
 
     }
 
-    private void deleteBasket() {
 
-        Query query = basketDatabase.orderByChild("buyerUserId").equalTo(myUserId);
-
-        query.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-
-                if(snapshot.exists())
-                {
-                    for(DataSnapshot dataSnapshot : snapshot.getChildren())
-                    {
-                        dataSnapshot.getRef().removeValue();
-                    }
-
-                    updateBuyersWallet();
-
-
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
-    }
 
     private void updateBuyersWallet() {
 
@@ -490,19 +466,47 @@ public class place_order_page extends AppCompatActivity {
                 if(task.isSuccessful())
                 {
                     progressDialog.dismiss();
-                    Intent intent = new Intent(place_order_page.this, order_summary_page.class);
+                    Intent intent = new Intent(place_order_page2.this, order_summary_page.class);
                     intent.putExtra("storeOwnersUserId", storeOwnersUserId);
                     intent.putExtra("orderId", orderId);
                     intent.putExtra("storeId", storeId);
                     startActivity(intent);
-                    finish();
+
                 }
-
-
 
             }
         });
 
+    }
+
+    private void deleteBasket() {
+
+        Query query = basketDatabase.orderByChild("buyerUserId").equalTo(myUserId);
+
+        query.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+                snapshot.getRef().removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void unused) {
+
+                        Intent intent = new Intent(place_order_page2.this, order_summary_page.class);
+                        intent.putExtra("storeOwnersUserId", storeOwnersUserId);
+                        intent.putExtra("orderId", orderId);
+                        intent.putExtra("storeId", storeId);
+                        startActivity(intent);
+                    }
+                });
+
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
 
     private void generateNotification() {
@@ -543,7 +547,7 @@ public class place_order_page extends AppCompatActivity {
             com.google.android.libraries.places.api.model.Place place = Autocomplete.getPlaceFromIntent(data);
 
             List<Address> address = null;
-            geocoder = new Geocoder(place_order_page.this, Locale.getDefault());
+            geocoder = new Geocoder(place_order_page2.this, Locale.getDefault());
 
             try {
                 address = geocoder.getFromLocation(place.getLatLng().latitude, place.getLatLng().longitude, 1);
@@ -551,7 +555,7 @@ public class place_order_page extends AppCompatActivity {
                 latString = String.valueOf(address.get(0).getLatitude());
                 longString = String.valueOf(address.get(0).getLongitude());
 
-                latLng = latString + "," + longString;
+                String latLng = latString + "," + longString;
                 String addressText =  place.getAddress().toString();
 
                 tv_enterDeviveryAddress.setText(addressText);
@@ -576,7 +580,7 @@ public class place_order_page extends AppCompatActivity {
 
         et_contactNum = findViewById(R.id.et_contactNum);
 
-        Places.initialize(place_order_page.this, getString(R.string.API_KEY));
+        Places.initialize(place_order_page2.this, getString(R.string.API_KEY));
 
 
     }

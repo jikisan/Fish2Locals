@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.fish2locals.R;
 import com.example.fish2locals.view_store_page;
+import com.example.fish2locals.view_store_page2;
 import com.squareup.picasso.Picasso;
 
 import java.text.DecimalFormat;

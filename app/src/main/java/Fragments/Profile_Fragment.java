@@ -28,6 +28,7 @@ import com.example.fish2locals.seller_homepage;
 import com.example.fish2locals.view_my_bookmarks_page;
 import com.example.fish2locals.view_my_order_page;
 import com.example.fish2locals.view_my_wallet_page;
+import com.example.fish2locals.view_privacy_and_policy_page;
 import com.example.fish2locals.view_ratings_page;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -290,7 +291,9 @@ public class Profile_Fragment extends Fragment {
         tv_privacyPolicy.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(getContext(), "Privacy policy coming soon", Toast.LENGTH_SHORT).show();
+
+                Intent intent = new Intent(getContext(), view_privacy_and_policy_page.class);
+                startActivity(intent);
             }
         });
 

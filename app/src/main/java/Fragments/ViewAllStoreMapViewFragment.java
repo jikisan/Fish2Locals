@@ -279,7 +279,6 @@ public class ViewAllStoreMapViewFragment extends Fragment implements GoogleMap.O
                 if(snapshot.exists())
                 {
 
-
                     for(DataSnapshot dataSnapshot : snapshot.getChildren())
                     {
                         Store store = dataSnapshot.getValue(Store.class);

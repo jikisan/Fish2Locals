@@ -22,6 +22,21 @@
         tools:replace="android:icon"
         tools:targetApi="31">
         <activity
+            android:name=".view_privacy_and_policy_page"
+            android:exported="false" />
+        <activity
+            android:name=".seller_statistics_page"
+            android:exported="false" />
+        <activity
+            android:name=".view_store_page2"
+            android:exported="false" />
+        <activity
+            android:name=".place_order_page2"
+            android:exported="false" />
+        <activity
+            android:name=".add_to_basket_page2"
+            android:exported="false" />
+        <activity
             android:name=".view_photo_fullscreen_page"
             android:exported="false" />
         <activity

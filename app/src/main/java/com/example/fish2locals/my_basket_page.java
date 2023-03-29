@@ -3,7 +3,6 @@ package com.example.fish2locals;
 import static android.view.View.GONE;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -16,30 +15,26 @@ import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
-import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import Adapters.AdapterMyBasketItem;
-import Adapters.AdapterStoreProductsItem;
 import Models.Basket;
-import Models.Products;
 
 public class my_basket_page extends AppCompatActivity {
 
-    private List<Basket> arrBasket = new ArrayList<>();
+    private final List<Basket> arrBasket = new ArrayList<>();
 
     private ProgressBar progressBar;
     private RecyclerView rv_myBasket;
-    private TextView tv_back, tv_placeOrderBtn;
+    private TextView tv_back, tv_checkOutBtn;
 
     private AdapterMyBasketItem adapterMyBasketItem;
 
@@ -77,11 +72,11 @@ public class my_basket_page extends AppCompatActivity {
             }
         });
 
-        tv_placeOrderBtn.setOnClickListener(new View.OnClickListener() {
+        tv_checkOutBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
-            Intent intent = new Intent(my_basket_page.this, place_order_page.class);
+            Intent intent = new Intent(my_basket_page.this, place_order_page2.class);
             intent.putExtra("storeOwnersUserId", storeOwnersUserId);
             intent.putExtra("storeId", storeId);
             startActivity(intent);
@@ -153,7 +148,7 @@ public class my_basket_page extends AppCompatActivity {
         rv_myBasket = findViewById(R.id.rv_myBasket);
 
         tv_back = findViewById(R.id.tv_back);
-        tv_placeOrderBtn = findViewById(R.id.tv_placeOrderBtn);
+        tv_checkOutBtn = findViewById(R.id.tv_checkOutBtn);
 
     }
 

@@ -15,11 +15,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.fish2locals.R;
 import com.example.fish2locals.add_to_basket_page;
-import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.example.fish2locals.add_to_basket_page2;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -37,18 +36,18 @@ import Models.Products;
 
 public class StoreProductsFragment extends Fragment {
 
-    private List<Products> arrProducts = new ArrayList<>();
-    private List<String> arrProductIds = new ArrayList<>();
+    private final List<Products> arrProducts = new ArrayList<>();
+    private final List<String> arrProductIds = new ArrayList<>();
     private AdapterStoreProductsItem adapterStoreProductsItem;
 
     private ProgressBar progressBar;
     private RecyclerView rv_storeProducts;
     private TextView tv_textPlaceholder;
 
-    private FirebaseUser user;
     private DatabaseReference productDatabase;
 
-    private String myUserId, storeOwnersUserId, storeId;
+    private String storeOwnersUserId;
+    private String storeId;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -56,8 +55,8 @@ public class StoreProductsFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_store_products, container, false);
 
-        user = FirebaseAuth.getInstance().getCurrentUser();
-        myUserId = user.getUid();
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        String myUserId = user.getUid();
         productDatabase = FirebaseDatabase.getInstance().getReference("Products");
 
         storeOwnersUserId = getActivity().getIntent().getStringExtra("storeOwnersUserId");
@@ -66,6 +65,7 @@ public class StoreProductsFragment extends Fragment {
         setRef(view);
         generateRecyclerLayout();
         click();
+
         return view;
     }
 
@@ -141,7 +141,6 @@ public class StoreProductsFragment extends Fragment {
                 if(arrProducts.isEmpty())
                 {
                     tv_textPlaceholder.setVisibility(View.VISIBLE);
-                    tv_textPlaceholder.setText("Empty");
                 }
 
                 adapterStoreProductsItem.notifyDataSetChanged();

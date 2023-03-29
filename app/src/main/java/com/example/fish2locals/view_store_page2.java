@@ -1,9 +1,6 @@
 package com.example.fish2locals;
 
-import static android.view.View.GONE;
-
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.viewpager2.widget.ViewPager2;
@@ -19,7 +16,6 @@ import com.google.android.material.appbar.CollapsingToolbarLayout;
 import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -30,7 +26,6 @@ import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import Adapters.fragmentAdapterViewStoreTabs;
 import Models.Basket;
@@ -38,31 +33,26 @@ import Models.Store;
 import Objects.TextModifier;
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
-public class view_store_page extends AppCompatActivity {
+public class view_store_page2 extends AppCompatActivity {
 
     private TabLayout tab_layout;
     private ViewPager2 vp_viewPager2;
     private ImageView iv_storeBanner, iv_back;
-    private CollapsingToolbarLayout collapsingToolbar;
     private TextView tv_myBasketButton;
 
-    private List<Store> arrStore = new ArrayList<>();
-    private List<Basket> arrBasket = new ArrayList<>();
-    private fragmentAdapterViewStoreTabs fragmentAdapterViewStoreTabs;
+    private final List<Basket> arrBasket = new ArrayList<>();
 
-    private FirebaseUser user;
-    private DatabaseReference userDatabase, storeDatabase, basketDatabase;
+    private DatabaseReference storeDatabase, basketDatabase;
 
     private String storeId, storeOwnersUserId, myUserId, fromWherePage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.view_store_page);
+        setContentView(R.layout.view_store_page2);
 
-        user = FirebaseAuth.getInstance().getCurrentUser();
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         myUserId = user.getUid();
-        userDatabase = FirebaseDatabase.getInstance().getReference("Users");
         storeDatabase = FirebaseDatabase.getInstance().getReference("Store");
         basketDatabase = FirebaseDatabase.getInstance().getReference("Basket");
 
@@ -92,7 +82,7 @@ public class view_store_page extends AppCompatActivity {
                     }
                     else if(fromWherePage.equals("fromAddToBasketPage"))
                     {
-                        Intent intent = new Intent(view_store_page.this, homepage.class);
+                        Intent intent = new Intent(view_store_page2.this, homepage.class);
                         startActivity(intent);
 
                     }
@@ -101,14 +91,14 @@ public class view_store_page extends AppCompatActivity {
                 }
                 else
                 {
-                    new SweetAlertDialog(view_store_page.this, SweetAlertDialog.WARNING_TYPE)
+                    new SweetAlertDialog(view_store_page2.this, SweetAlertDialog.WARNING_TYPE)
                             .setTitleText("Warning!")
                             .setCancelText("No")
                             .setConfirmButton("End", new SweetAlertDialog.OnSweetClickListener() {
                                 @Override
                                 public void onClick(SweetAlertDialog sweetAlertDialog) {
 
-                                deleteBasketData();
+                                    deleteBasketData();
                                 }
                             })
                             .setContentText("Your basket has\n" +
@@ -127,11 +117,11 @@ public class view_store_page extends AppCompatActivity {
 
                 if(arrBasket.isEmpty())
                 {
-                    Toast.makeText(view_store_page.this, "Basket is empty. Please choose a product.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(view_store_page2.this, "Basket is empty. Please choose a product.", Toast.LENGTH_SHORT).show();
                 }
                 else {
 
-                    Intent intent = new Intent(view_store_page.this, my_basket_page.class);
+                    Intent intent = new Intent(view_store_page2.this, my_basket_page.class);
                     intent.putExtra("storeOwnersUserId", storeOwnersUserId);
                     intent.putExtra("storeId", storeId);
                     startActivity(intent);
@@ -157,7 +147,7 @@ public class view_store_page extends AppCompatActivity {
                         dataSnapshot.getRef().removeValue();
                     }
 
-                    Intent intent = new Intent(view_store_page.this, homepage.class);
+                    Intent intent = new Intent(view_store_page2.this, homepage.class);
                     startActivity(intent);
 
                 }
@@ -171,6 +161,7 @@ public class view_store_page extends AppCompatActivity {
     }
 
     private void generateBasketData() {
+
 
         Query query = basketDatabase.orderByChild("storeId").equalTo(storeId);
         query.addValueEventListener(new ValueEventListener() {
@@ -218,6 +209,7 @@ public class view_store_page extends AppCompatActivity {
 
             }
         });
+
     }
 
     private void generateStoreData() {
@@ -229,24 +221,21 @@ public class view_store_page extends AppCompatActivity {
                 if(snapshot.exists())
                 {
 
-                        Store store = snapshot.getValue(Store.class);
+                    Store store = snapshot.getValue(Store.class);
 
-                        TextModifier textModifier = new TextModifier();
-                        textModifier.setSentenceCase(store.getStoreName());
+                    TextModifier textModifier = new TextModifier();
+                    textModifier.setSentenceCase(store.getStoreName());
 
-                        String storeName = textModifier.getSentenceCase();
-                        String bannerUrl = store.getStoreUrl();
+                    String storeName = textModifier.getSentenceCase();
+                    String bannerUrl = store.getStoreUrl();
 
-                        collapsingToolbar.setTitle(storeName);
 
-                        if(!bannerUrl.isEmpty())
-                        {
-                            Picasso.get()
-                                    .load(bannerUrl)
-                                    .centerCrop()
-                                    .fit()
-                                    .into(iv_storeBanner);
-                        }
+                    Picasso.get()
+                            .load(bannerUrl)
+                            .centerCrop()
+                            .fit()
+                            .into(iv_storeBanner);
+
 
                 }
 
@@ -267,7 +256,7 @@ public class view_store_page extends AppCompatActivity {
         tab_layout.addTab(tab_layout.newTab().setText("Reviews"));
 
         FragmentManager fragmentManager = getSupportFragmentManager();
-        fragmentAdapterViewStoreTabs = new fragmentAdapterViewStoreTabs(fragmentManager, getLifecycle());
+        Adapters.fragmentAdapterViewStoreTabs fragmentAdapterViewStoreTabs = new fragmentAdapterViewStoreTabs(fragmentManager, getLifecycle());
         vp_viewPager2.setAdapter(fragmentAdapterViewStoreTabs);
         vp_viewPager2.setUserInputEnabled(false);
 
@@ -304,8 +293,6 @@ public class view_store_page extends AppCompatActivity {
 
         iv_storeBanner = findViewById(R.id.iv_storeBanner);
         iv_back = findViewById(R.id.iv_back);
-
-        collapsingToolbar = findViewById(R.id.collapsingToolbar);
 
         tv_myBasketButton = findViewById(R.id.tv_myBasketButton);
     }

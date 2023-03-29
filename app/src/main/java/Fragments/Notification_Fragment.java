@@ -71,7 +71,6 @@ public class Notification_Fragment extends Fragment {
             public void onClick(View view) {
 
 
-
             Query query = notifDatabase.orderByChild("notificationUserId").equalTo(myUserId);
 
                 query.addListenerForSingleValueEvent(new ValueEventListener() {
