@@ -63,7 +63,7 @@ public class rate_buyer_page extends AppCompatActivity {
         orderId = getIntent().getStringExtra("orderId");
         buyerUserId = getIntent().getStringExtra("buyerUserId");
 
-        setRef();
+        setRef(); // initialize UI Id's
         generateBuyersReviews();
         generateBuyersData();
         clicks();

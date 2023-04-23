@@ -78,10 +78,10 @@ public class chat_activity_page extends AppCompatActivity {
         storeOwnersUserId = getIntent().getStringExtra("storeOwnersUserId");
         storeId = getIntent().getStringExtra("storeId");
 
-        setRef();
-        splitChatUid();
-        generateMyData();
-        generateStoreData();
+        setRef(); // initialize UI Id's
+        splitChatUid(); // get sender and receiver
+        generateMyData(); // generate user data
+        generateStoreData(); // generate store data
         clicks();
 
     }

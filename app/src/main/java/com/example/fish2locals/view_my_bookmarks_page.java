@@ -84,9 +84,9 @@ public class view_my_bookmarks_page extends AppCompatActivity {
         ratingDatabase = FirebaseDatabase.getInstance().getReference("Ratings");
 
 
-        setRef();
-        getCurrentLocation();
-        clicks();
+        setRef(); // initialize UI Id's
+        getCurrentLocation(); // generate current location
+        clicks(); // buttons
     }
 
     private void clicks() {

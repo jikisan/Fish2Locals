@@ -70,10 +70,11 @@ public class Seller_Home_Fragment extends Fragment {
         orderDatabase = FirebaseDatabase.getInstance().getReference("Orders");
 
 
-        setRef(view);
-        generateUsersData();
-        generateTotalSales();
+        setRef(view); //initialize UI ID's
+        generateUsersData(); //generate user data
+        generateTotalSales(); // generate Total Sales
         clicks();
+
         return view;
     }
 
@@ -87,6 +88,7 @@ public class Seller_Home_Fragment extends Fragment {
                 {
                     Users users = snapshot.getValue(Users.class);
 
+                    //get image from database
                     String imageUrl = users.getImageUrl();
 
                     if(!imageUrl.isEmpty())
@@ -97,6 +99,7 @@ public class Seller_Home_Fragment extends Fragment {
                     }
 
 
+                    //get first name from database
                     TextModifier textModifier = new TextModifier();
                     textModifier.setSentenceCase(users.getFname());
                     String fname = textModifier.getSentenceCase();

@@ -72,6 +72,7 @@ public class StoreReviewsFragment extends Fragment {
         rv_storeReviews.setAdapter(adapterReviewsItem);
 
         getViewHolderValues();
+
     }
 
     private void getViewHolderValues() {

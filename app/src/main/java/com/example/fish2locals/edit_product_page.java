@@ -93,10 +93,10 @@ public class edit_product_page extends AppCompatActivity {
 
         productId = getIntent().getStringExtra("productId");
 
-        setRef();
-        generateProductData();
-        getStoreId();
-        clicks();
+        setRef(); // initialize UI Id's
+        generateProductData(); //generate product from database
+        getStoreId(); // generate store id
+        clicks(); // buttons
 
 
 

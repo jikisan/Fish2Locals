@@ -72,11 +72,11 @@ public class StoreInfoFragment extends Fragment {
         storeOwnersUserId = getActivity().getIntent().getStringExtra("storeOwnersUserId");
         storeId = getActivity().getIntent().getStringExtra("storeId");
 
-        setRef(view);
-        generateReviews();
-        checkIfBookmarked();
-        generateStoreData();
-        click();
+        setRef(view); // initialize UI Id's
+        generateReviews(); // generate review data from database
+        checkIfBookmarked(); // check if store is bookmarked
+        generateStoreData(); // generate store data from database
+        click(); // buttons
         return view;
     }
 
@@ -105,6 +105,7 @@ public class StoreInfoFragment extends Fragment {
                     String ratingCounter = "(" + String.valueOf(counter) + ")";
                     tv_userRating.setText(ratingCounter);
                     rb_userRating.setRating((float) averageRating);
+
                 }
             }
 

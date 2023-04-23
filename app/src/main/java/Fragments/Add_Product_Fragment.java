@@ -99,9 +99,9 @@ public class Add_Product_Fragment extends Fragment {
         storeDatabase = FirebaseDatabase.getInstance().getReference("Store");
         productsDatabase = FirebaseDatabase.getInstance().getReference("Products");
 
-        setRef(view);
-        getStoreId();
-        clicks();
+        setRef(view); // initialize UI Id's
+        getStoreId(); //get store ID
+        clicks(); // buttons
 
 
         Adapter_Spinner_Fish adapter_spinner_fish = new Adapter_Spinner_Fish(getContext(), images, fish);

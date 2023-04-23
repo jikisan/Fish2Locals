@@ -71,10 +71,10 @@ public class view_my_wallet_page extends AppCompatActivity {
         walletDatabase = FirebaseDatabase.getInstance().getReference("Wallets");
         transactionDatabase = FirebaseDatabase.getInstance().getReference("Transactions");
 
-        setRef();
-        generateWalletData();
-        generateRecyclerLayout();
-        clicks();
+        setRef(); // initialize UI Id's
+        generateWalletData(); // generate wallet data from database
+        generateRecyclerLayout(); // generate recyclerview layout
+        clicks(); // buttons
     }
 
     private void generateRecyclerLayout() {

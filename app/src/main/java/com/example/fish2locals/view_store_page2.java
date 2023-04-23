@@ -60,11 +60,11 @@ public class view_store_page2 extends AppCompatActivity {
         storeId = getIntent().getStringExtra("storeId");
         fromWherePage = getIntent().getStringExtra("fromWherePage");
 
-        setRef();
-        clicks();
-        generateStoreData();
-        generateBasketData();
-        generateTabs();
+        setRef(); // initialize UI ID's
+        clicks(); // buttons
+        generateStoreData(); // generate store data
+        generateBasketData(); // generate basket data
+        generateTabs(); // generate tab layout
     }
 
     private void clicks(){
@@ -162,8 +162,8 @@ public class view_store_page2 extends AppCompatActivity {
 
     private void generateBasketData() {
 
-
         Query query = basketDatabase.orderByChild("storeId").equalTo(storeId);
+
         query.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {

@@ -50,8 +50,8 @@ public class login_page extends AppCompatActivity {
         userDatabase = FirebaseDatabase.getInstance().getReference("Users");
         walletDatabase = FirebaseDatabase.getInstance().getReference("Wallets");
 
-        setRef();
-        clicks();
+        setRef(); //initialize UI ID's
+        clicks(); // buttons
 
 
     }

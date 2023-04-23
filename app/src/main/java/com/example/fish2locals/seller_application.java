@@ -78,8 +78,8 @@ public class seller_application extends AppCompatActivity {
         storeDatabase = FirebaseDatabase.getInstance().getReference("Store");
         userDatabase = FirebaseDatabase.getInstance().getReference("Users");
 
-        setRef();
-        clicks();
+        setRef(); //initialize UI ID's
+        clicks(); //buttons
 
     }
 
@@ -105,6 +105,7 @@ public class seller_application extends AppCompatActivity {
             }
         });
 
+        //upload valid documents
         tv_addValidDOCS.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -117,6 +118,7 @@ public class seller_application extends AppCompatActivity {
             }
         });
 
+        //upload valid documents
         iv_validDocs.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -221,6 +223,7 @@ public class seller_application extends AppCompatActivity {
         }
     }
 
+    //save all data to database
     private void submit(String storeImageName, String storeName, String storeAddress,
                         String storeContactNum, String storeContactPerson, String validDocsName) {
 
@@ -256,6 +259,7 @@ public class seller_application extends AppCompatActivity {
 
     }
 
+    //save image in database storage
     private void generateValidDocsUrl(String storeImageName, String storeName, String storeAddress,
                                       String storeContactNum, String storeContactPerson,
                                       String validDocsName, String storeImageUrl) {
@@ -287,6 +291,7 @@ public class seller_application extends AppCompatActivity {
         });
     }
 
+    //save all text data to database
     private void addDataToDatabase(String storeImageName, String storeName, String storeAddress,
                                    String storeContactNum, String storeContactPerson,
                                    String validDocsName, String storeImageUrl, String validDocsUrl) {
@@ -331,6 +336,7 @@ public class seller_application extends AppCompatActivity {
         });
     }
 
+    //for accesing phone storage
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);

@@ -55,9 +55,9 @@ public class Messages_Fragment extends Fragment {
 
         chatDatabase = FirebaseDatabase.getInstance().getReference("Chats");
 
-        setRef(view);
-        generateRecyclerLayout();
-        clickListeners();
+        setRef(view); // initialize UI Id's
+        generateRecyclerLayout(); // generate recylcer layout
+        clickListeners(); // buttons
 
         return view;
     }

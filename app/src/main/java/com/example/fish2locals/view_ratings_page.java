@@ -51,9 +51,10 @@ public class view_ratings_page extends AppCompatActivity {
 
         ratingsId = getIntent().getStringExtra("ratingsId");
 
-        setRef();
-        generateRecyclerLayout();
-        clicks();
+        setRef(); // initialize UI Id's
+        generateRecyclerLayout(); // generate recylcerview layout
+        clicks(); // buttons
+
     }
 
     private void generateRecyclerLayout() {

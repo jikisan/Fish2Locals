@@ -79,9 +79,9 @@ public class add_funds_page extends AppCompatActivity {
         fundReqStorage = FirebaseStorage.getInstance().getReference("Fund Requests").child(myUserID);
 
 
-        setRef();
-        generateWalletData();
-        clicks();
+        setRef(); // initialize UI Id's
+        generateWalletData(); // generate wallet data from database
+        clicks(); // buttons
     }
 
     private void clicks() {

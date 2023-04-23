@@ -70,9 +70,9 @@ public class edit_profile_page extends AppCompatActivity {
         userDatabase = FirebaseDatabase.getInstance().getReference("Users");
         userStorage = FirebaseStorage.getInstance().getReference("Users");
 
-        generateMyData();
-        setRef();
-        clicks();
+        generateMyData(); //access user data in database
+        setRef();  // initialize UI ID's
+        clicks(); // button
     }
 
     private void generateMyData() {
@@ -198,7 +198,6 @@ public class edit_profile_page extends AppCompatActivity {
             saveWithOutImage();
 
         }else
-
         {
             saveWithImage();
         }

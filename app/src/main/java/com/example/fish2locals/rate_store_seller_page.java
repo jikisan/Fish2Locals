@@ -68,7 +68,7 @@ public class rate_store_seller_page extends AppCompatActivity {
         storeId = getIntent().getStringExtra("storeId");
         sellerUserId = getIntent().getStringExtra("sellerUserId");
 
-        setRef();
+        setRef(); // initialize UI Id's
         generateSellerReviews();
         generateStoreReviews();
         generateProductCount();

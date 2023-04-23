@@ -99,18 +99,18 @@ public class Home_Fragment extends Fragment {
 
         user = FirebaseAuth.getInstance().getCurrentUser();
         myUserId = user.getUid();
+
         userDatabase = FirebaseDatabase.getInstance().getReference("Users");
         storeDatabase = FirebaseDatabase.getInstance().getReference("Store");
         ratingDatabase = FirebaseDatabase.getInstance().getReference("Ratings");
         productsDatabase = FirebaseDatabase.getInstance().getReference("Products");
 
 
-
-        setRef(view);
-        generateUsersData();
-        generateProductsList();
-        getCurrentLocation();
-        clicks();
+        setRef(view); // initialize UI ID's
+        generateUsersData(); // generate users data
+        generateProductsList(); // generate product list
+        getCurrentLocation(); // generate current user location
+        clicks(); // buttons
 
 
         return view;
@@ -141,14 +141,14 @@ public class Home_Fragment extends Fragment {
                 Set<String> productNameSet = new HashSet<String>(arrProductNames);
                 List<String> newProductNameList = new ArrayList<String>(productNameSet);
 
-
                 Set<String> imageNameSet = new HashSet<String>(arrProductImageNames);
                 List<String> newImageNameList = new ArrayList<String>(imageNameSet);
 
-
+                //best seller list
                 adapterBestSellers = new AdapterBestSellers(newProductNameList, newImageNameList, getContext());
                 rv_bestSeller.setAdapter(adapterBestSellers);
                 rv_bestSeller.setHasFixedSize(true);
+
                 LinearLayoutManager linearLayoutManager2 = new LinearLayoutManager(getContext(),
                         LinearLayoutManager.HORIZONTAL, false);
                 rv_bestSeller.setLayoutManager(linearLayoutManager2);
@@ -203,9 +203,11 @@ public class Home_Fragment extends Fragment {
 
     @SuppressLint("MissingPermission")
     private void getCurrentLocation() {
+
         // Initialize Location manager
         LocationManager locationManager = (LocationManager) getActivity()
                 .getSystemService(Context.LOCATION_SERVICE);
+
         // Check condition
         if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
                 || locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
@@ -352,18 +354,22 @@ public class Home_Fragment extends Fragment {
 
                 }
 
+                // sort products list by distance
                 Collections.sort(arrTempStoreData, new Comparator<TempStoreData>() {
                     @Override
                     public int compare(TempStoreData tempStoreData, TempStoreData t1) {
                         return Double.compare(tempStoreData.getDistance(), t1.getDistance());
                     }
                 });
+
+                // sort products list by ratings
                 Collections.sort(arrTempStoreData2, new Comparator<TempStoreData>() {
                     @Override
                     public int compare(TempStoreData tempStoreData, TempStoreData t1) {
                         return Double.compare(tempStoreData.getRatings(), t1.getRatings());
                     }
                 });
+
                 Collections.reverse(arrTempStoreData2);
 
                 adapterStoresNearMe.notifyDataSetChanged();

@@ -62,9 +62,9 @@ public class StoreProductsFragment extends Fragment {
         storeOwnersUserId = getActivity().getIntent().getStringExtra("storeOwnersUserId");
         storeId = getActivity().getIntent().getStringExtra("storeId");
 
-        setRef(view);
-        generateRecyclerLayout();
-        click();
+        setRef(view); // initialize UI Id's
+        generateRecyclerLayout(); // generate recyclerlayout
+        click(); // buttons
 
         return view;
     }

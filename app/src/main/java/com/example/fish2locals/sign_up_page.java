@@ -50,8 +50,8 @@ public class sign_up_page extends AppCompatActivity {
 
         userDatabase = FirebaseDatabase.getInstance().getReference("Users");
 
-        setRef();
-        clicks();
+        setRef(); // Initialize reference of UI ID's
+        clicks(); // buttons users can click
 
 
     }
@@ -63,14 +63,14 @@ public class sign_up_page extends AppCompatActivity {
                 Intent intent = new Intent(sign_up_page.this, login_page.class);
                 startActivity(intent);
             }
-        });
+        }); //click to go to login page
 
         tv_signUpBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 validate();
             }
-        });
+        });// click to submit form to register
         
         
     }
@@ -171,6 +171,7 @@ public class sign_up_page extends AppCompatActivity {
                 .show();
     }
 
+    //create account method
     private void createAuthAccount(String firstName, String lastName, String contactNum, String username, String password) {
 
         fAuth.createUserWithEmailAndPassword(username, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
@@ -196,6 +197,7 @@ public class sign_up_page extends AppCompatActivity {
         });
     }
 
+    //save database all data
     private void savingDataToDatabase(String firstName, String lastName, String contactNum,
                                       String username, String password) {
 
