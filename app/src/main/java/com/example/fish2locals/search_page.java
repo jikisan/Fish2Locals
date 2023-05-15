@@ -193,8 +193,6 @@ public class search_page extends AppCompatActivity {
             if (object.getStoreName().toLowerCase().contains(s.toLowerCase()))
             {
                 arr.add(object);
-
-
             }
 
             if(s.isEmpty())

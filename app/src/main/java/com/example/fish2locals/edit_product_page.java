@@ -58,7 +58,7 @@ public class edit_product_page extends AppCompatActivity {
             R.drawable.fish_bisugo_threadfinbream, R.drawable.fish_tanigue_spanishmackerel,
             R.drawable.fish_bangus_milkfish };
 
-    private ImageView iv_fishPhoto, iv_decreaseBtn, iv_increaseBtn;
+    private ImageView iv_fishPhoto, iv_decreaseBtn, iv_increaseBtn, iv_deleteBtn;
     private CheckBox cb_pickUp, cb_ownDelivery, cb_3rdPartyDelivery;
     private TextView tv_quantity, tv_submitBtn, tv_back, tv_productName, tv_viewPhotos;
     private EditText et_price;
@@ -427,6 +427,7 @@ public class edit_product_page extends AppCompatActivity {
         iv_fishPhoto = findViewById(R.id.iv_fishPhoto);
         iv_decreaseBtn = findViewById(R.id.iv_decreaseBtn);
         iv_increaseBtn = findViewById(R.id.iv_increaseBtn);
+        iv_deleteBtn = findViewById(R.id.iv_deleteBtn);
 
         tv_back = findViewById(R.id.tv_back);
         tv_submitBtn = findViewById(R.id.tv_submitBtn);

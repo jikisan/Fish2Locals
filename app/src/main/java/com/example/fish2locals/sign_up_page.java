@@ -21,9 +21,15 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -43,20 +49,55 @@ public class sign_up_page extends AppCompatActivity {
 
     private ProgressDialog progressDialog;
 
+    private List<String> arrEmail = new ArrayList<>();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.sign_up_page);
 
+
         userDatabase = FirebaseDatabase.getInstance().getReference("Users");
 
         setRef(); // Initialize reference of UI ID's
+        generateUsersData();
         clicks(); // buttons users can click
 
 
     }
 
+    private void generateUsersData() {
+
+        userDatabase.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+                if(snapshot.exists())
+                {
+
+                    for(DataSnapshot dataSnapshot : snapshot.getChildren())
+                    {
+                        Users users = dataSnapshot.getValue(Users.class);
+
+                        String email = users.getEmail();
+                        arrEmail.add(email);
+                    }
+
+                }
+
+
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
     private void clicks() {
+
         tv_signIn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -140,8 +181,36 @@ public class sign_up_page extends AppCompatActivity {
         }
         else
         {
+            checkIfEmailExist(firstName, lastName, contactNum, username, password);
+
+
+        }
+    }
+
+    private void checkIfEmailExist(String firstName, String lastName, String contactNum,
+                                   String username, String password) {
+
+        boolean isEmailExist = false;
+
+        for(int i = 0; i < arrEmail.size(); i++)
+        {
+            String tempEmail = arrEmail.get(i).toLowerCase().toString();
+
+            if (tempEmail.equalsIgnoreCase(username))
+            {
+                Toast.makeText(this, "Email already exist!", Toast.LENGTH_SHORT).show();
+                et_username.setError("Email already exist!");
+                isEmailExist = true;
+            }
+
+
+        }
+
+        if(!isEmailExist)
+        {
             signUp(firstName, lastName, contactNum, username, password);
         }
+
     }
 
     private void signUp(String firstName, String lastName, String contactNum, String username, String password) {

@@ -21,6 +21,17 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <ImageView
+        android:id="@+id/iv_deleteBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:src="@drawable/delete_btn"
+        app:layout_constraintBottom_toBottomOf="@+id/tv_back"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/tv_back"
+        app:tint="@color/red_btn_bg_pressed_color" />
+
     <ScrollView
         android:id="@+id/scrollview"
         android:layout_width="match_parent"
