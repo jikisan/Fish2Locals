@@ -19,6 +19,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.fish2locals.R;
+import com.example.fish2locals.about_us_page;
 import com.example.fish2locals.change_password_page;
 import com.example.fish2locals.edit_profile_page;
 import com.example.fish2locals.homepage;
@@ -284,7 +285,8 @@ public class Profile_Fragment extends Fragment {
         tv_aboutUs.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(getContext(), "About us coming soon.", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(getContext(), about_us_page.class);
+                startActivity(intent);
             }
         });
 

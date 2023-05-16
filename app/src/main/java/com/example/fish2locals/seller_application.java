@@ -58,7 +58,7 @@ public class seller_application extends AppCompatActivity {
     private ProgressDialog progressDialog;
 
     private FirebaseUser user;
-    private DatabaseReference storeDatabase, userDatabase;
+    private DatabaseReference storeDatabase, userDatabase, storeRequestDatabase;
     private StorageReference storeStorage;
     private StorageTask addTask;
 
@@ -76,6 +76,7 @@ public class seller_application extends AppCompatActivity {
         myUserID = user.getUid();
         storeStorage = FirebaseStorage.getInstance().getReference("Store").child(myUserID);
         storeDatabase = FirebaseDatabase.getInstance().getReference("Store");
+        storeRequestDatabase = FirebaseDatabase.getInstance().getReference("Store Requests");
         userDatabase = FirebaseDatabase.getInstance().getReference("Users");
 
         setRef(); //initialize UI ID's
@@ -302,7 +303,7 @@ public class seller_application extends AppCompatActivity {
                 latString, longString, storeContactNum, storeContactPerson, validDocsUrl,
                 validDocsName, myUserID, ratings);
 
-        storeDatabase.push().setValue(store).addOnCompleteListener(new OnCompleteListener<Void>() {
+        storeRequestDatabase.push().setValue(store).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
 
@@ -317,12 +318,12 @@ public class seller_application extends AppCompatActivity {
                     public void onClick(SweetAlertDialog sweetAlertDialog) {
 
 
-                        boolean hasSellerAccount = true;
-
-                        HashMap<String, Object> hashMap = new HashMap<String, Object>();
-                        hashMap.put("hasSellerAccount", hasSellerAccount);
-
-                        userDatabase.child(myUserID).updateChildren(hashMap);
+//                        boolean hasSellerAccount = true;
+//
+//                        HashMap<String, Object> hashMap = new HashMap<String, Object>();
+//                        hashMap.put("hasSellerAccount", hasSellerAccount);
+//
+//                        userDatabase.child(myUserID).updateChildren(hashMap);
 
                         pdialog.dismiss();
                         Intent intent = new Intent(seller_application.this, homepage.class);
