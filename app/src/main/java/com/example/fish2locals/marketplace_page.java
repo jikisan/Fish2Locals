@@ -187,7 +187,6 @@ public class marketplace_page extends AppCompatActivity {
     }
 
 
-
     private void setRef() {
 
 

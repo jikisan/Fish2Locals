@@ -5,6 +5,7 @@ import static android.view.View.GONE;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.annotation.SuppressLint;
@@ -46,9 +47,10 @@ import java.util.Comparator;
 import java.util.List;
 
 import Adapters.AdapterViewAllStores;
+import Adapters.AdapterViewSpecificProductList;
 import Models.Products;
-import Models.Ratings;
 import Models.Store;
+import Models.TempBestSellerData;
 import Models.TempStoreData;
 
 public class view_stores_of_best_sellers_page extends AppCompatActivity {
@@ -57,9 +59,10 @@ public class view_stores_of_best_sellers_page extends AppCompatActivity {
     private double myLatDouble, myLongDouble, distance;
 
     private List<Store> arrStore = new ArrayList<>();
-    private List<TempStoreData> arrTempStoreData = new ArrayList<>();
+    private List<TempBestSellerData> arrTempBestSeller = new ArrayList<>();
     private List<String> arrStoreIds = new ArrayList<>();
-    private AdapterViewAllStores adapterViewAllStores;
+
+    private AdapterViewSpecificProductList adapterViewSpecificProductList;
     private ArrayAdapter<String> dataAdapter;
 
 
@@ -75,7 +78,7 @@ public class view_stores_of_best_sellers_page extends AppCompatActivity {
     int counter = 0;
     double totalRating = 0, tempRatingValue = 0, averageRating = 0;
 
-    String[] sortList ={"Near me", "Most Trusted"};
+    String[] sortList ={"Near me", "Most Trusted", "Price", "Quantity"};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -114,8 +117,6 @@ public class view_stores_of_best_sellers_page extends AppCompatActivity {
         {
             tv_back.setText("Store/s that are selling " + split[1].toUpperCase());
         }
-
-
 
 
 
@@ -170,27 +171,53 @@ public class view_stores_of_best_sellers_page extends AppCompatActivity {
                 switch (i) {
 
                     case 0:
-                        Collections.sort(arrTempStoreData, new Comparator<TempStoreData>() {
+                        Collections.sort(arrTempBestSeller, new Comparator<TempBestSellerData>() {
                             @Override
-                            public int compare(TempStoreData tempStoreData, TempStoreData t1) {
-                                return Double.compare(tempStoreData.getDistance(), t1.getDistance());
+                            public int compare(TempBestSellerData o1, TempBestSellerData o2) {
+                                return Double.compare(o1.getDistance(), o2.getDistance());
                             }
+
+
                         });
 
-                        adapterViewAllStores.notifyDataSetChanged();
+                        adapterViewSpecificProductList.notifyDataSetChanged();
                         break;
 
                     case 1:
-                        Collections.sort(arrTempStoreData, new Comparator<TempStoreData>() {
+                        Collections.sort(arrTempBestSeller, new Comparator<TempBestSellerData>() {
                             @Override
-                            public int compare(TempStoreData tempStoreData, TempStoreData t1) {
-                                return Double.compare(tempStoreData.getRatings(), t1.getRatings());
+                            public int compare(TempBestSellerData o1, TempBestSellerData o2) {
+                                return Double.compare(o1.getRatings(), o2.getRatings());
                             }
                         });
 
-                        Collections.reverse(arrTempStoreData);
+                        Collections.reverse(arrTempBestSeller);
+                        adapterViewSpecificProductList.notifyDataSetChanged();
+                        break;
 
-                        adapterViewAllStores.notifyDataSetChanged();
+                    case 2:
+                        Collections.sort(arrTempBestSeller, new Comparator<TempBestSellerData>() {
+                            @Override
+                            public int compare(TempBestSellerData o1, TempBestSellerData o2) {
+                                return Double.compare(o1.getPricePerKilo(), o2.getPricePerKilo());
+                            }
+                        });
+
+
+
+                        adapterViewSpecificProductList.notifyDataSetChanged();
+                        break;
+
+                    case 3:
+                        Collections.sort(arrTempBestSeller, new Comparator<TempBestSellerData>() {
+                            @Override
+                            public int compare(TempBestSellerData o1, TempBestSellerData o2) {
+                                return Integer.compare(o1.getQuantityByKilo(), o2.getQuantityByKilo());
+                            }
+                        });
+
+                        Collections.reverse(arrTempBestSeller);
+                        adapterViewSpecificProductList.notifyDataSetChanged();
                         break;
 
 
@@ -269,11 +296,12 @@ public class view_stores_of_best_sellers_page extends AppCompatActivity {
     private void generateRecyclerLayout() {
 
         rv_storeLists.setHasFixedSize(true);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(view_stores_of_best_sellers_page.this);
         GridLayoutManager gridLayoutManager = new GridLayoutManager(view_stores_of_best_sellers_page.this, 2, GridLayoutManager.VERTICAL, false);
-        rv_storeLists.setLayoutManager(gridLayoutManager);
+        rv_storeLists.setLayoutManager(linearLayoutManager);
 
-        adapterViewAllStores = new AdapterViewAllStores(arrStore, arrTempStoreData, view_stores_of_best_sellers_page.this);
-        rv_storeLists.setAdapter(adapterViewAllStores);
+        adapterViewSpecificProductList = new AdapterViewSpecificProductList(arrTempBestSeller, view_stores_of_best_sellers_page.this);
+        rv_storeLists.setAdapter(adapterViewSpecificProductList);
 
         getViewHolderValues();
 
@@ -281,54 +309,96 @@ public class view_stores_of_best_sellers_page extends AppCompatActivity {
 
     private void getViewHolderValues() {
 
-        arrTempStoreData.clear();
+        arrTempBestSeller.clear();
         arrStore.clear();
 
-        for(int i = 0; i < arrStoreIds.size(); i++)
-        {
-            String tempStoreId = arrStoreIds.get(i);
+//        for(int i = 0; i < arrStoreIds.size(); i++)
+//        {
+//            String tempStoreId = arrStoreIds.get(i);
+//
+//            storeDatabase.child(tempStoreId).addValueEventListener(new ValueEventListener() {
+//                @Override
+//                public void onDataChange(@NonNull DataSnapshot snapshot) {
+//
+//
+//                    if(snapshot.exists())
+//                    {
+//                        Store store = snapshot.getValue(Store.class);
+//
+//                        String storeUrl = store.getStoreUrl();
+//                        String storeName = store.getStoreName();
+//
+//                        double latDouble = Double.parseDouble(store.getStoreLat());
+//                        double longDouble = Double.parseDouble(store.getStoreLang());
+//                        LatLng location = new LatLng(latDouble, longDouble);
+//                        double distance = generateDistance(location);
+//
+//                        long ratings = store.getRatings();
+//                        String storeId = snapshot.getKey();
+//                        String storeOwnersUserId = store.getStoreOwnersUserId();
+//
+//                        TempStoreData tempStoreData = new TempStoreData(storeUrl, storeName,
+//                                distance, ratings, counter, storeId, storeOwnersUserId);
+//
+//
+//                        arrStore.add(store);
+//                        arrTempStoreData.add(tempStoreData);
+//                        adapterViewAllStores.notifyDataSetChanged();
+//                    }
+//
+//
+//
+//                }
+//
+//
+//                @Override
+//                public void onCancelled(@NonNull DatabaseError error) {
+//
+//                }
+//            });
+//        }
 
-            storeDatabase.child(tempStoreId).addValueEventListener(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot snapshot) {
+        productsDatabase.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
 
-
-                    if(snapshot.exists())
+                if(snapshot.exists())
+                {
+                    for(DataSnapshot dataSnapshot : snapshot.getChildren())
                     {
-                        Store store = snapshot.getValue(Store.class);
+                        Products products = dataSnapshot.getValue(Products.class);
 
-                        String storeUrl = store.getStoreUrl();
-                        String storeName = store.getStoreName();
-
-                        double latDouble = Double.parseDouble(store.getStoreLat());
-                        double longDouble = Double.parseDouble(store.getStoreLang());
-                        LatLng location = new LatLng(latDouble, longDouble);
-                        double distance = generateDistance(location);
-
-                        long ratings = store.getRatings();
-                        String storeId = snapshot.getKey();
-                        String storeOwnersUserId = store.getStoreOwnersUserId();
-
-                        TempStoreData tempStoreData = new TempStoreData(storeUrl, storeName,
-                                distance, ratings, counter, storeId, storeOwnersUserId);
+                        String tempFishImageName = products.getImageName();
 
 
-                        arrStore.add(store);
-                        arrTempStoreData.add(tempStoreData);
-                        adapterViewAllStores.notifyDataSetChanged();
+                        if(tempFishImageName.equals(fishImageName))
+                        {
+                            String tempFishName = products.getFishName();
+                            double tempPrice = products.getPricePerKilo();
+                            int tempQuantity = products.getQuantityByKilo();
+                            String storeId = products.getStoreId();
+
+                            arrStoreIds.add(storeId);
+
+                            generateStoreData(storeId, tempFishImageName, tempFishName, tempPrice,
+                                    tempQuantity);
+
+                        }
+
+
                     }
 
 
-
                 }
 
 
-                @Override
-                public void onCancelled(@NonNull DatabaseError error) {
+            }
 
-                }
-            });
-        }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
 
 
         if(arrStoreIds.isEmpty())
@@ -341,6 +411,52 @@ public class view_stores_of_best_sellers_page extends AppCompatActivity {
 
     }
 
+    private void generateStoreData(String storeId, String tempFishImageName, String tempFishName,
+                                   double tempPrice, int tempQuantity) {
+
+        storeDatabase.child(storeId).addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+
+                    if(snapshot.exists())
+                    {
+                        Store store = snapshot.getValue(Store.class);
+
+                        String storeName = store.getStoreName();
+
+                        double latDouble = Double.parseDouble(store.getStoreLat());
+                        double longDouble = Double.parseDouble(store.getStoreLang());
+                        LatLng location = new LatLng(latDouble, longDouble);
+
+                        double distance = generateDistance(location);
+                        long ratings = store.getRatings();
+                        String tempStoreId = snapshot.getKey();
+                        String tempStoreOwnersUserId = store.getStoreOwnersUserId();
+
+                        TempBestSellerData tempBestSellerData = new TempBestSellerData(tempFishImageName,
+                                tempFishName, tempPrice, tempQuantity, storeName, distance, ratings,
+                                tempStoreId, tempStoreOwnersUserId);
+
+                        arrStore.add(store);
+                        arrTempBestSeller.add(tempBestSellerData);
+
+                        adapterViewSpecificProductList.notifyDataSetChanged();
+
+                    }
+
+
+
+                }
+
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+
+                }
+            });
+
+    }
 
 
     private double generateDistance(LatLng location) {

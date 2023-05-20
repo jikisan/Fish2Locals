@@ -292,26 +292,28 @@ public class rate_store_seller_page extends AppCompatActivity {
 
     private void submitRating(float getRatingUser, float getRatingStore) {
 
-        String commentUsers = et_ratingCommentUser.getText().toString();
-        String commentStore = et_ratingCommentStore.getText().toString();
+//        String commentUsers = et_ratingCommentUser.getText().toString();
+//        Ratings ratingsUsers = new Ratings(sellerUserId, myUserId, getRatingUser, commentUsers, orderId);
 
-        Ratings ratingsUsers = new Ratings(sellerUserId, myUserId, getRatingUser, commentUsers, orderId);
+        String commentStore = et_ratingCommentStore.getText().toString();
         Ratings ratingsStore = new Ratings(storeId, myUserId, getRatingStore, commentStore, orderId);
 
-        ratingDatabase.push().setValue(ratingsUsers).addOnCompleteListener(new OnCompleteListener<Void>() {
+//        ratingDatabase.push().setValue(ratingsUsers).addOnCompleteListener(new OnCompleteListener<Void>() {
+//            @Override
+//            public void onComplete(@NonNull Task<Void> task) {
+//
+//
+//
+//
+//
+//            }
+//        });
+
+        ratingDatabase.push().setValue(ratingsStore).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
 
-
-                ratingDatabase.push().setValue(ratingsStore).addOnCompleteListener(new OnCompleteListener<Void>() {
-                        @Override
-                        public void onComplete(@NonNull Task<Void> task) {
-
-                            updateOrderStatus(getRatingUser, getRatingStore);
-
-                        }
-                    });
-
+                updateOrderStatus(getRatingUser, getRatingStore);
 
             }
         });
@@ -339,23 +341,20 @@ public class rate_store_seller_page extends AppCompatActivity {
 
 
         // Update Seller's Ratings
-        double newAverageSellerRating = 0, tempSellerRatingValue;
+//        double newAverageSellerRating = 0, tempSellerRatingValue;
+//
+//        for(int i = 0; i < arrSellerRatings.size(); i++)
+//        {
+//            tempSellerRatingValue = arrSellerRatings.get(i);
+//            newAverageSellerRating = newAverageSellerRating + tempSellerRatingValue;
+//
+//        }
+//
+//        HashMap<String, Object> sellerRating = new HashMap<String, Object>();
+//        sellerRating.put("rating", newAverageSellerRating);
+//
+//        userDatabase.child(sellerUserId).updateChildren(sellerRating);
 
-        for(int i = 0; i < arrSellerRatings.size(); i++)
-        {
-            tempSellerRatingValue = arrSellerRatings.get(i);
-            newAverageSellerRating = newAverageSellerRating + tempSellerRatingValue;
-
-        }
-
-        HashMap<String, Object> sellerRating = new HashMap<String, Object>();
-        sellerRating.put("rating", newAverageSellerRating);
-
-        userDatabase.child(sellerUserId).updateChildren(sellerRating);
-
-
-
-        // Update Store's Ratings
 
         double newAverageStoreRating = 0, tempStoreRatingValue;
 
@@ -365,6 +364,8 @@ public class rate_store_seller_page extends AppCompatActivity {
             newAverageStoreRating = newAverageStoreRating + tempStoreRatingValue;
 
         }
+
+        // Update Store's Ratings
 
         HashMap<String, Object> storeRating = new HashMap<String, Object>();
         storeRating.put("ratings", newAverageStoreRating);

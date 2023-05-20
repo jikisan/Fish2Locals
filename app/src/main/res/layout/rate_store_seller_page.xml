@@ -15,7 +15,7 @@
         android:drawableStart="@drawable/back_arrow"
         android:drawableTint="@color/teal_200"
         android:drawablePadding="8dp"
-        android:text="Rate the seller and store"
+        android:text="Rate the store"
         android:textColor="@color/teal_200"
         android:textSize="16sp"
         android:textStyle="bold"
@@ -29,6 +29,7 @@
         android:layout_marginTop="24dp"
         android:background="@drawable/rounded100"
         android:src="@drawable/person"
+        android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tv_backBtn" />
@@ -40,6 +41,7 @@
         android:layout_marginTop="8dp"
         android:text="Name"
         android:textColor="@color/white"
+        android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/iv_sellerPhoto" />
@@ -53,6 +55,7 @@
         android:rating="4.5"
         android:stepSize="0.5"
         android:theme="@style/RatingBar"
+        android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
@@ -67,6 +70,7 @@
         android:text="Comment"
         android:textColor="@color/white"
         android:textStyle="bold"
+        android:visibility="gone"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/ratingBarUser" />
 
@@ -77,13 +81,13 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="16dp"
-        android:layout_marginBottom="32dp"
         android:background="@drawable/rounded5"
         android:gravity="top"
         android:hint="Enter your comment here"
         android:padding="8dp"
-        android:textSize="16sp"
         android:textColor="@color/black"
+        android:textSize="16sp"
+        android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView18" />
@@ -92,7 +96,7 @@
         android:id="@+id/iv_storePhoto"
         android:layout_width="150dp"
         android:layout_height="100dp"
-        android:layout_marginTop="50dp"
+        android:layout_marginTop="64dp"
         android:background="@color/white"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -162,6 +166,7 @@
         android:id="@+id/btn_ratingSubmit"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
         android:background="@drawable/gradient_button_background"
         android:padding="16dp"
         android:paddingLeft="32dp"
@@ -172,6 +177,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/et_ratingCommentStore" />
+        app:layout_constraintTop_toBottomOf="@+id/et_ratingCommentStore"
+        app:layout_constraintVertical_bias="0.0" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

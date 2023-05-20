@@ -14,67 +14,80 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.fish2locals.R;
 import com.example.fish2locals.view_store_page;
-import com.example.fish2locals.view_store_page2;
 import com.squareup.picasso.Picasso;
+
+import org.w3c.dom.Text;
 
 import java.text.DecimalFormat;
 import java.util.List;
 
-import Models.Store;
+import Models.TempBestSellerData;
 import Models.TempStoreData;
 
-public class AdapterViewAllStores extends RecyclerView.Adapter<AdapterViewAllStores.ItemViewHolder> {
+public class AdapterViewSpecificProductList extends RecyclerView.Adapter<AdapterViewSpecificProductList.ItemViewHolder> {
 
-    private List<Store> arrStore;
-    private List<TempStoreData> arrTempStoreData;
+    private List<TempBestSellerData> arrTempBestSeller;
     private OnItemClickListener onItemClickListener;
     private Context context;
 
-    public AdapterViewAllStores() {
+    public AdapterViewSpecificProductList() {
     }
 
-    public AdapterViewAllStores(List<Store> arrStore, List<TempStoreData> arrTempStoreData, Context context) {
-        this.arrStore = arrStore;
-        this.arrTempStoreData = arrTempStoreData;
+    public AdapterViewSpecificProductList(List<TempBestSellerData> arrTempBestSeller, Context context) {
+        this.arrTempBestSeller = arrTempBestSeller;
         this.context = context;
     }
 
     @NonNull
     @Override
-    public AdapterViewAllStores.ItemViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public AdapterViewSpecificProductList.ItemViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         return new ItemViewHolder
-                (LayoutInflater.from(parent.getContext()).inflate(R.layout.item_bookmarks,parent, false));
+                (LayoutInflater.from(parent.getContext()).inflate(R.layout.item_fish_lists,parent, false));
     }
 
     @Override
-    public void onBindViewHolder(@NonNull AdapterViewAllStores.ItemViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull AdapterViewSpecificProductList.ItemViewHolder holder, int position) {
 
-        TempStoreData tempStoreData = arrTempStoreData.get(position);
+        TempBestSellerData tempBestSellerData = arrTempBestSeller.get(position);
 
-        String storeUrl = tempStoreData.getStoreUrl();
-        String storeName = tempStoreData.getStoreName();
-        double distance = tempStoreData.getDistance();
-        double averageRating = tempStoreData.getRatings();
-        int count = tempStoreData.getRatingsCount();
-        String storeId = tempStoreData.getStoreId();
-        String storeOwnersUserId = tempStoreData.getStoreOwnersUserId();
+
+        String productImageName = tempBestSellerData.getImageName();
+        String fishName = tempBestSellerData.getFishName();
+        double price = tempBestSellerData.getPricePerKilo();
+        int quantity = tempBestSellerData.getQuantityByKilo();
+        String storeName = tempBestSellerData.getStoreName();
+        double distance = tempBestSellerData.getDistance();
+        double averageRating = tempBestSellerData.getRatings();
+        String storeId = tempBestSellerData.getStoreId();
+        String storeOwnersUserId = tempBestSellerData.getStoreOwnersUserId();
 
         DecimalFormat df = new DecimalFormat("#.00");
         df.format(distance);
+
         if (distance > 1000) {
+
             double kilometers = distance / 1000;
             holder.tv_distance.setText(df.format(kilometers) + " Km Away");
+
         } else {
+
             holder.tv_distance.setText(df.format(distance) + " m Away");
+
         }
 
+        int imageResource = context.getResources().getIdentifier(productImageName, "drawable", context.getPackageName());
+
         Picasso.get()
-                .load(storeUrl)
+                .load(imageResource)
                 .fit()
                 .centerCrop()
-                .into(holder.iv_storePhoto);
+                .into(holder.iv_productPhoto);
 
-        holder.tv_storeName.setText(storeName);
+        holder.tv_fishName.setText(fishName);
+        holder.tv_productQuantity.setText(quantity + " kilogram/s remaining.");
+        holder.tv_productPrice.setText("₱ " + price + " / Kg");
+
+        holder.tv_storeName.setText("Sold by: " + storeName);
         holder.tv_userRatingCount.setText(averageRating + "");
         holder.rb_userRating.setRating((float) averageRating);
 
@@ -90,11 +103,12 @@ public class AdapterViewAllStores extends RecyclerView.Adapter<AdapterViewAllSto
             }
         });
 
+
     }
 
     @Override
     public int getItemCount() {
-        return arrTempStoreData.size();
+        return arrTempBestSeller.size();
     }
 
     public interface  OnItemClickListener{
@@ -103,14 +117,19 @@ public class AdapterViewAllStores extends RecyclerView.Adapter<AdapterViewAllSto
 
     public class ItemViewHolder extends RecyclerView.ViewHolder {
 
-        ImageView iv_storePhoto;
+        ImageView iv_productPhoto;
+        TextView tv_fishName, tv_productQuantity, tv_productPrice;
         TextView tv_storeName, tv_distance, tv_userRatingCount, tv_visitStoreBtn;
         RatingBar rb_userRating;
 
         public ItemViewHolder(@NonNull View itemView) {
             super(itemView);
 
-            iv_storePhoto = itemView.findViewById(R.id.iv_storePhoto);
+            iv_productPhoto = itemView.findViewById(R.id.iv_productPhoto);
+
+            tv_fishName = itemView.findViewById(R.id.tv_fishName);
+            tv_productQuantity = itemView.findViewById(R.id.tv_productQuantity);
+            tv_productPrice = itemView.findViewById(R.id.tv_productPrice);
 
             tv_storeName = itemView.findViewById(R.id.tv_storeName);
             tv_distance = itemView.findViewById(R.id.tv_distance);
@@ -118,7 +137,6 @@ public class AdapterViewAllStores extends RecyclerView.Adapter<AdapterViewAllSto
             tv_visitStoreBtn = itemView.findViewById(R.id.tv_visitStoreBtn);
 
             rb_userRating = itemView.findViewById(R.id.rb_userRating);
-
 
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
