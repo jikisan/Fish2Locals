@@ -51,7 +51,7 @@ public class order_details_page extends AppCompatActivity {
     private List<String> arrOrderSnapshotIds = new ArrayList<>();
     private AdapterPlaceOrderItem adapterPlaceOrderItem;
 
-    private LinearLayout layout;
+    private LinearLayout layout, layout1;
     private ProgressBar progressBar;
     private RecyclerView rv_myBasket;
     private TextView tv_back, tv_orderId, tv_dateCreated, tv_timeCreated, tv_seller,
@@ -161,9 +161,13 @@ public class order_details_page extends AppCompatActivity {
                     boolean rated = arrOrders.get(0).isRated();
 
 
-                    if(orderStatus.equals("1"))
+                    if(orderStatus.equals("0"))
                     {
                         layout.setVisibility(View.VISIBLE);
+                    }
+                    else if(orderStatus.equals("1"))
+                    {
+                        layout1.setVisibility(View.VISIBLE);
                     }
                     else if(orderStatus.equals("2") && !rated)
                     {
@@ -583,6 +587,7 @@ public class order_details_page extends AppCompatActivity {
     private void setRef() {
 
         layout = findViewById(R.id.layout);
+        layout1 = findViewById(R.id.layout1);
 
         tv_back = findViewById(R.id.tv_back);
 

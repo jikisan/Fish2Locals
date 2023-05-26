@@ -9,6 +9,7 @@ import androidx.viewpager2.adapter.FragmentStateAdapter;
 import Fragments.My_Order_Cancelled_Fragment;
 import Fragments.My_Order_Completed_Fragment;
 import Fragments.My_Order_In_Transit_Fragment;
+import Fragments.My_Order_To_Ship_Fragment;
 import Fragments.StoreInfoFragment;
 import Fragments.StoreProductsFragment;
 import Fragments.StoreReviewsFragment;
@@ -23,17 +24,21 @@ public class fragmentAdapterMyOrder extends FragmentStateAdapter {
     public Fragment createFragment(int position) {
 
         switch (position) {
+
             case 1:
-                return new My_Order_Completed_Fragment();
+                return new My_Order_In_Transit_Fragment();
             case 2:
+                return new My_Order_Completed_Fragment();
+            case 3:
                 return new My_Order_Cancelled_Fragment();
+
         }
 
-        return new My_Order_In_Transit_Fragment();
+        return new My_Order_To_Ship_Fragment();
     }
 
     @Override
     public int getItemCount() {
-        return 3;
+        return 4;
     }
 }

@@ -57,6 +57,7 @@ public class sellers_order_page extends AppCompatActivity {
 
     private void generateTabs() {
 
+        tab_layout.addTab(tab_layout.newTab().setText("To Ship"));
         tab_layout.addTab(tab_layout.newTab().setText("In Transit"));
         tab_layout.addTab(tab_layout.newTab().setText("Completed"));
         tab_layout.addTab(tab_layout.newTab().setText("Canceled"));

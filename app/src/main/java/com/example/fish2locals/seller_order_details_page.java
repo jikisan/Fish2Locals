@@ -52,12 +52,12 @@ public class seller_order_details_page extends AppCompatActivity {
     private List<String> arrOrderSnapshotIds = new ArrayList<>();
     private AdapterPlaceOrderItem adapterPlaceOrderItem;
 
-    private LinearLayout layout;
+    private LinearLayout layout, layout0;
     private ProgressBar progressBar;
     private RecyclerView rv_myBasket;
     private TextView tv_back, tv_orderId, tv_dateCreated, tv_timeCreated, tv_seller,
             tv_deliveryAddress, tv_contactNum, tv_totalPrice, tv_cancelOrderBtn,
-            tv_rateBtn, tv_cancelText;
+            tv_rateBtn, tv_cancelText, tv_inTransitBtn;
 
 
     private FirebaseUser user;
@@ -158,6 +158,10 @@ public class seller_order_details_page extends AppCompatActivity {
                     boolean rated = arrOrders.get(0).isRated();
 
 
+                    if(orderStatus.equals("0"))
+                    {
+                        layout0.setVisibility(View.VISIBLE);
+                    }
                     if(orderStatus.equals("1"))
                     {
                         layout.setVisibility(View.VISIBLE);
@@ -251,8 +255,6 @@ public class seller_order_details_page extends AppCompatActivity {
 
     }
 
-
-
     private void click() {
 
         tv_back.setOnClickListener(new View.OnClickListener() {
@@ -301,6 +303,57 @@ public class seller_order_details_page extends AppCompatActivity {
                 });
                 sDialog.show();
 
+
+            }
+        });
+
+        tv_inTransitBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                SweetAlertDialog sDialog;
+                sDialog = new SweetAlertDialog(seller_order_details_page.this, SweetAlertDialog.WARNING_TYPE);
+                sDialog.setTitleText("Change order status to " +
+                        "\nIn Transit?");
+                sDialog.setCancelText("No");
+                sDialog.setConfirmButton("Yes", new SweetAlertDialog.OnSweetClickListener() {
+                    @Override
+                    public void onClick(SweetAlertDialog sweetAlertDialog) {
+
+
+                        ProgressDialog progressDialog;
+                        progressDialog = new ProgressDialog(seller_order_details_page.this);
+                        progressDialog.setTitle("Processing...");
+                        progressDialog.setCancelable(false);
+                        progressDialog.show();
+
+                        for(int i=0; i < arrOrderSnapshotIds.size(); i++)
+                        {
+                            String orderSnapshotIds = arrOrderSnapshotIds.get(i).toString();
+
+                            HashMap<String, Object> hashMap = new HashMap<String, Object>();
+                            hashMap.put("orderStatus", "1");
+                            ordersDatabase.child(orderSnapshotIds).updateChildren(hashMap);
+                        }
+
+                        SweetAlertDialog s2Dialog;
+                        s2Dialog = new SweetAlertDialog(seller_order_details_page.this, SweetAlertDialog.SUCCESS_TYPE);
+                        s2Dialog.setTitleText("Status Changed!");
+                        s2Dialog.setConfirmButton("Continue", new SweetAlertDialog.OnSweetClickListener() {
+                            @Override
+                            public void onClick(SweetAlertDialog sweetAlertDialog) {
+
+                                s2Dialog.dismiss();
+                                sDialog.dismiss();
+                                progressDialog.dismiss();
+                                Intent intent = new Intent(seller_order_details_page.this, sellers_order_page.class);
+                                startActivity(intent);
+                            }
+                        });
+                        s2Dialog.show();
+                    }
+                });
+                sDialog.show();
 
             }
         });
@@ -404,6 +457,7 @@ public class seller_order_details_page extends AppCompatActivity {
 
     private void setRef() {
 
+        layout0 = findViewById(R.id.layout0);
         layout = findViewById(R.id.layout);
 
         tv_back = findViewById(R.id.tv_back);
@@ -416,6 +470,7 @@ public class seller_order_details_page extends AppCompatActivity {
         tv_contactNum = findViewById(R.id.tv_contactNum);
         tv_totalPrice = findViewById(R.id.tv_totalPrice);
 
+        tv_inTransitBtn = findViewById(R.id.tv_inTransitBtn);
         tv_cancelOrderBtn = findViewById(R.id.tv_cancelOrderBtn);
         tv_rateBtn = findViewById(R.id.tv_rateBtn);
         tv_cancelText = findViewById(R.id.tv_cancelText);

@@ -9,6 +9,7 @@ import androidx.viewpager2.adapter.FragmentStateAdapter;
 import Fragments.Sellers_Order_Cancelled_Fragment;
 import Fragments.Sellers_Order_Completed_Fragment;
 import Fragments.Sellers_Order_In_Transit_Fragment;
+import Fragments.Sellers_Order_To_Ship_Fragment;
 
 public class fragmentAdapterSellersOrder extends FragmentStateAdapter {
     public fragmentAdapterSellersOrder(@NonNull FragmentManager fragmentManager, @NonNull Lifecycle lifecycle) {
@@ -21,16 +22,18 @@ public class fragmentAdapterSellersOrder extends FragmentStateAdapter {
 
         switch (position) {
             case 1:
-                return new Sellers_Order_Completed_Fragment();
+                return new Sellers_Order_In_Transit_Fragment();
             case 2:
+                return new Sellers_Order_Completed_Fragment();
+            case 3:
                 return new Sellers_Order_Cancelled_Fragment();
         }
 
-        return new Sellers_Order_In_Transit_Fragment();
+        return new Sellers_Order_To_Ship_Fragment();
     }
 
     @Override
     public int getItemCount() {
-        return 3;
+        return 4;
     }
 }
