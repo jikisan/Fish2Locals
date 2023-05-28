@@ -38,7 +38,7 @@ import cn.pedant.SweetAlert.SweetAlertDialog;
 public class add_to_basket_page extends AppCompatActivity {
 
     private TextView tv_productName, tv_productQuantity, tv_productPrice, tv_hasPickup, tv_hasOwnDelivery,
-            tv_has3rdPartyDelivery, tv_quantity, tv_addToBasketBtn, tv_back, tv_viewPhotos;
+            tv_has3rdPartyDelivery, tv_quantity, tv_addToBasketBtn, tv_back, tv_viewPhotos, tv_messageIfForDelivery;
     private ImageView iv_productPhoto, iv_decreaseBtn, iv_increaseBtn;
     private LinearLayout layout_hasPickup, layout_hasOwnDelivery, layout_has3rdPartyDelivery;
     private CheckBox cb_hasPickup, cb_hasOwnDelivery, cb_has3rdPartyDelivery;
@@ -46,7 +46,7 @@ public class add_to_basket_page extends AppCompatActivity {
     private FirebaseUser user;
     private DatabaseReference productDatabase, basketDatabase;
 
-    private String myUserId, storeOwnersUserId, storeId, productId;
+    private String myUserId, storeOwnersUserId, storeId, productId, deliveryMessage;
     private int productQuantity , intValue = 1;;
 
     String fishImageName;
@@ -98,6 +98,9 @@ public class add_to_basket_page extends AppCompatActivity {
                     hasOwnDelivery = products.isHasOwnDelivery();
                     has3rdPartyDelivery = products.isHas3rdPartyDelivery();
 
+                    int freeDistance = products.getFreeKmForDelivery();
+                    int chargePerKm = products.getChargePerKm();
+
                     if(!fishImageName.isEmpty())
                     {
                         int imageResource = add_to_basket_page.this.getResources().getIdentifier(fishImageName,
@@ -114,6 +117,8 @@ public class add_to_basket_page extends AppCompatActivity {
                     tv_productName.setText(productName);
                     tv_productQuantity.setText(productQuantity + " kilogram/s remaining.");
                     tv_productPrice.setText("₱ " + productPrice + " / Kg");
+                    tv_messageIfForDelivery.setText("Delivery is free for first " + freeDistance + " km." +
+                            "\n More than " + freeDistance+ " km. we charge Php" + chargePerKm + ".00 per km.");
 
                     if(hasPickup == true)
                     {
@@ -125,6 +130,7 @@ public class add_to_basket_page extends AppCompatActivity {
                     {
                         layout_hasOwnDelivery.setVisibility(View.VISIBLE);
                         tv_hasOwnDelivery.setText("• Delivery");
+
                     }
 
                     if(has3rdPartyDelivery == true)
@@ -269,10 +275,16 @@ public class add_to_basket_page extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
+                int quantityTemp = Integer.parseInt(tv_quantity.getText().toString());
+
                 if(!cb_hasPickup.isChecked() && !cb_hasOwnDelivery.isChecked()
                         && !cb_has3rdPartyDelivery.isChecked())
                 {
                     Toast.makeText(add_to_basket_page.this, "Please choose a delivery option", Toast.LENGTH_SHORT).show();
+                }
+                else if(quantityTemp < 1)
+                {
+                    Toast.makeText(add_to_basket_page.this, "Please enter quantity", Toast.LENGTH_SHORT).show();
                 }
                 else
                 {
@@ -293,7 +305,6 @@ public class add_to_basket_page extends AppCompatActivity {
 //                    });
 //                    sDialog.setContentText("Add this product\n to your basket?");
 //                    sDialog.show();
-
                     addProductToBasket();
 //                    AlertDialog.Builder builder = new AlertDialog.Builder(add_to_basket_page.this);
 //                    builder.setTitle("ADD PRODUCT");
@@ -326,6 +337,8 @@ public class add_to_basket_page extends AppCompatActivity {
 
                 cb_hasOwnDelivery.setChecked(false);
                 cb_has3rdPartyDelivery.setChecked(false);
+                tv_messageIfForDelivery.setVisibility(View.GONE);
+
             }
         });
 
@@ -336,6 +349,15 @@ public class add_to_basket_page extends AppCompatActivity {
                 cb_hasPickup.setChecked(false);
                 cb_has3rdPartyDelivery.setChecked(false);
 
+//                if(cb_hasOwnDelivery.isChecked())
+//                {
+//                    tv_messageIfForDelivery.setVisibility(View.VISIBLE);
+//                }
+//                if(!cb_hasOwnDelivery.isChecked())
+//                {
+//                    tv_messageIfForDelivery.setVisibility(View.GONE);
+//                }
+
             }
         });
 
@@ -345,6 +367,7 @@ public class add_to_basket_page extends AppCompatActivity {
 
                 cb_hasPickup.setChecked(false);
                 cb_hasOwnDelivery.setChecked(false);
+                tv_messageIfForDelivery.setVisibility(View.GONE);
 
             }
         });
@@ -431,6 +454,7 @@ public class add_to_basket_page extends AppCompatActivity {
         tv_quantity = findViewById(R.id.tv_quantity);
         tv_addToBasketBtn = findViewById(R.id.tv_addToBasketBtn);
         tv_viewPhotos = findViewById(R.id.tv_viewPhotos);
+        tv_messageIfForDelivery = findViewById(R.id.tv_messageIfForDelivery);
 
         iv_productPhoto = findViewById(R.id.iv_productPhoto);
         iv_decreaseBtn = findViewById(R.id.iv_decreaseBtn);

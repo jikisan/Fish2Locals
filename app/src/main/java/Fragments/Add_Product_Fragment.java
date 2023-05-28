@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import android.text.InputType;
+import android.text.Layout;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,6 +19,7 @@ import android.widget.AdapterView;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -71,11 +73,12 @@ public class Add_Product_Fragment extends Fragment {
             R.drawable.fish_bisugo_threadfinbream, R.drawable.fish_tanigue_spanishmackerel,
             R.drawable.fish_bangus_milkfish };
 
+    private LinearLayout layout4;
     private ImageView iv_fishPhoto, iv_decreaseBtn, iv_increaseBtn;
     private Spinner spinner;
     private CheckBox cb_pickUp, cb_ownDelivery, cb_3rdPartyDelivery;
     private TextView tv_quantity, tv_submitBtn;
-    private EditText et_price;
+    private EditText et_price, et_kmForFreeDelivery, et_priceForExtraKm;
 
     private FirebaseUser user;
     private DatabaseReference storeDatabase, productsDatabase;
@@ -262,9 +265,29 @@ public class Add_Product_Fragment extends Fragment {
                 validate();
             }
         });
+
+
+//        cb_ownDelivery.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//
+//                if(!cb_ownDelivery.isChecked())
+//                {
+//                    layout4.setVisibility(View.GONE);
+//                }
+//
+//                if(cb_ownDelivery.isChecked())
+//                {
+//                    layout4.setVisibility(View.VISIBLE);
+//                }
+//
+//            }
+//        });
+
     }
 
     private void validate() {
+
 
         if(!cb_pickUp.isChecked() && !cb_ownDelivery.isChecked() && !cb_3rdPartyDelivery.isChecked())
         {
@@ -278,6 +301,14 @@ public class Add_Product_Fragment extends Fragment {
         {
             tv_quantity.setError("Please enter product quantity");
         }
+//        else if(et_kmForFreeDelivery == null || TextUtils.isEmpty(et_kmForFreeDelivery.getText()))
+//        {
+//            et_kmForFreeDelivery.setError("Please enter Km for free delivery");
+//        }
+//        else if(et_priceForExtraKm == null || TextUtils.isEmpty(et_priceForExtraKm.getText()))
+//        {
+//            et_kmForFreeDelivery.setError("Please enter per Km charge for delivery");
+//        }
         else
         {
             new AlertDialog.Builder(getContext())
@@ -314,6 +345,8 @@ public class Add_Product_Fragment extends Fragment {
         String fishName = fish[itemNumber];
         double pricePerKilo = Double.parseDouble(et_price.getText().toString());
         int quantityByKilo = Integer.parseInt(tv_quantity.getText().toString());
+//        int kmForFreeDelivery = Integer.parseInt(et_kmForFreeDelivery.getText().toString());
+//        int priceForExtraKm = Integer.parseInt(et_priceForExtraKm.getText().toString());
 
 
         if(cb_pickUp.isChecked())
@@ -334,7 +367,8 @@ public class Add_Product_Fragment extends Fragment {
 
 
         Products products = new Products(imageName, fishName, hasPickup, hasOwnDelivery,
-                has3rdPartyDelivery, pricePerKilo, quantityByKilo, storeId, myUserID);
+                has3rdPartyDelivery, pricePerKilo, quantityByKilo, storeId, myUserID,
+                0, 0);
 
         productsDatabase.push().setValue(products).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
@@ -385,11 +419,16 @@ public class Add_Product_Fragment extends Fragment {
         tv_submitBtn = view.findViewById(R.id.tv_submitBtn);
         tv_quantity = view.findViewById(R.id.tv_quantity);
 
+        et_kmForFreeDelivery = view.findViewById(R.id.et_kmForFreeDelivery);
+        et_priceForExtraKm = view.findViewById(R.id.et_priceForExtraKm);
+
         et_price = view.findViewById(R.id.et_price);
 
         cb_pickUp = view.findViewById(R.id.cb_pickUp);
         cb_ownDelivery = view.findViewById(R.id.cb_ownDelivery);
         cb_3rdPartyDelivery = view.findViewById(R.id.cb_3rdPartyDelivery);
+
+        layout4 = view.findViewById(R.id.layout4);
 
 
     }

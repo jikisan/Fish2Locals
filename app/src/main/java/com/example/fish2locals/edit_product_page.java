@@ -15,6 +15,7 @@ import android.widget.AdapterView;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -58,10 +59,11 @@ public class edit_product_page extends AppCompatActivity {
             R.drawable.fish_bisugo_threadfinbream, R.drawable.fish_tanigue_spanishmackerel,
             R.drawable.fish_bangus_milkfish };
 
+    private LinearLayout layout4;
     private ImageView iv_fishPhoto, iv_decreaseBtn, iv_increaseBtn, iv_deleteBtn;
     private CheckBox cb_pickUp, cb_ownDelivery, cb_3rdPartyDelivery;
     private TextView tv_quantity, tv_submitBtn, tv_back, tv_productName, tv_viewPhotos;
-    private EditText et_price;
+    private EditText et_price, et_kmForFreeDelivery, et_priceForExtraKm;
 
     private FirebaseUser user;
     private DatabaseReference storeDatabase, productsDatabase;
@@ -104,6 +106,7 @@ public class edit_product_page extends AppCompatActivity {
 
     private void generateProductData() {
 
+
         productsDatabase.child(productId).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -119,6 +122,8 @@ public class edit_product_page extends AppCompatActivity {
                     pickup = products.isHasPickup();
                     ownDelivery = products.isHasOwnDelivery();
                     thirdPartyDelivery = products.isHas3rdPartyDelivery();
+                    int freeKm = products.getFreeKmForDelivery();
+                    int chargePerKm = products.getChargePerKm();
 
                     int imageResource = getResources().getIdentifier(fishImageName,
                             "drawable", getApplicationContext().getApplicationContext().getPackageName());
@@ -132,19 +137,20 @@ public class edit_product_page extends AppCompatActivity {
                     tv_productName.setText(productName);
                     tv_quantity.setText(productQuantity + "");
                     et_price.setText(productPrice + "");
+//                    et_kmForFreeDelivery.setText(freeKm + "");
+//                    et_priceForExtraKm.setText(chargePerKm + "");
 
                     if(pickup)
                     {
                         cb_pickUp.setChecked(true);
-                        cb_ownDelivery.setChecked(false);
-                        cb_3rdPartyDelivery.setChecked(false);
+
                     }
 
                     if(ownDelivery)
                     {
-                        cb_pickUp.setChecked(false);
                         cb_ownDelivery.setChecked(true);
-                        cb_3rdPartyDelivery.setChecked(false);
+
+
                     }
 
                     if(thirdPartyDelivery)
@@ -312,6 +318,22 @@ public class edit_product_page extends AppCompatActivity {
             }
         });
 
+//        cb_ownDelivery.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//
+//                if(!cb_ownDelivery.isChecked())
+//                {
+//                    layout4.setVisibility(View.GONE);
+//                }
+//
+//                if(cb_ownDelivery.isChecked())
+//                {
+//                    layout4.setVisibility(View.VISIBLE);
+//                }
+//
+//            }
+//        });
 
     }
 
@@ -365,7 +387,8 @@ public class edit_product_page extends AppCompatActivity {
         String fishName = fish[itemNumber];
         double pricePerKilo = Double.parseDouble(et_price.getText().toString());
         int quantityByKilo = Integer.parseInt(tv_quantity.getText().toString());
-
+//        int kmForFreeDelivery = Integer.parseInt(et_kmForFreeDelivery.getText().toString());
+//        int priceForExtraKm = Integer.parseInt(et_priceForExtraKm.getText().toString());
 
         if(cb_pickUp.isChecked())
         {
@@ -383,7 +406,8 @@ public class edit_product_page extends AppCompatActivity {
         }
 
         Products products = new Products(imageName, fishName, hasPickup, hasOwnDelivery,
-                has3rdPartyDelivery, pricePerKilo, quantityByKilo, storeId, myUserID);
+                has3rdPartyDelivery, pricePerKilo, quantityByKilo, storeId, myUserID,
+                0, 0);
 
 
         HashMap<String, Object> hashMap = new HashMap<String, Object>();
@@ -434,11 +458,16 @@ public class edit_product_page extends AppCompatActivity {
         tv_quantity = findViewById(R.id.tv_quantity);
         tv_viewPhotos = findViewById(R.id.tv_viewPhotos);
 
+        et_kmForFreeDelivery = findViewById(R.id.et_kmForFreeDelivery);
+        et_priceForExtraKm = findViewById(R.id.et_priceForExtraKm);
+
         et_price = findViewById(R.id.et_price);
 
         cb_pickUp = findViewById(R.id.cb_pickUp);
         cb_ownDelivery = findViewById(R.id.cb_ownDelivery);
         cb_3rdPartyDelivery = findViewById(R.id.cb_3rdPartyDelivery);
+
+        layout4 = findViewById(R.id.layout4);
 
 
     }

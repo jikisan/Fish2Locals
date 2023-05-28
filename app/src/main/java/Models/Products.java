@@ -11,13 +11,15 @@ public class Products {
     private int quantityByKilo;
     private String storeId;
     private String userId;
+    private int chargePerKm;
+    private int freeKmForDelivery;
 
     public Products() {
     }
 
     public Products(String imageName, String fishName, boolean hasPickup, boolean hasOwnDelivery,
                     boolean has3rdPartyDelivery, double pricePerKilo, int quantityByKilo,
-                    String storeId, String userId) {
+                    String storeId, String userId, int chargePerKm, int freeKmForDelivery) {
         this.imageName = imageName;
         this.fishName = fishName;
         this.hasPickup = hasPickup;
@@ -27,6 +29,8 @@ public class Products {
         this.quantityByKilo = quantityByKilo;
         this.storeId = storeId;
         this.userId = userId;
+        this.chargePerKm = chargePerKm;
+        this.freeKmForDelivery = freeKmForDelivery;
     }
 
     public String getImageName() {
@@ -99,5 +103,21 @@ public class Products {
 
     public void setUserId(String userId) {
         this.userId = userId;
+    }
+
+    public int getChargePerKm() {
+        return chargePerKm;
+    }
+
+    public void setChargePerKm(int chargePerKm) {
+        this.chargePerKm = chargePerKm;
+    }
+
+    public int getFreeKmForDelivery() {
+        return freeKmForDelivery;
+    }
+
+    public void setFreeKmForDelivery(int freeKmForDelivery) {
+        this.freeKmForDelivery = freeKmForDelivery;
     }
 }

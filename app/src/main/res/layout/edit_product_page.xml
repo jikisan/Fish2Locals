@@ -242,6 +242,103 @@
                 app:layout_constraintVertical_bias="0.375"
                 app:tint="@color/teal_200" />
 
+
+            <LinearLayout
+                android:id="@+id/layout4"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="@+id/textView12"
+                app:layout_constraintTop_toBottomOf="@+id/tv_quantity">
+
+                <TextView
+                    android:id="@+id/textView13"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="What is the distance for free delivery in Km?"
+                    android:textColor="@color/teal_200"
+                    android:textStyle="bold"
+                    app:layout_constraintStart_toStartOf="@+id/textView12"
+                    app:layout_constraintTop_toBottomOf="@+id/tv_quantity" />
+
+                <EditText
+                    android:id="@+id/et_kmForFreeDelivery"
+                    android:layout_width="wrap_content"
+                    android:layout_height="32dp"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="8dp"
+                    android:background="@drawable/rounded5"
+                    android:gravity="center"
+                    android:hint="0"
+                    android:inputType="number"
+                    android:paddingLeft="16dp"
+                    android:paddingRight="16dp"
+                    android:textColor="@color/black"
+                    android:textStyle="bold"
+                    app:layout_constraintStart_toStartOf="@+id/textView13"
+                    app:layout_constraintTop_toBottomOf="@+id/textView13" />
+
+                <TextView
+                    android:id="@+id/textView14"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="Please set the pricing for each Km of delivery."
+                    android:textColor="@color/teal_200"
+                    android:textStyle="bold"
+                    app:layout_constraintStart_toStartOf="@+id/textView13"
+                    app:layout_constraintTop_toBottomOf="@+id/et_kmForFreeDelivery" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="8dp"
+                    >
+
+                    <TextView
+                        android:id="@+id/textViewPesos2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="32dp"
+                        android:gravity="center"
+                        android:text="@string/peso_sign"
+                        android:textColor="@color/teal_200"
+                        android:textSize="24sp"
+                        android:textStyle="bold"
+                        app:layout_constraintStart_toStartOf="@+id/cb_3rdPartyDelivery"
+                        app:layout_constraintTop_toBottomOf="@+id/textView14" />
+
+                    <EditText
+                        android:id="@+id/et_priceForExtraKm"
+                        android:layout_width="wrap_content"
+                        android:layout_height="32dp"
+                        android:layout_marginStart="8dp"
+                        android:background="@drawable/rounded5"
+                        android:gravity="center"
+                        android:hint="0.00"
+                        android:inputType="numberDecimal"
+                        android:paddingLeft="16dp"
+                        android:paddingRight="16dp"
+                        android:textColor="@color/black"
+                        android:textStyle="bold"
+                        app:layout_constraintBottom_toBottomOf="@+id/textViewPesos2"
+                        app:layout_constraintStart_toEndOf="@+id/textViewPesos2"
+                        app:layout_constraintTop_toTopOf="@+id/textViewPesos2" />
+
+                </LinearLayout>
+
+
+
+            </LinearLayout>
+
+
+
             <TextView
                 android:id="@+id/tv_submitBtn"
                 android:layout_width="match_parent"
@@ -256,9 +353,12 @@
                 android:text="SUBMIT"
                 android:textColor="@color/white"
                 android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/tv_quantity" />
+                app:layout_constraintTop_toBottomOf="@+id/layout4"
+                app:layout_constraintVertical_bias="1.0" />
+
 
 
         </androidx.constraintlayout.widget.ConstraintLayout>

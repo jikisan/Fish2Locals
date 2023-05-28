@@ -85,7 +85,16 @@ public class AdapterBestSellers extends RecyclerView.Adapter<AdapterBestSellers.
 
     @Override
     public int getItemCount() {
-        return 5;
+
+        if(arrProductImageNames.size() > 6)
+        {
+            return 5;
+        }
+        else
+        {
+            return arrProductImageNames.size();
+        }
+
     }
 
     public interface  OnItemClickListener{

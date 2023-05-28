@@ -133,7 +133,7 @@
                 android:layout_marginStart="24dp"
                 android:background="@drawable/rounded5"
                 android:gravity="center"
-                android:text="1"
+                android:text="0"
                 android:textColor="@color/black"
                 android:textStyle="bold"
                 app:layout_constraintBottom_toBottomOf="@+id/iv_decreaseBtn"
@@ -246,7 +246,22 @@
 
             </LinearLayout>
 
-
+            <TextView
+                android:id="@+id/tv_messageIfForDelivery"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="8dp"
+                android:text="Loading..."
+                android:textColor="@color/black"
+                android:textStyle="italic"
+                android:visibility="gone"
+                android:gravity="center"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/linearLayout4" />
 
             <androidx.cardview.widget.CardView
                 android:id="@+id/cardView2"
@@ -254,7 +269,9 @@
                 android:layout_height="wrap_content"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent">
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tv_messageIfForDelivery"
+                app:layout_constraintVertical_bias="1.0">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
