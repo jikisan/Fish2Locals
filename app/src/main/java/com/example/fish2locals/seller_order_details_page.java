@@ -168,7 +168,7 @@ public class seller_order_details_page extends AppCompatActivity {
                     }
                     else if(orderStatus.equals("2") && !rated)
                     {
-                        tv_rateBtn.setVisibility(View.VISIBLE);
+//                        tv_rateBtn.setVisibility(View.VISIBLE);
                     }
                     else if(orderStatus.equals("3"))
                     {

@@ -8,11 +8,17 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.location.Address;
 import android.location.Geocoder;
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.Looper;
+import android.provider.Settings;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.EditText;
@@ -20,6 +26,12 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -35,9 +47,11 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.google.maps.android.SphericalUtil;
 
 import java.io.IOException;
 import java.text.DateFormat;
+import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -61,13 +75,17 @@ import Models.Wallets;
 
 public class place_order_page2 extends AppCompatActivity {
 
+    private FusedLocationProviderClient client;
+    private double myLatDouble, myLongDouble, distance;
+
     private final List<Basket> arrBasket = new ArrayList<>();
     private final List<Orders> arrOrders = new ArrayList<>();
     private final List<Products> arrProducts = new ArrayList<>();
 
     private ProgressBar progressBar;
     private RecyclerView rv_myBasket;
-    private TextView tv_back, tv_placeOrderBtn, tv_enterDeviveryAddress, tv_myWallet;
+    private TextView tv_back, tv_placeOrderBtn, tv_enterDeviveryAddress, tv_myWallet,
+            tv_distance, tv_deliveryMessage, tv_deliveryFee;
     private EditText et_contactNum;
     private ProgressDialog progressDialog;
 
@@ -95,6 +113,12 @@ public class place_order_page2 extends AppCompatActivity {
     private double myFundAmount;
     private long dateTimeInMillis;
     double totalPrice = 0;
+    final int EXCESS_KM = 6;
+    final int BASE_FARE = 49;
+    int deliverFee = 0;
+    boolean hasDelivery = false;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -115,11 +139,75 @@ public class place_order_page2 extends AppCompatActivity {
         storeId = getIntent().getStringExtra("storeId");
 
         setRef();
-
         generateMyData();
+        getCurrentLocation();
         generateMyWalletData();
-        generateRecyclerLayout();
         clicks();
+    }
+
+    @SuppressLint("MissingPermission")
+    private void getCurrentLocation() {
+        // Initialize Location manager
+        LocationManager locationManager = (LocationManager) place_order_page2.this
+                .getSystemService(Context.LOCATION_SERVICE);
+        // Check condition
+        if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
+                || locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
+            // When location service is enabled
+            // Get last location
+
+            client.getLastLocation().addOnCompleteListener(new OnCompleteListener<Location>() {
+                @Override
+                public void onComplete(
+                        @NonNull Task<Location> task) {
+
+                    // Initialize location
+                    Location location = task.getResult();                    // Check condition
+                    if (location != null) {
+                        // When location result is not
+                        // null set latitude
+                        myLatDouble = location.getLatitude();
+                        myLongDouble = location.getLongitude();
+                        generateRecyclerLayout();
+
+
+                    } else {
+                        // When location result is null
+                        // initialize location request
+                        LocationRequest locationRequest = new LocationRequest()
+                                .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
+                                .setInterval(10000)
+                                .setFastestInterval(1000)
+                                .setNumUpdates(1);
+
+                        // Initialize location call back
+                        LocationCallback locationCallback = new LocationCallback() {
+                            @Override
+                            public void
+                            onLocationResult(LocationResult locationResult) {
+                                // Initialize
+                                // location
+                                Location location1 = locationResult.getLastLocation();
+                                myLatDouble = location1.getLatitude();
+                                myLongDouble = location1.getLongitude();
+                                generateRecyclerLayout();
+
+
+                            }
+                        };
+
+                        // Request location updates
+                        client.requestLocationUpdates(locationRequest, locationCallback,
+                                Looper.myLooper());
+                    }
+                }
+            });
+        } else {
+            // When location service is not enabled
+            // open location setting
+            startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
+                    .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+        }
     }
 
     private void generateMyData() {
@@ -221,6 +309,13 @@ public class place_order_page2 extends AppCompatActivity {
                         String buyerUserId = basket.getBuyerUserId();
                         double pricePerKilo = basket.getPricePerKilo();
                         int basketQuantity = basket.getQuantityByKilo();
+                        hasDelivery = basket.isOwnDelivery();
+
+                        if(hasDelivery)
+                        {
+                            tv_deliveryFee.setVisibility(View.VISIBLE);
+                            tv_deliveryMessage.setVisibility(View.VISIBLE);
+                        }
 
                         if(buyerUserId.equals(myUserId))
                         {
@@ -371,7 +466,7 @@ public class place_order_page2 extends AppCompatActivity {
             String deliveryAddress = tv_enterDeviveryAddress.getText().toString();
             String buyerContactNum = et_contactNum.getText().toString();
 
-            String orderStatus = "1";
+            String orderStatus = "0";
             boolean rated = false;
 
             Orders orders = new Orders(productId, orderId, storeId, storeOwnersUserId, myUserId,
@@ -555,6 +650,42 @@ public class place_order_page2 extends AppCompatActivity {
                 latString = String.valueOf(address.get(0).getLatitude());
                 longString = String.valueOf(address.get(0).getLongitude());
 
+                double latDouble = Double.parseDouble(latString);
+                double longDouble = Double.parseDouble(longString);
+                LatLng location = new LatLng(latDouble, longDouble);
+
+                double distance = generateDistance(location);
+
+                DecimalFormat df = new DecimalFormat("#.00");
+                df.format(distance);
+
+                if(hasDelivery)
+                {
+                    if (distance > 1000) {
+                        double kilometers = distance / 1000;
+                        tv_distance.setText(df.format(kilometers) + " Km Away");
+
+                        deliverFee = ((int) kilometers * EXCESS_KM ) + BASE_FARE;
+                        totalPrice = totalPrice + deliverFee;
+
+                        tv_deliveryFee.setText("Delivery Fee: Php " + deliverFee + ".00");
+
+                        tv_placeOrderBtn.setText("PLACE ORDER (Total Amount: ₱ " +totalPrice+ ")");
+
+                    } else {
+                        tv_distance.setText(df.format(distance) + " m Away");
+
+                        deliverFee = BASE_FARE;
+                        totalPrice = totalPrice + deliverFee;
+
+                        tv_deliveryFee.setText("Delivery Fee: Php " + deliverFee + ".00");
+
+                        tv_placeOrderBtn.setText("PLACE ORDER (Total Amount: ₱ " +totalPrice+ ")");
+                    }
+                }
+
+
+
                 String latLng = latString + "," + longString;
                 String addressText =  place.getAddress().toString();
 
@@ -568,7 +699,21 @@ public class place_order_page2 extends AppCompatActivity {
 
     }
 
+    private double generateDistance(LatLng location) {
+
+        LatLng myLatLng = new LatLng(myLatDouble, myLongDouble);
+
+//        LatLng myLatLng = new LatLng(10.320066961476325, 123.89681572928217);
+
+
+        double distanceResult = SphericalUtil.computeDistanceBetween(myLatLng, location);
+
+        return distanceResult;
+    }
+
     private void setRef() {
+
+        client = LocationServices.getFusedLocationProviderClient(place_order_page2.this);
 
         progressBar = findViewById(R.id.progressBar);
         rv_myBasket = findViewById(R.id.rv_myBasket);
@@ -577,6 +722,9 @@ public class place_order_page2 extends AppCompatActivity {
         tv_enterDeviveryAddress = findViewById(R.id.tv_enterDeviveryAddress);
         tv_placeOrderBtn = findViewById(R.id.tv_placeOrderBtn);
         tv_myWallet = findViewById(R.id.tv_myWallet);
+        tv_distance = findViewById(R.id.tv_distance);
+        tv_deliveryMessage = findViewById(R.id.tv_deliveryMessage);
+        tv_deliveryFee = findViewById(R.id.tv_deliveryFee);
 
         et_contactNum = findViewById(R.id.et_contactNum);
 

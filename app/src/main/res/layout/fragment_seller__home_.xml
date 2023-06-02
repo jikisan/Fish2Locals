@@ -6,7 +6,6 @@
     android:background="#80000000"
     tools:context="Fragments.Seller_Home_Fragment">
 
-
     <TextView
         android:id="@+id/tv_textView20"
         android:layout_width="wrap_content"

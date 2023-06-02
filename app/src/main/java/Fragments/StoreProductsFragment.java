@@ -130,8 +130,15 @@ public class StoreProductsFragment extends Fragment {
                         Products products = dataSnapshot.getValue(Products.class);
                         String productId = dataSnapshot.getKey();
 
-                        arrProducts.add(products);
-                        arrProductIds.add(productId);
+                        int quantity = products.getQuantityByKilo();
+
+                        if(quantity > 0)
+                        {
+                            arrProducts.add(products);
+                            arrProductIds.add(productId);
+                        }
+
+
                     }
                 }
 

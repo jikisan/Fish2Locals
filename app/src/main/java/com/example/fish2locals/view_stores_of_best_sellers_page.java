@@ -196,14 +196,22 @@ public class view_stores_of_best_sellers_page extends AppCompatActivity {
                         break;
 
                     case 2:
+
+                        Collections.sort(arrTempBestSeller, new Comparator<TempBestSellerData>() {
+                            @Override
+                            public int compare(TempBestSellerData o1, TempBestSellerData o2) {
+                                return Double.compare(o1.getRatings(), o2.getRatings());
+                            }
+                        });
+
+                        Collections.reverse(arrTempBestSeller);
+
                         Collections.sort(arrTempBestSeller, new Comparator<TempBestSellerData>() {
                             @Override
                             public int compare(TempBestSellerData o1, TempBestSellerData o2) {
                                 return Double.compare(o1.getPricePerKilo(), o2.getPricePerKilo());
                             }
                         });
-
-
 
                         adapterViewSpecificProductList.notifyDataSetChanged();
                         break;

@@ -133,9 +133,15 @@ public class Seller_Home_Fragment extends Fragment {
                     for(DataSnapshot dataSnapshot : snapshot.getChildren())
                     {
                         Orders orders = dataSnapshot.getValue(Orders.class);
+                        int quantity = orders.getQuantity();
                         double pricePerKilo = orders.getPricePerKilo();
+                        String orderStatus = orders.getOrderStatus();
 
-                        totalPricePerKilo = totalPricePerKilo + pricePerKilo;
+                        if(orderStatus.equals("2"))
+                        {
+                            totalPricePerKilo = totalPricePerKilo + (pricePerKilo * quantity);
+                        }
+
 
                     }
 

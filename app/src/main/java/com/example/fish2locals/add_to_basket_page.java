@@ -47,7 +47,7 @@ public class add_to_basket_page extends AppCompatActivity {
     private DatabaseReference productDatabase, basketDatabase;
 
     private String myUserId, storeOwnersUserId, storeId, productId, deliveryMessage;
-    private int productQuantity , intValue = 1;;
+    private int productQuantity , intValue = 0;
 
     String fishImageName;
     String productName;
@@ -123,7 +123,7 @@ public class add_to_basket_page extends AppCompatActivity {
                     if(hasPickup == true)
                     {
                         layout_hasPickup.setVisibility(View.VISIBLE);
-                        tv_hasPickup.setText("• Pickup (5% Discount)");
+                        tv_hasPickup.setText("• Pickup");
                     }
 
                     if(hasOwnDelivery == true)
@@ -200,9 +200,6 @@ public class add_to_basket_page extends AppCompatActivity {
         iv_increaseBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
-
-
 
                 if(intValue >= productQuantity)
                 {
@@ -285,6 +282,10 @@ public class add_to_basket_page extends AppCompatActivity {
                 else if(quantityTemp < 1)
                 {
                     Toast.makeText(add_to_basket_page.this, "Please enter quantity", Toast.LENGTH_SHORT).show();
+                }
+                else if(quantityTemp > productQuantity)
+                {
+                    Toast.makeText(add_to_basket_page.this, "Not enough quantity", Toast.LENGTH_SHORT).show();
                 }
                 else
                 {
@@ -380,8 +381,8 @@ public class add_to_basket_page extends AppCompatActivity {
 
         if(cb_hasPickup.isChecked())
         {
-            double pickupDiscount = .05;
-            productPrice = productPrice - (productPrice*pickupDiscount);
+//            double pickupDiscount = .05;
+//            productPrice = productPrice - (productPrice*pickupDiscount);
             pickup = true;
             ownDelivery = false;
             thirdPartyDelivery = false;
