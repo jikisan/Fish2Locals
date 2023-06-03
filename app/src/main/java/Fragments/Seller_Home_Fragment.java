@@ -16,6 +16,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.fish2locals.R;
+import com.example.fish2locals.homepage;
 import com.example.fish2locals.seller_homepage;
 import com.example.fish2locals.seller_statistics_page;
 import com.example.fish2locals.sellers_order_page;
@@ -33,13 +34,21 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
+import java.text.DateFormat;
 import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import Adapters.AdapterMostTrusted;
 import Adapters.AdapterStoresNearMe;
+import Models.InTransitOrders;
 import Models.Orders;
 import Models.Store;
 import Models.TempStoreData;
@@ -48,12 +57,19 @@ import Objects.TextModifier;
 
 public class Seller_Home_Fragment extends Fragment {
 
+    private static final long THREE_HOURS = 3 * 60 * 60 * 1000; // 3 hours in milliseconds
+    private long minutes = 0, timeDifference;
+    private String TARGET_TIME;
+    private List<InTransitOrders> inTransitOrdersArrayList = new ArrayList<>();
+    private boolean isThirtyMinutesPassed = false;
+
+
     private ImageView iv_userPhoto;
     private TextView tv_fName, tv_totalSales;
     private LinearLayout layout_myProducts, layout_myOrders, layout_myWallet, layout_myStatistics;
 
     private FirebaseUser user;
-    private DatabaseReference userDatabase, storeDatabase, orderDatabase;
+    private DatabaseReference userDatabase, orderDatabase, inTransitOrdersDatabase;
 
     private String myUserId;
     double totalPricePerKilo = 0;
@@ -68,11 +84,14 @@ public class Seller_Home_Fragment extends Fragment {
         myUserId = user.getUid();
         userDatabase = FirebaseDatabase.getInstance().getReference("Users");
         orderDatabase = FirebaseDatabase.getInstance().getReference("Orders");
+        inTransitOrdersDatabase = FirebaseDatabase.getInstance().getReference("InTransitOrders");
 
 
         setRef(view); //initialize UI ID's
         generateUsersData(); //generate user data
         generateTotalSales(); // generate Total Sales
+        generateInTransitOrders();
+        autoReceiveOrderIfBuyerDidNotAcceptTheOrder();
         clicks();
 
         return view;
@@ -223,5 +242,146 @@ public class Seller_Home_Fragment extends Fragment {
         layout_myStatistics = view.findViewById(R.id.layout_myStatistics);
 
 
+    }
+
+
+
+    private void autoReceiveOrderIfBuyerDidNotAcceptTheOrder() {
+        // Execute your desired function here
+
+        Timer timer = new Timer();
+
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        // Execute your desired function here
+
+                        for(int i = 0; i < inTransitOrdersArrayList.size(); i++)
+                        {
+                            hasThirtyMinutesPassed(i);
+
+                        }
+
+
+                    }
+                });
+
+
+            }
+        }, 0, 5000);
+
+    }
+
+    // check the current world time
+    private void hasThirtyMinutesPassed(int i) {
+
+        SimpleDateFormat formatTime = new SimpleDateFormat("yyyyMMddhhmma");
+
+        Date dateTime = Calendar.getInstance().getTime();
+        String dateTimeInString = DateFormat.getDateTimeInstance().format(dateTime);
+
+        String currentTimeInString = formatTime.format(Date.parse(dateTimeInString));
+
+        TARGET_TIME = inTransitOrdersArrayList.get(i).getTimeInTransit();
+
+        try
+        {
+            Date currentTime = formatTime.parse(currentTimeInString);
+            Date targetTime = formatTime.parse(TARGET_TIME);
+
+            long currentTimeInMillis = currentTime.getTime();
+            long targetTimeInMillis = targetTime.getTime();
+
+            timeDifference = currentTimeInMillis - targetTimeInMillis;
+            minutes = timeDifference / 60000;
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+
+        if(timeDifference >= THREE_HOURS)
+        {
+            isThirtyMinutesPassed = true;
+        }
+        else
+        {
+            isThirtyMinutesPassed = false;
+        }
+
+
+    }
+
+    private void manageDatabase(int i) {
+
+
+        String orderSnapshotIds = inTransitOrdersArrayList.get(i).getOrderId();
+
+        HashMap<String, Object> hashMap = new HashMap<String, Object>();
+        hashMap.put("orderStatus", "2");
+        orderDatabase.child(orderSnapshotIds).updateChildren(hashMap);
+
+
+
+        Query query = inTransitOrdersDatabase.orderByChild("orderId").equalTo(orderSnapshotIds);
+
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+                if(snapshot.exists())
+                {
+                    for(DataSnapshot dataSnapshot : snapshot.getChildren())
+                    {
+                        dataSnapshot.getRef().removeValue();
+                    }
+
+                    Intent intent = new Intent(getContext(), homepage.class);
+                    startActivity(intent);
+
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+    }
+
+    private void generateInTransitOrders() {
+
+        inTransitOrdersDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+                if(snapshot.exists())
+                {
+                    for(DataSnapshot dataSnapshot : snapshot.getChildren())
+                    {
+                        InTransitOrders inTransitOrders = dataSnapshot.getValue(InTransitOrders.class);
+
+                        String sellerId = inTransitOrders.getSellerId();
+
+                        if(sellerId.equals(myUserId))
+                        {
+                            inTransitOrdersArrayList.add(inTransitOrders);
+                        }
+
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
 }

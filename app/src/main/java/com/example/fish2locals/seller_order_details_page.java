@@ -36,9 +36,9 @@ import java.util.List;
 
 import Adapters.AdapterPlaceOrderItem;
 import Models.Basket;
+import Models.InTransitOrders;
 import Models.Notifications;
 import Models.Orders;
-import Models.Store;
 import Models.Transactions;
 import Models.Users;
 import Models.Wallets;
@@ -61,10 +61,11 @@ public class seller_order_details_page extends AppCompatActivity {
 
 
     private FirebaseUser user;
-    private DatabaseReference ordersDatabase, walletDatabase, userDatabase, transactionDatabase;
+    private DatabaseReference ordersDatabase, walletDatabase, userDatabase, transactionDatabase,
+            inTransitOrdersDatabase;
 
     private String myUserId, orderId, storeId, sellerUserId, buyerUserId, productId;
-    private String buyerWalletId, timeCreated, dateCreated;
+    private String buyerWalletId, timeCreated, dateCreated, dateTimeCreated;
     private double buyerfundAmount;
     private long dateTimeInMillis;
 
@@ -79,7 +80,7 @@ public class seller_order_details_page extends AppCompatActivity {
         walletDatabase = FirebaseDatabase.getInstance().getReference("Wallets");
         userDatabase = FirebaseDatabase.getInstance().getReference("Users");
         transactionDatabase = FirebaseDatabase.getInstance().getReference("Transactions");
-
+        inTransitOrdersDatabase = FirebaseDatabase.getInstance().getReference("InTransitOrders");
 
         orderId = getIntent().getStringExtra("orderId");
         storeId = getIntent().getStringExtra("storeId");
@@ -320,6 +321,7 @@ public class seller_order_details_page extends AppCompatActivity {
                     @Override
                     public void onClick(SweetAlertDialog sweetAlertDialog) {
 
+                        setUpDate();
 
                         ProgressDialog progressDialog;
                         progressDialog = new ProgressDialog(seller_order_details_page.this);
@@ -334,6 +336,12 @@ public class seller_order_details_page extends AppCompatActivity {
                             HashMap<String, Object> hashMap = new HashMap<String, Object>();
                             hashMap.put("orderStatus", "1");
                             ordersDatabase.child(orderSnapshotIds).updateChildren(hashMap);
+
+                            InTransitOrders inTransitOrders = new InTransitOrders(orderSnapshotIds,
+                                    dateTimeCreated, buyerUserId, myUserId);
+
+                            inTransitOrdersDatabase.push().setValue(inTransitOrders);
+
                         }
 
                         SweetAlertDialog s2Dialog;
@@ -358,7 +366,6 @@ public class seller_order_details_page extends AppCompatActivity {
             }
         });
     }
-
 
 
     // Cancel Order
@@ -492,6 +499,7 @@ public class seller_order_details_page extends AppCompatActivity {
         SimpleDateFormat formatTime = new SimpleDateFormat("hh:mm a");
 
         dateTimeInMillis = Calendar.getInstance().getTimeInMillis();
+        dateTimeCreated = formatDateTimeInMillis.format(Date.parse(dateTime));
         timeCreated = formatTime.format(Date.parse(dateTime));
         dateCreated = formatDate.format(Date.parse(dateTime));
 
