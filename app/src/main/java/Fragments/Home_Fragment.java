@@ -12,6 +12,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.os.Handler;
 import android.os.Looper;
 import android.provider.Settings;
 import android.view.LayoutInflater;
@@ -22,8 +23,10 @@ import android.widget.SearchView;
 import android.widget.TextView;
 
 import com.example.fish2locals.R;
+import com.example.fish2locals.homepage;
 import com.example.fish2locals.search_page;
 import com.example.fish2locals.view_all_stores;
+import com.example.fish2locals.view_store_page;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
@@ -51,6 +54,8 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import Adapters.AdapterBestSellers;
 import Adapters.AdapterMostTrusted;
@@ -63,6 +68,10 @@ import Models.Users;
 import Objects.TextModifier;
 
 public class Home_Fragment extends Fragment {
+
+    private Timer timer = new Timer();
+    private Handler handler;
+    private Runnable runnable;
 
 
     private FusedLocationProviderClient client;
@@ -85,7 +94,7 @@ public class Home_Fragment extends Fragment {
 //    private List<String> newList, newImageList;
 
     private FirebaseUser user;
-    private DatabaseReference userDatabase, storeDatabase, ratingDatabase, productsDatabase;
+    private DatabaseReference userDatabase, storeDatabase, ratingDatabase, productsDatabase, basketDatabase;
 
     private String myUserId, ratingCounter;
     int counter = 0;
@@ -104,12 +113,14 @@ public class Home_Fragment extends Fragment {
         storeDatabase = FirebaseDatabase.getInstance().getReference("Store");
         ratingDatabase = FirebaseDatabase.getInstance().getReference("Ratings");
         productsDatabase = FirebaseDatabase.getInstance().getReference("Products");
+        basketDatabase = FirebaseDatabase.getInstance().getReference("Basket");
 
 
         setRef(view); // initialize UI ID's
         generateUsersData(); // generate users data
         generateProductsList(); // generate product list
         getCurrentLocation(); // generate current user location
+//        deleteActiveBaskets(); // Delete existing baskets
         clicks(); // buttons
 
 
@@ -437,6 +448,49 @@ public class Home_Fragment extends Fragment {
         return distanceResult;
     }
 
+    private void deleteActiveBaskets() {
+
+
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+
+                Query query = basketDatabase.orderByChild("buyerUserId").equalTo(myUserId);
+
+                query.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+                        if(!snapshot.exists())
+                        {
+                            timer.cancel();
+                        }
+                        else if(snapshot.exists())
+                        {
+                            for(DataSnapshot dataSnapshot : snapshot.getChildren())
+                            {
+                                dataSnapshot.getRef().removeValue();
+                            }
+
+                            Intent intent = new Intent(getContext(), homepage.class);
+                            startActivity(intent);
+
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
+
+
+            }
+        }, 0, 10000);
+
+
+    }
+
     private void clicks() {
 
         tv_nearMeViewAll.setOnClickListener(new View.OnClickListener() {
@@ -485,6 +539,19 @@ public class Home_Fragment extends Fragment {
         tv_mostTrustedViewAll = view.findViewById(R.id.tv_mostTrustedViewAll);
 
         tv_search = view.findViewById(R.id.tv_search);
+
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        timer.cancel(); // Stop the timer when the activity is paused
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        timer.cancel();; // Stop the timer when the activity is paused
 
     }
 }

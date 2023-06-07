@@ -47,7 +47,7 @@ public class StoreProductsFragment extends Fragment {
     private DatabaseReference productDatabase;
 
     private String storeOwnersUserId;
-    private String storeId;
+    private String storeId, myUserId;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -56,7 +56,7 @@ public class StoreProductsFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_store_products, container, false);
 
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        String myUserId = user.getUid();
+        myUserId = user.getUid();
         productDatabase = FirebaseDatabase.getInstance().getReference("Products");
 
         storeOwnersUserId = getActivity().getIntent().getStringExtra("storeOwnersUserId");
@@ -84,15 +84,6 @@ public class StoreProductsFragment extends Fragment {
                 intent.putExtra("storeOwnersUserId", storeOwnersUserId);
                 intent.putExtra("storeId", storeId);
                 startActivity(intent);
-
-
-//                Bundle bundle = new Bundle();
-//                bundle.putString("productId", productId);
-//                bundle.putString("context", getContext().toString());
-//
-//                ProductBottomSheetDialog productBottomSheetDialog = new ProductBottomSheetDialog();
-//                productBottomSheetDialog.setArguments(bundle);
-//                productBottomSheetDialog.show(getParentFragmentManager(), "ModalBottomSheet");
 
 
             }

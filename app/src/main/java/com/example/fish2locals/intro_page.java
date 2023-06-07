@@ -103,7 +103,7 @@ public class intro_page extends AppCompatActivity {
         if(!(user == null))
         {
             myUserId = user.getUid();
-            deleteBasketData(myUserId);
+            checkIfWalletExist(myUserId);
 
         }else{
 
@@ -124,17 +124,10 @@ public class intro_page extends AppCompatActivity {
 
                 if(snapshot.exists())
                 {
-                    for(DataSnapshot dataSnapshot : snapshot.getChildren())
-                    {
-                        dataSnapshot.getRef().removeValue();
-                    }
-
                     checkIfWalletExist(myUserId);
 
                 }
-                else {
-                    checkIfWalletExist(myUserId);
-                }
+
             }
 
             @Override

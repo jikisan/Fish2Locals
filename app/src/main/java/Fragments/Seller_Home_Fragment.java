@@ -65,7 +65,7 @@ public class Seller_Home_Fragment extends Fragment {
 
 
     private ImageView iv_userPhoto;
-    private TextView tv_fName, tv_totalSales;
+    private TextView tv_fName, tv_totalSales, tv_totalInTransit;
     private LinearLayout layout_myProducts, layout_myOrders, layout_myWallet, layout_myStatistics;
 
     private FirebaseUser user;
@@ -235,6 +235,7 @@ public class Seller_Home_Fragment extends Fragment {
         iv_userPhoto = view.findViewById(R.id.iv_userPhoto);
         tv_fName = view.findViewById(R.id.tv_fName);
         tv_totalSales = view.findViewById(R.id.tv_totalSales);
+        tv_totalInTransit = view.findViewById(R.id.tv_totalInTransit);
 
         layout_myProducts = view.findViewById(R.id.layout_myProducts);
         layout_myOrders = view.findViewById(R.id.layout_myOrders);
@@ -244,10 +245,7 @@ public class Seller_Home_Fragment extends Fragment {
 
     }
 
-
-
     private void autoReceiveOrderIfBuyerDidNotAcceptTheOrder() {
-        // Execute your desired function here
 
         Timer timer = new Timer();
 
@@ -258,11 +256,14 @@ public class Seller_Home_Fragment extends Fragment {
                 getActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        // Execute your desired function here
 
                         for(int i = 0; i < inTransitOrdersArrayList.size(); i++)
                         {
-                            hasThirtyMinutesPassed(i);
+                            hasThreeHoursPassed(i);
+
+                            if (isThirtyMinutesPassed) {
+                                manageDatabase(i);
+                            }
 
                         }
 
@@ -277,7 +278,7 @@ public class Seller_Home_Fragment extends Fragment {
     }
 
     // check the current world time
-    private void hasThirtyMinutesPassed(int i) {
+    private void hasThreeHoursPassed(int i) {
 
         SimpleDateFormat formatTime = new SimpleDateFormat("yyyyMMddhhmma");
 
@@ -327,7 +328,6 @@ public class Seller_Home_Fragment extends Fragment {
         orderDatabase.child(orderSnapshotIds).updateChildren(hashMap);
 
 
-
         Query query = inTransitOrdersDatabase.orderByChild("orderId").equalTo(orderSnapshotIds);
 
         query.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -372,6 +372,7 @@ public class Seller_Home_Fragment extends Fragment {
                         if(sellerId.equals(myUserId))
                         {
                             inTransitOrdersArrayList.add(inTransitOrders);
+                            tv_totalInTransit.setText(inTransitOrdersArrayList.size() + "");
                         }
 
                     }

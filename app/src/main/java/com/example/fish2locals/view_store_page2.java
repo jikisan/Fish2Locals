@@ -98,13 +98,14 @@ public class view_store_page2 extends AppCompatActivity {
                                 @Override
                                 public void onClick(SweetAlertDialog sweetAlertDialog) {
 
-                                    deleteBasketData();
+//                                    deleteBasketData();
+                                    Intent intent = new Intent(view_store_page2.this, homepage.class);
+                                    startActivity(intent);
                                 }
                             })
                             .setContentText("Your basket has\n" +
                                     arrBasket.size() + " item/s.\n" +
-                                    "Are you sure you want to end\n" +
-                                    "the transaction?")
+                                    "Basket will be deleted after 3 minutes.")
                             .show();
                 }
 

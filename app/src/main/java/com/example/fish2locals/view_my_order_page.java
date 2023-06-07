@@ -148,7 +148,7 @@ public class view_my_order_page extends AppCompatActivity {
 
                         for(int i = 0; i < inTransitOrdersArrayList.size(); i++)
                         {
-                            hasThirtyMinutesPassed(i);
+                            hasThreeHoursPassed(i);
 
                             if (isThirtyMinutesPassed) {
                                 manageDatabase(i);
@@ -166,7 +166,7 @@ public class view_my_order_page extends AppCompatActivity {
     }
 
     // check the current world time
-    private void hasThirtyMinutesPassed(int i) {
+    private void hasThreeHoursPassed(int i) {
 
         SimpleDateFormat formatTime = new SimpleDateFormat("yyyyMMddhhmma");
 
