@@ -29,6 +29,10 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 
 import Models.Basket;
@@ -48,6 +52,9 @@ public class add_to_basket_page extends AppCompatActivity {
 
     private String myUserId, storeOwnersUserId, storeId, productId, deliveryMessage;
     private int productQuantity , intValue = 0;
+
+    private String timeCreated, dateCreated, dateTimeCreated;
+    private long dateTimeInMillis;
 
     String fishImageName;
     String productName;
@@ -377,6 +384,8 @@ public class add_to_basket_page extends AppCompatActivity {
 
     private void addProductToBasket() {
 
+        setUpDate();
+
         int quantity = Integer.parseInt(tv_quantity.getText().toString());
 
         if(cb_hasPickup.isChecked())
@@ -405,8 +414,7 @@ public class add_to_basket_page extends AppCompatActivity {
                 ownDelivery, thirdPartyDelivery, quantity, storeId, storeOwnersUserId,
                 myUserId, productId);
 
-        long imageTime = System.currentTimeMillis();
-        String databaseName = myUserId + "-" + productName + "-" + imageTime;
+        String databaseName = myUserId + "-" + productName + "-" + dateTimeCreated;
         basketDatabase.child(databaseName).setValue(basket);
 
         basketDatabase.child(databaseName).setValue(basket).addOnCompleteListener(new OnCompleteListener<Void>() {
@@ -415,22 +423,8 @@ public class add_to_basket_page extends AppCompatActivity {
 
                 if(task.isSuccessful() )
                 {
-//                    SweetAlertDialog sDialog;
-//                    sDialog = new SweetAlertDialog(add_to_basket_page.this, SweetAlertDialog.SUCCESS_TYPE);
-//                    sDialog.setTitleText("The product is added to your basket.");
-//                    sDialog.setConfirmButton("Continue", new SweetAlertDialog.OnSweetClickListener() {
-//                        @Override
-//                        public void onClick(SweetAlertDialog sweetAlertDialog) {
-//
-//                            Log.d("Click 2", "sDialog close");
-//                            sDialog.dismiss();
-//
-//
-//                        }
-//                    });
-//                    sDialog.show();
 
-                    Intent intent = new Intent(add_to_basket_page.this, view_store_page2.class);
+                    Intent intent = new Intent(add_to_basket_page.this, view_store_page.class);
                     intent.putExtra("storeOwnersUserId", storeOwnersUserId);
                     intent.putExtra("storeId", storeId);
                     startActivity(intent);
@@ -468,6 +462,22 @@ public class add_to_basket_page extends AppCompatActivity {
         cb_hasPickup = findViewById(R.id.cb_hasPickup);
         cb_hasOwnDelivery = findViewById(R.id.cb_hasOwnDelivery);
         cb_has3rdPartyDelivery = findViewById(R.id.cb_has3rdPartyDelivery);
+
+    }
+
+    private void setUpDate() {
+
+        Date currentTime = Calendar.getInstance().getTime();
+        String dateTime = DateFormat.getDateTimeInstance().format(currentTime);
+
+        SimpleDateFormat formatDateTimeInMillis = new SimpleDateFormat("yyyyMMddhhmma");
+        SimpleDateFormat formatDate = new SimpleDateFormat("MMM-dd-yyyy");
+        SimpleDateFormat formatTime = new SimpleDateFormat("hh:mm a");
+
+        dateTimeInMillis = Calendar.getInstance().getTimeInMillis();
+        dateTimeCreated = formatDateTimeInMillis.format(Date.parse(dateTime));
+        timeCreated = formatTime.format(Date.parse(dateTime));
+        dateCreated = formatDate.format(Date.parse(dateTime));
 
     }
 }

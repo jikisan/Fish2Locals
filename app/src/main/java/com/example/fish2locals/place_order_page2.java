@@ -515,8 +515,6 @@ public class place_order_page2 extends AppCompatActivity {
 
     }
 
-
-
     private void updateBuyersWallet() {
 
         double newFundValue = myFundAmount - totalPrice;

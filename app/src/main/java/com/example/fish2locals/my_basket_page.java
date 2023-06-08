@@ -105,7 +105,7 @@ public class my_basket_page extends AppCompatActivity {
                 .equalTo(storeId);
 
 
-        query.addValueEventListener(new ValueEventListener() {
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
 

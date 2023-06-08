@@ -51,8 +51,6 @@ public class order_summary_page extends AppCompatActivity {
     private RecyclerView rv_myBasket;
     private TextView tv_back, tv_viewMyOrderBtn, tv_contactNum, tv_deviveryAddress;
 
-
-
     private AdapterPlaceOrderItem adapterPlaceOrderItem;
 
     private FirebaseUser user;
@@ -143,7 +141,7 @@ public class order_summary_page extends AppCompatActivity {
 
     private void deleteBasket() {
 
-        Query query = basketDatabase.orderByChild("buyerUserId").equalTo(myUserId);
+        Query query = basketDatabase.orderByChild("storeId").equalTo(storeId);
 
         query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -151,7 +149,14 @@ public class order_summary_page extends AppCompatActivity {
 
                 for(DataSnapshot dataSnapshot : snapshot.getChildren())
                 {
-                    dataSnapshot.getRef().removeValue();
+                    Basket basket = dataSnapshot.getValue(Basket.class);
+                    String buyerUserId = basket.getBuyerUserId();
+
+                    if(buyerUserId.equals(myUserId))
+                    {
+                        dataSnapshot.getRef().removeValue();
+                    }
+
                 }
 
                 Intent intent = new Intent(order_summary_page.this, view_my_order_page.class);

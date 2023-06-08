@@ -37,7 +37,7 @@ import Models.InTransitOrders;
 
 public class sellers_order_page extends AppCompatActivity {
 
-    private static final long THREE_HOURS = 3 * 60 * 60 * 1000; // 3 hours in milliseconds
+    private static final long THREE_HOURS = 1000 * 60 * 60 * 3;// 3 hours in milliseconds
     private long minutes = 0, timeDifference;
     private String TARGET_TIME, myUserId;
     private List<InTransitOrders> inTransitOrdersArrayList = new ArrayList<>();

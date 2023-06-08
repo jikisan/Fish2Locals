@@ -28,9 +28,15 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import Adapters.fragmentAdapterViewStoreTabs;
 import Models.Basket;
@@ -40,6 +46,11 @@ import cn.pedant.SweetAlert.SweetAlertDialog;
 
 public class view_store_page extends AppCompatActivity {
 
+    private static final long TWO_HOURS = 1000 * 60 * 60 * 2 ; // 2 hours in milliseconds
+    private long minutes = 0, timeDifference;
+    private String TARGET_TIME;
+    private boolean isTwoHoursPassed = false;
+
     private TabLayout tab_layout;
     private ViewPager2 vp_viewPager2;
     private ImageView iv_storeBanner, iv_back;
@@ -48,6 +59,7 @@ public class view_store_page extends AppCompatActivity {
 
     private List<Store> arrStore = new ArrayList<>();
     private List<Basket> arrBasket = new ArrayList<>();
+    private final List<String> arrBasketId = new ArrayList<>();
     private fragmentAdapterViewStoreTabs fragmentAdapterViewStoreTabs;
 
     private FirebaseUser user;
@@ -74,6 +86,7 @@ public class view_store_page extends AppCompatActivity {
         clicks();
         generateStoreData();
         generateBasketData();
+
         generateTabs();
     }
 
@@ -108,13 +121,13 @@ public class view_store_page extends AppCompatActivity {
                                 @Override
                                 public void onClick(SweetAlertDialog sweetAlertDialog) {
 
-                                deleteBasketData();
+                                    Intent intent = new Intent(view_store_page.this, homepage.class);
+                                    startActivity(intent);
                                 }
                             })
                             .setContentText("Your basket has\n" +
                                     arrBasket.size() + " item/s.\n" +
-                                    "Are you sure you want to end\n" +
-                                    "the transaction?")
+                                    "Basket will be deleted after 2 hours.")
                             .show();
                 }
 
@@ -172,52 +185,82 @@ public class view_store_page extends AppCompatActivity {
 
     private void generateBasketData() {
 
-        Query query = basketDatabase.orderByChild("storeId").equalTo(storeId);
-        query.addValueEventListener(new ValueEventListener() {
+        Timer timer = new Timer();
+
+        timer.schedule(new TimerTask() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
+            public void run() {
 
-                if(snapshot.exists())
-                {
-                    arrBasket.clear();
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        // Execute your desired function here
 
-                    for(DataSnapshot dataSnapshot : snapshot.getChildren())
-                    {
-                        Basket basket = dataSnapshot.getValue(Basket.class);
 
-                        String buyerUserId = basket.getBuyerUserId();
+                        Query query = basketDatabase.orderByChild("storeId").equalTo(storeId);
+                        query.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot snapshot) {
 
-                        if(buyerUserId.equals(myUserId))
-                        {
-                            arrBasket.add(basket);
-                        }
+                                if(snapshot.exists())
+                                {
+                                    arrBasket.clear();
+
+                                    for(DataSnapshot dataSnapshot : snapshot.getChildren())
+                                    {
+                                        Basket basket = dataSnapshot.getValue(Basket.class);
+                                        String buyerUserId = basket.getBuyerUserId();
+
+
+                                        try {
+                                            if(buyerUserId.equals(myUserId))
+                                            {
+                                                arrBasket.add(basket);
+
+                                                String basketId = dataSnapshot.getKey();
+                                                arrBasketId.add(basketId);
+                                            }
+                                        }catch (Exception e){
+                                            System.out.println("Error basket: " + e);
+                                        }
+
+
+                                    }
+
+                                    int basketCount = arrBasket.size();
+                                    if(basketCount == 0)
+                                    {
+                                        tv_myBasketButton.setText("Empty basket");
+                                    }
+
+
+                                    tv_myBasketButton.setText("GO TO MY BASKET (" + basketCount + " item/s )");
+                                    autoDeleteBasketAfterToHours();
+
+                                }
+                                else
+                                {
+                                    arrBasket.clear();
+                                    tv_myBasketButton.setText("Empty basket");
+                                }
+
+
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError error) {
+
+                            }
+                        });
 
                     }
-
-                    int basketCount = arrBasket.size();
-
-                    if(basketCount == 0)
-                    {
-                        tv_myBasketButton.setText("Empty basket");
-                    }
-
-                    tv_myBasketButton.setText("GO TO MY BASKET (" + basketCount + " item/s )");
-
-                }
-                else
-                {
-                    arrBasket.clear();
-                    tv_myBasketButton.setText("Empty basket");
-                }
+                });
 
 
             }
+        }, 0, 1000 );
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
 
-            }
-        });
     }
 
     private void generateStoreData() {
@@ -308,5 +351,91 @@ public class view_store_page extends AppCompatActivity {
         collapsingToolbar = findViewById(R.id.collapsingToolbar);
 
         tv_myBasketButton = findViewById(R.id.tv_myBasketButton);
+    }
+
+
+    private void autoDeleteBasketAfterToHours() {
+        // Execute your desired function here
+
+        for(int i = 0; i < arrBasketId.size(); i++)
+        {
+            hasTwoHoursPassed(i);
+
+            if (isTwoHoursPassed) {
+                manageDatabase(i);
+            }
+        }
+
+
+
+    }
+
+    // check the current world time
+    private void hasTwoHoursPassed(int i) {
+
+        String[] basketIdSplit = arrBasketId.get(i).split("-");
+
+
+        SimpleDateFormat formatTime = new SimpleDateFormat("yyyyMMddhhmma");
+
+        Date dateTime = Calendar.getInstance().getTime();
+        String dateTimeInString = DateFormat.getDateTimeInstance().format(dateTime);
+
+        String currentTimeInString = formatTime.format(Date.parse(dateTimeInString));
+
+        TARGET_TIME = basketIdSplit[2];
+
+        try
+        {
+            Date currentTime = formatTime.parse(currentTimeInString);
+            Date targetTime = formatTime.parse(TARGET_TIME);
+
+            long currentTimeInMillis = currentTime.getTime();
+            long targetTimeInMillis = targetTime.getTime();
+
+            timeDifference = currentTimeInMillis - targetTimeInMillis;
+            minutes = timeDifference / 60000;
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+
+        if(timeDifference >= TWO_HOURS)
+        {
+            isTwoHoursPassed = true;
+        }
+        else
+        {
+            isTwoHoursPassed = false;
+        }
+    }
+
+    private void manageDatabase(int i) {
+
+        String basketId = arrBasketId.get(i);
+
+        basketDatabase.child(basketId).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+                if(snapshot.exists())
+                {
+                    for(DataSnapshot dataSnapshot : snapshot.getChildren())
+                    {
+                        dataSnapshot.getRef().removeValue();
+                    }
+
+
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
     }
 }

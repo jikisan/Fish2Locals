@@ -410,12 +410,13 @@ public class Seller_Home_Fragment extends Fragment {
 
     private void generateInTransitOrders() {
 
-        inTransitOrdersDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
+        inTransitOrdersDatabase.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
 
                 if(snapshot.exists())
                 {
+
                     for(DataSnapshot dataSnapshot : snapshot.getChildren())
                     {
                         InTransitOrders inTransitOrders = dataSnapshot.getValue(InTransitOrders.class);
