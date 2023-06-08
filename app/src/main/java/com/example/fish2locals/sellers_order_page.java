@@ -228,8 +228,6 @@ public class sellers_order_page extends AppCompatActivity {
                         dataSnapshot.getRef().removeValue();
                     }
 
-                    Intent intent = new Intent(sellers_order_page.this, homepage.class);
-                    startActivity(intent);
 
                 }
             }

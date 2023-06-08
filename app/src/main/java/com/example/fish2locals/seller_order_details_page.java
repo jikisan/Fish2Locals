@@ -34,6 +34,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
+import Adapters.AdapterPendingInTransit;
 import Adapters.AdapterPlaceOrderItem;
 import Models.Basket;
 import Models.InTransitOrders;
@@ -51,6 +52,7 @@ public class seller_order_details_page extends AppCompatActivity {
     private List<Basket> arrBasket = new ArrayList<>();
     private List<String> arrOrderSnapshotIds = new ArrayList<>();
     private AdapterPlaceOrderItem adapterPlaceOrderItem;
+
 
     private LinearLayout layout, layout0;
     private ProgressBar progressBar;

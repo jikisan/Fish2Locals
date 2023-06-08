@@ -5,6 +5,7 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.LayoutInflater;
@@ -39,6 +40,7 @@ import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -47,8 +49,11 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import Adapters.AdapterMostTrusted;
+import Adapters.AdapterNotificationItem;
+import Adapters.AdapterPendingInTransit;
 import Adapters.AdapterStoresNearMe;
 import Models.InTransitOrders;
+import Models.Notifications;
 import Models.Orders;
 import Models.Store;
 import Models.TempStoreData;
@@ -57,16 +62,19 @@ import Objects.TextModifier;
 
 public class Seller_Home_Fragment extends Fragment {
 
-    private static final long THREE_HOURS = 3 * 60 * 60 * 1000; // 3 hours in milliseconds
+    private static final long THREE_HOURS = 1000 * 60 * 60 * 3; // 3 hours in milliseconds
     private long minutes = 0, timeDifference;
     private String TARGET_TIME;
     private List<InTransitOrders> inTransitOrdersArrayList = new ArrayList<>();
+    private List<Orders> arrOrders = new ArrayList<>();
     private boolean isThirtyMinutesPassed = false;
 
+    private AdapterPendingInTransit adapterPendingInTransit;
 
     private ImageView iv_userPhoto;
     private TextView tv_fName, tv_totalSales, tv_totalInTransit;
     private LinearLayout layout_myProducts, layout_myOrders, layout_myWallet, layout_myStatistics;
+    private RecyclerView rv_inTransitProducts;
 
     private FirebaseUser user;
     private DatabaseReference userDatabase, orderDatabase, inTransitOrdersDatabase;
@@ -88,6 +96,7 @@ public class Seller_Home_Fragment extends Fragment {
 
 
         setRef(view); //initialize UI ID's
+        generateRecyclerLayout();
         generateUsersData(); //generate user data
         generateTotalSales(); // generate Total Sales
         generateInTransitOrders();
@@ -95,6 +104,49 @@ public class Seller_Home_Fragment extends Fragment {
         clicks();
 
         return view;
+    }
+
+    private void generateRecyclerLayout() {
+
+        rv_inTransitProducts.setHasFixedSize(true);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
+        rv_inTransitProducts.setLayoutManager(linearLayoutManager);
+
+        adapterPendingInTransit = new AdapterPendingInTransit(arrOrders, getContext());
+        rv_inTransitProducts.setAdapter(adapterPendingInTransit);
+
+        getViewHolderValues();
+    }
+
+    private void getViewHolderValues() {
+
+        Query query = orderDatabase.orderByChild("orderStatus").equalTo("1");
+
+        query.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+                if(snapshot.exists())
+                {
+                    arrOrders.clear();
+
+                    for(DataSnapshot dataSnapshot : snapshot.getChildren())
+                    {
+                        Orders orders = dataSnapshot.getValue(Orders.class);
+
+                        arrOrders.add(orders);
+                        tv_totalInTransit.setText(arrOrders.size() + "");
+                    }
+                }
+
+                adapterPendingInTransit.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
 
     private void generateUsersData() {
@@ -242,38 +294,41 @@ public class Seller_Home_Fragment extends Fragment {
         layout_myWallet = view.findViewById(R.id.layout_myWallet);
         layout_myStatistics = view.findViewById(R.id.layout_myStatistics);
 
+        rv_inTransitProducts = view.findViewById(R.id.rv_inTransitProducts);
 
     }
 
+
+
     private void autoReceiveOrderIfBuyerDidNotAcceptTheOrder() {
 
-        Timer timer = new Timer();
 
-        timer.schedule(new TimerTask() {
-            @Override
-            public void run() {
+            Timer timer = new Timer();
 
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
+            timer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
 
-                        for(int i = 0; i < inTransitOrdersArrayList.size(); i++)
-                        {
-                            hasThreeHoursPassed(i);
+                            for(int i = 0; i < inTransitOrdersArrayList.size(); i++)
+                            {
+                                hasThreeHoursPassed(i);
 
-                            if (isThirtyMinutesPassed) {
-                                manageDatabase(i);
+                                if (isThirtyMinutesPassed) {
+                                    manageDatabase(i);
+                                }
+
                             }
 
+
                         }
+                    });
+                }
+            }, 0, 5000);
 
 
-                    }
-                });
-
-
-            }
-        }, 0, 5000);
 
     }
 
@@ -341,8 +396,6 @@ public class Seller_Home_Fragment extends Fragment {
                         dataSnapshot.getRef().removeValue();
                     }
 
-                    Intent intent = new Intent(getContext(), homepage.class);
-                    startActivity(intent);
 
                 }
             }
@@ -372,7 +425,6 @@ public class Seller_Home_Fragment extends Fragment {
                         if(sellerId.equals(myUserId))
                         {
                             inTransitOrdersArrayList.add(inTransitOrders);
-                            tv_totalInTransit.setText(inTransitOrdersArrayList.size() + "");
                         }
 
                     }
